@@ -1,0 +1,10 @@
+O projeto QT segue o padrão camellcase.
+
+Nome de classe: inicia com letra maiuscula e a segunda palavra também maiuscula quando composta
+
+Nome de variaves: inicia com minusculo e a segunda palavra é mauiscula quando composta.
+
+enum: segue a classe, mas no seu corpo suas variaveis(tipos) começam com maiusculo diferente das variaves dentro das classes.
+
+funções: seguem o estilo das variaves, começam com minusculo e a segunda palavra é maiuscula quando composta.
+em sua definição as palavras também seguem o mesmo estilo.
