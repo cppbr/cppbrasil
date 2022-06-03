@@ -24,6 +24,7 @@ Para essa finalidade criaremos libs utilizando essas tecnologias que ajudarão n
 - OpenSSL
 - LibXML2
 - ZLib
+- libIconv(caso opte por compilar a libxml2 com suporte a libIconv. No linux vem instalado por padrão. Para windows[link](https://github.com/pffang/libiconv-for-Windows))
 
 ## Compilação
 Linux 
