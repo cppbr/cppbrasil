@@ -9,7 +9,7 @@ Para essa finalidade criaremos libs utilizando essas tecnologias que ajudarão n
 
 ## Bibliotecas(Libs) 
 - libCppNFe - lib para emissão de documentos fiscais NFe e NFCe.
-- libDanfeQtRPt - lib para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). utiliza o QtRpt(Gerenciador de Relatórios).
+- libDanfeQtRpt - lib para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). utiliza o QtRpt(Gerenciador de Relatórios).
 
 
 # Tecnologias utilizadas
