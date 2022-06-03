@@ -24,9 +24,10 @@ Para essa finalidade criaremos libs utilizando essas tecnologias que ajudarão n
 
 ## Compilação
 Windows 
+[Video](https://www.youtube.com/watch?v=UBzTjaNRnmI)
 
 Linux
-
+[Video](https://www.youtube.com/watch?v=PiyHN9Ju4UA)
 
 # Autor
 
