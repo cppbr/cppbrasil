@@ -26,10 +26,10 @@ Para essa finalidade criaremos libs utilizando essas tecnologias que ajudarão n
 - ZLib
 
 ## Compilação
-Windows 
+Linux 
 [Video](https://www.youtube.com/watch?v=UBzTjaNRnmI)
 
-Linux
+Windows
 [Video](https://www.youtube.com/watch?v=PiyHN9Ju4UA)
 
 # Autor
