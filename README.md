@@ -39,3 +39,8 @@ João Elson
 
 https://cppbrasil.com.br
 
+Fórum para suporte, interação, sujestão e etc.
+https://forum.cppbrasil.com.br
+
+
+
