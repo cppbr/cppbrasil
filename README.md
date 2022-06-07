@@ -34,13 +34,14 @@ Windows
 [Video](https://www.youtube.com/watch?v=PiyHN9Ju4UA)
 
 # Autor
+João Elson.
 
-João Elson
 
-https://cppbrasil.com.br
+**Site do Projeto.**
+- https://cppbrasil.com.br
 
-Fórum para suporte, interação, sujestão e etc.
-https://forum.cppbrasil.com.br
+**Fórum para suporte, interação, sugestões e etc.**
+- https://forum.cppbrasil.com.br
 
 
 
