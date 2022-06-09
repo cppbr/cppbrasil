@@ -1828,31 +1828,35 @@ void XmlWrite::get_transp()
 {   //transp - X01
     this->m_xmlw->writeStartElement("transp");//abertura grupo transp
     this->m_xmlw->writeTextElement("modFrete", ConvNF::modFreteToStr(this->m_infNFe->transp->get_modFrete()));
+
     //transporta - X03
-    if (!this->m_infNFe->transp->transporta->get_CNPJ().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_CPF().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_xNome().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_IE().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_xEnder().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_xMun().isEmpty() ||
-        !this->m_infNFe->transp->transporta->get_UF().isEmpty())
+    if (this->m_infNFe->transp->get_modFrete() != ModFrete::SemFrete)
     {
-        this->m_xmlw->writeStartElement("transp");//abertura grupo transporta
-        if (!this->m_infNFe->transp->transporta->get_CNPJ().isEmpty())
-            this->m_xmlw->writeTextElement("CNPJ", this->m_infNFe->transp->transporta->get_CNPJ());
-        if (!this->m_infNFe->transp->transporta->get_CPF().isEmpty())
-            this->m_xmlw->writeTextElement("CPF", this->m_infNFe->transp->transporta->get_CPF());
-        if (!this->m_infNFe->transp->transporta->get_xNome().isEmpty())
-            this->m_xmlw->writeTextElement("xNome", this->m_infNFe->transp->transporta->get_xNome());
-        if (!this->m_infNFe->transp->transporta->get_IE().isEmpty())
-            this->m_xmlw->writeTextElement("IE", this->m_infNFe->transp->transporta->get_IE());
-        if (!this->m_infNFe->transp->transporta->get_xEnder().isEmpty())
-            this->m_xmlw->writeTextElement("xEnder", this->m_infNFe->transp->transporta->get_xEnder());
-        if (!this->m_infNFe->transp->transporta->get_xMun().isEmpty())
-            this->m_xmlw->writeTextElement("xMun", this->m_infNFe->transp->transporta->get_xMun());
-        if (!this->m_infNFe->transp->transporta->get_UF().isEmpty())
-            this->m_xmlw->writeTextElement("UF", this->m_infNFe->transp->transporta->get_UF());
-        this->m_xmlw->writeEndElement();//fechamento grupo transporta
+        if (!this->m_infNFe->transp->transporta->get_CNPJ().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_CPF().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_xNome().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_IE().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_xEnder().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_xMun().isEmpty() ||
+            !this->m_infNFe->transp->transporta->get_UF().isEmpty())
+        {
+            this->m_xmlw->writeStartElement("transp");//abertura grupo transporta
+            if (!this->m_infNFe->transp->transporta->get_CNPJ().isEmpty())
+                this->m_xmlw->writeTextElement("CNPJ", this->m_infNFe->transp->transporta->get_CNPJ());
+            if (!this->m_infNFe->transp->transporta->get_CPF().isEmpty())
+                this->m_xmlw->writeTextElement("CPF", this->m_infNFe->transp->transporta->get_CPF());
+            if (!this->m_infNFe->transp->transporta->get_xNome().isEmpty())
+                this->m_xmlw->writeTextElement("xNome", this->m_infNFe->transp->transporta->get_xNome());
+            if (!this->m_infNFe->transp->transporta->get_IE().isEmpty())
+                this->m_xmlw->writeTextElement("IE", this->m_infNFe->transp->transporta->get_IE());
+            if (!this->m_infNFe->transp->transporta->get_xEnder().isEmpty())
+                this->m_xmlw->writeTextElement("xEnder", this->m_infNFe->transp->transporta->get_xEnder());
+            if (!this->m_infNFe->transp->transporta->get_xMun().isEmpty())
+                this->m_xmlw->writeTextElement("xMun", this->m_infNFe->transp->transporta->get_xMun());
+            if (!this->m_infNFe->transp->transporta->get_UF().isEmpty())
+                this->m_xmlw->writeTextElement("UF", this->m_infNFe->transp->transporta->get_UF());
+            this->m_xmlw->writeEndElement();//fechamento grupo transporta
+        }
     }
     //retTransp - X11
     if (this->m_infNFe->transp->retTransp->get_vServ() > 0 ||
