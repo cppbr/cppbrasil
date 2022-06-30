@@ -4,7 +4,9 @@ Nota::Nota(QObject *parent)
     : QObject{parent}, m_nfe{new CppNFe}
 {
     connect(m_nfe, &CppNFe::wsChange, this, &Nota::onWSChange);
-    connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
+    //connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
+    connect(m_nfe, &CppNFe::errorOccurred, this, &Nota::errorOccurred);
+
     configurar();
 }
 
@@ -891,7 +893,7 @@ void Nota::onReqGerarEnviar()
     m_nfe->notafiscal->assinar();
     m_nfe->notafiscal->validar();
 
-    QString _retLote;
+    QString _retLote, _xml;
     int _lote = 3;
     if (m_nfe->notafiscal->enviar(_lote))
     {
@@ -926,12 +928,15 @@ void Nota::onReqGerarEnviar()
                  _retLote += "xMsg: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_xMsg() +"\n";
                  _retLote += QStringLiteral("-------------------------------") + "\n\n";
 
+                 _xml +=  m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_xml();
+
              }
+
+             emit retXML(_xml);
 
         }
         emit retLote(_retLote);
     }
-
 }
 
 void Nota::onWSChange(const WebServicesNF &webServicesNF)

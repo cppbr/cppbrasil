@@ -55,6 +55,7 @@ signals:
     void retWSChange(const QString &webServices);
     void retStatusServico(const QString &status);
     void retLote(const QString &lote);
+    void retXML(const QString &xml);
 
 public slots:
     void onReqStatusServico();
