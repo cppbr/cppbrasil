@@ -5,7 +5,7 @@
 
 O objetivo do projeto [C++ Brasil](https://cppbrasil.com.br) é criar uma comunidade para desenvolvedores C++ e Qt, ajudando pessoas e alavancando o uso do Qt no Brasil.
 
-Para essa finalidade criaremos libs utilizando essas tecnologias que ajudarão no desenvolvimento de aplicativos de gestão: ERP, CRM e outros.
+Para essa finalidade, criaremos bibliotecas utilizando essas tecnologias, para ajudar no desenvolvimento de aplicativos de gestão: ERP, CRM e outros.
 
 ## Bibliotecas(Libs) 
 - libCppNFe - lib para emissão de documentos fiscais NFe e NFCe.
