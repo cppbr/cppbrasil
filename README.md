@@ -3,13 +3,12 @@
 
 # Sobre o projeto
 
-O objetivo do projeto [C++ Brasil](https://cppbrasil.com.br) é criar uma comunidade para desenvolvedores C++ e Qt, ajudando pessoas e alavancando o uso do Qt no Brasil.
+Projeto que utiliza C++ e Qt framework para criação de bibliotecas multiplataforma que ajuda no desenvolvimento de softwares ERP, CRM e outros.
 
-Para essa finalidade, criaremos bibliotecas utilizando essas tecnologias, para ajudar no desenvolvimento de aplicativos de gestão: ERP, CRM e outros.
 
-## Bibliotecas(Libs) 
+## Bibliotecas desenvolvidas
 - libCppNFe - lib para emissão de documentos fiscais NFe e NFCe.
-- libDanfeQtRpt - lib para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). utiliza o QtRpt(Gerenciador de Relatórios).
+- libDanfeQtRpt - lib para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). Utiliza o QtRpt(Gerenciador de Relatórios open source).
 
 
 # Tecnologias utilizadas
