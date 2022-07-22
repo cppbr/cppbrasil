@@ -3,7 +3,7 @@
 
 # Sobre o projeto
 
-Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multiplataforma que ajuda no desenvolvimento de softwares ERP, CRM e outros.
+Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multiplataforma que ajudam no desenvolvimento de softwares ERP, CRM e outros.
 
 
 ## Bibliotecas desenvolvidas
