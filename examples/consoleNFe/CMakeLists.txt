@@ -15,16 +15,19 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(/usr/include/openssl)
 include_directories(/usr/include/libxml2)
-include_directories(/usr/include)
-include_directories(/home/cppnfeTestes/include/cppbrasil)
+include_directories(/home/usuario/cppnfeTestes/include)
 
 add_executable(consoleNFe
   main.cpp
   ../nota.h
   ../nota.cpp
 )
-target_link_libraries(consoleNFe Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
-target_link_directories(consoleNFe PUBLIC "/home/cppnfeTestes/lib/linux_64")
-target_link_libraries(consoleNFe -lcppnfe -lcrypto -lssl -lxml2 -lz)
+
+target_link_libraries(consoleNFe 
+   PRIVATE Qt${QT_VERSION_MAJOR}::Core 
+   PRIVATE Qt${QT_VERSION_MAJOR}::Network
+)
+
+target_link_directories(consoleNFe PRIVATE "/home/usuario/cppnfeTestes/lib/linux_64")
+target_link_libraries(consoleNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)

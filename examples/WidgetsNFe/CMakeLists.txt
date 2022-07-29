@@ -17,10 +17,8 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(/usr/include/openssl)
 include_directories(/usr/include/libxml2)
-include_directories(/usr/include)
-include_directories(/home/joao/cppnfeTestes/include/cppbrasil)
+include_directories(/home/usuario/cppnfeTestes/include)
 
 
 set(PROJECT_SOURCES
@@ -55,8 +53,10 @@ else()
     endif()
 endif()
 
-target_link_libraries(WidgetsNFe PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(WidgetsNFe PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(WidgetsNFe 
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+    PRIVATE Qt${QT_VERSION_MAJOR}::Network
+)
 
 set_target_properties(WidgetsNFe PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
@@ -70,5 +70,5 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(WidgetsNFe)
 endif()
 
-target_link_directories(WidgetsNFe PRIVATE "/home/joao/cppnfeTestes/lib/linux_64")
-target_link_libraries(WidgetsNFe  PRIVATE -lcppnfe -lcrypto -lssl -lxml2 -lz)
+target_link_directories(WidgetsNFe PRIVATE "/home/usuario/cppnfeTestes/lib/linux_64")
+target_link_libraries(WidgetsNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)
