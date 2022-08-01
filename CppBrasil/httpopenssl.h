@@ -49,7 +49,7 @@ limitations under the License.
 #include <CppBrasil/cppcrypto.h>
 #include <CppBrasil/cpputility.h>
 
-class CPPBRASIL_EXPORT HttpOpenSSL : public HttpClient
+class CPPNFE_EXPORT HttpOpenSSL : public HttpClient
 {
     Q_OBJECT
 public:

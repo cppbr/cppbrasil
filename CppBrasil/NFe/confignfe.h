@@ -29,7 +29,7 @@ limitations under the License.
 #include <CppBrasil/config.h>
 #include <CppBrasil/cppxml.h>
 
-class CPPBRASIL_EXPORT Certificado: public ConfCertificado
+class CPPNFE_EXPORT Certificado: public ConfCertificado
 {
     friend class Nfe;
     friend class NotaFiscal;
@@ -41,7 +41,7 @@ public:
 
 //-----------------------------------------------------
 
-class CPPBRASIL_EXPORT ConfigNFe
+class CPPNFE_EXPORT ConfigNFe
 {
     friend class Nfe;
     friend class NotaFiscal;

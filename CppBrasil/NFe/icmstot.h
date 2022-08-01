@@ -22,7 +22,7 @@ limitations under the License.
 #define ICMSTOT_H
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT IcmsTot
+class CPPNFE_EXPORT IcmsTot
 {
 public:
     IcmsTot();

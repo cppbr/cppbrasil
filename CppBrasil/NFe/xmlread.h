@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/NFe/nfe.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT XmlRead
+class CPPNFE_EXPORT XmlRead
 {
 public:
     XmlRead(Nfe *NFe, const QByteArray &xml);

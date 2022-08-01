@@ -23,10 +23,16 @@ limitations under the License.
 
 #include <QtCore/qglobal.h>
 
-#if defined(CPPBRASIL_LIBRARY)
-#  define CPPBRASIL_EXPORT Q_DECL_EXPORT
+#if defined(CPPNFE_LIBRARY)
+#  define CPPNFE_EXPORT Q_DECL_EXPORT
 #else
-#  define CPPBRASIL_EXPORT Q_DECL_IMPORT
+#  define CPPNFE_EXPORT Q_DECL_IMPORT
+#endif
+
+#if defined(CPPDANFE_LIBRARY)
+#  define CPPDANFE_EXPORT Q_DECL_EXPORT
+#else
+#  define CPPDANFE_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // CPPNFE_GLOBAL_H

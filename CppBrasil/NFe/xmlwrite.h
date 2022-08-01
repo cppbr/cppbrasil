@@ -38,7 +38,7 @@ limitations under the License.
 #include <CppBrasil/NFe/urlnfe.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT XmlWrite
+class CPPNFE_EXPORT XmlWrite
 {
 public:
     explicit XmlWrite(const InfNFe *infNFe, const ConfigNFe *confgNFe);

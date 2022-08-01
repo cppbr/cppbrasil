@@ -32,7 +32,7 @@ limitations under the License.
 #include <CppBrasil/NFe/vol.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT Transp
+class CPPNFE_EXPORT Transp
 {
 public:
     Transp();

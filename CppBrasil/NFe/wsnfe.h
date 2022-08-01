@@ -34,7 +34,7 @@ limitations under the License.
 #include <CppBrasil/NFe/urlnfe.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT WSNFeBase : public WebServices
+class CPPNFE_EXPORT WSNFeBase : public WebServices
 {
     Q_OBJECT
 public:
@@ -66,7 +66,7 @@ private:
 };
 
 
-class CPPBRASIL_EXPORT WSNFe : public WSNFeBase
+class CPPNFE_EXPORT WSNFe : public WSNFeBase
 {
 public:
     WSNFe(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsReciNFe* retorno);
@@ -99,7 +99,7 @@ private:
 };
 
 
-class CPPBRASIL_EXPORT WSStatus : public WSNFeBase
+class CPPNFE_EXPORT WSStatus : public WSNFeBase
 {
 public:
     WSStatus(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsStatServ* retorno);

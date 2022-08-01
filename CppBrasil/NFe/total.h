@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/issqntot.h>
 #include <CppBrasil/NFe/rettrib.h>
 
-class CPPBRASIL_EXPORT Total
+class CPPNFE_EXPORT Total
 {
 public:
     Total();

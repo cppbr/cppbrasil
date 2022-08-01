@@ -30,7 +30,7 @@ limitations under the License.
 
 enum class XMLReturnType {XMLSign, SignNode};
 
-class CPPBRASIL_EXPORT CppXML : public QObject
+class CPPNFE_EXPORT CppXML : public QObject
 {
     Q_OBJECT
 

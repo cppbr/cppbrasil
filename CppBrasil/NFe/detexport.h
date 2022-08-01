@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/NFe/exportind.h>
 
-class CPPBRASIL_EXPORT DetExport
+class CPPNFE_EXPORT DetExport
 {
 public:
     DetExport();

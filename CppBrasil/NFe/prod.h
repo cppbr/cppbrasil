@@ -34,7 +34,7 @@ limitations under the License.
 #include <CppBrasil/NFe/comb.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT Prod
+class CPPNFE_EXPORT Prod
 {
 public:
     Prod();

@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/container.h>
 #include <CppBrasil/NFe/lacres.h>
 
-class CPPBRASIL_EXPORT Vol
+class CPPNFE_EXPORT Vol
 {
 public:
     Vol();

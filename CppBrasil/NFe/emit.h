@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/enderemit.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT Emit
+class CPPNFE_EXPORT Emit
 {
 public:
     Emit();

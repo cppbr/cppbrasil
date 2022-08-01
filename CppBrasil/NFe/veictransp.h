@@ -24,7 +24,7 @@ limitations under the License.
 #include <QString>
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT VeicTransp
+class CPPNFE_EXPORT VeicTransp
 {
 public:
     VeicTransp();

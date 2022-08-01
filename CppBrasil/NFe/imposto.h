@@ -33,7 +33,7 @@ limitations under the License.
 #include <CppBrasil/NFe/cofinsst.h>
 #include <CppBrasil/NFe/issqn.h>
 
-class CPPBRASIL_EXPORT Imposto
+class CPPNFE_EXPORT Imposto
 {
 public:
     Imposto();

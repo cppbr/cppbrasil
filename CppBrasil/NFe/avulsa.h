@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/cpputility.h>
 
 
-class CPPBRASIL_EXPORT Avulsa
+class CPPNFE_EXPORT Avulsa
 {
 public:
     Avulsa();

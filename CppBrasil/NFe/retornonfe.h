@@ -36,7 +36,7 @@ limitations under the License.
  * fazer duas classes iguais. A classe protNFe também pertente a essas duas classes.
 */
 
-class CPPBRASIL_EXPORT ProtNFe
+class CPPNFE_EXPORT ProtNFe
 {
     friend class WSNFe;
     friend class NotaFiscal;
@@ -95,7 +95,7 @@ private:
 
 };
 
-class CPPBRASIL_EXPORT RetConsReciNFe
+class CPPNFE_EXPORT RetConsReciNFe
 {
     friend class WSNFe;
     friend class NotaFiscal;

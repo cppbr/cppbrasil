@@ -24,7 +24,7 @@ limitations under the License.
 #include <QString>
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT Cide
+class CPPNFE_EXPORT Cide
 {
 public:
     Cide();

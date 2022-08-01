@@ -28,7 +28,7 @@ limitations under the License.
 #include <CppBrasil/NFe/fordia.h>
 #include <CppBrasil/NFe/deduc.h>
 
-class CPPBRASIL_EXPORT Cana
+class CPPNFE_EXPORT Cana
 {
 public:
     Cana();

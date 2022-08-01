@@ -39,7 +39,7 @@ enum class DtH{Date,           //yyyy-MM-dd
 
 enum class TipoArquivo{HTML, TXT, XML};
 
-class CPPBRASIL_EXPORT CppUtility
+class CPPNFE_EXPORT CppUtility
 {
 public:
     CppUtility();

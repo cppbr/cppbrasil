@@ -29,7 +29,7 @@ limitations under the License.
 #include <CppBrasil/NFe/convnf.h>
 
 
-class CPPBRASIL_EXPORT RetConsStatServ
+class CPPNFE_EXPORT RetConsStatServ
 {
     friend class WSStatus;
 public:

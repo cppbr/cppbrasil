@@ -23,7 +23,7 @@ limitations under the License.
 
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT RetTrib
+class CPPNFE_EXPORT RetTrib
 {
 public:
     RetTrib();

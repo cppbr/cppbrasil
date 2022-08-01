@@ -31,7 +31,7 @@ limitations under the License.
 #include <CppBrasil/NFe/wsnfe.h>
 #include <CppBrasil/NFe/xmlread.h>
 
-class CPPBRASIL_EXPORT NotaFiscal : public QObject
+class CPPNFE_EXPORT NotaFiscal : public QObject
 {
     Q_OBJECT
 

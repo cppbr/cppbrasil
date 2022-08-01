@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/card.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT DetPag
+class CPPNFE_EXPORT DetPag
 {
 public:
     DetPag();

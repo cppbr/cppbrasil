@@ -26,7 +26,7 @@ limitations under the License.
 #include <zlib.h>
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT CppZip
+class CPPNFE_EXPORT CppZip
 {
 public:
     CppZip();

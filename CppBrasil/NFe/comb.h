@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/cide.h>
 #include <CppBrasil/NFe/encerrante.h>
 
-class CPPBRASIL_EXPORT Comb
+class CPPNFE_EXPORT Comb
 {
 public:
     Comb();

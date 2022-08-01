@@ -30,7 +30,7 @@ limitations under the License.
 
 enum class TipoInfNFeSupl{qrCode, urlChave};
 
-class CPPBRASIL_EXPORT UrlNFe
+class CPPNFE_EXPORT UrlNFe
 {
 public:
     UrlNFe();

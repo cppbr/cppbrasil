@@ -41,7 +41,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/cppcrypto.h>
 
-class CPPBRASIL_EXPORT CppOpenSSL: public CppCrypto
+class CPPNFE_EXPORT CppOpenSSL: public CppCrypto
 {
 public:
     CppOpenSSL(const QByteArray &p12path, const QByteArray &pass);

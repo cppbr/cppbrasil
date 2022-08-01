@@ -30,7 +30,7 @@ limitations under the License.
 #include <CppBrasil/NFe/adi.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT Di
+class CPPNFE_EXPORT Di
 {
 public:
     Di();

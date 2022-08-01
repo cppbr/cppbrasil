@@ -33,7 +33,7 @@ limitations under the License.
 #include <CppBrasil/NFe/infnfesupl.h>
 
 
-class CPPBRASIL_EXPORT Nfe
+class CPPNFE_EXPORT Nfe
 {
     friend class XmlRead;
 public:

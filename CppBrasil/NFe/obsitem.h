@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/obscont.h>
 #include <CppBrasil/NFe/obsfisco.h>
 
-class CPPBRASIL_EXPORT ObsItem
+class CPPNFE_EXPORT ObsItem
 {
 public:
     ObsItem();

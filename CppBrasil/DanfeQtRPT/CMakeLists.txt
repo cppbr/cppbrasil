@@ -85,7 +85,7 @@ install(TARGETS CppDanfeQtRPT
 )
 
 #caso necessário, informe os diretórios das libs openssl, libxml2, zlib, libIconv(caso esteja no windows), libCppNFe e libQtRPT
-#target_link_directories(CppNFe
+#target_link_directories(CppDanfeQtRPT
 #    PRIVATE "/home/usuario/openssl/"
 #    PRIVATE "/home/usuario/libxml2"
 #    PRIVATE "/home/usuario/zlib"
@@ -93,12 +93,13 @@ install(TARGETS CppDanfeQtRPT
 #    PRIVATE "/home/usuario/CppBrasil/lib"
 #    PRIVATE "/home/usuario/QtRptProject/lib"
 #)
+
 #link libs no windows, linux e macos
 if (CMAKE_SYSTEM MATCHES "Windows")
-    target_link_libraries(CppNFe  PRIVATE libCppNFe libQtRPT libcrypto libssl libiconv.lib libxml2 zlib )
+    target_link_libraries(CppDanfeQtRPT PRIVATE CppNFe QtRPT libcrypto libssl libiconv libxml2 zlib)
 elseif (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(CppNFe  PRIVATE -lCppNFe -lQtRPT -lcrypto -lssl  -lxml2 -lz)
+    target_link_libraries(CppDanfeQtRPT  PRIVATE -lCppNFe -lQtRPT -lcrypto -lssl  -lxml2 -lz)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") #Darwin para Mac OS
-    target_link_libraries(CppNFe  PRIVATE CppNFe QtRPT crypto ssl  xml2 z)
+    target_link_libraries(CppDanfeQtRPT  PRIVATE CppNFe QtRPT crypto ssl  xml2 z)
 endif()
 

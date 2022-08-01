@@ -23,7 +23,7 @@ limitations under the License.
 #include <QString>
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT ExportInd
+class CPPNFE_EXPORT ExportInd
 {
 public:
     ExportInd();

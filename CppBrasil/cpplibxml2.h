@@ -32,7 +32,7 @@ limitations under the License.
 #include <CppBrasil/cppcrypto.h>
 #include <CppBrasil/cppopenssl.h>
 
-class CPPBRASIL_EXPORT CppLibXml2: public CppXML
+class CPPNFE_EXPORT CppLibXml2: public CppXML
 {
 public:
     CppLibXml2(CppCrypto *cppcrypto, QByteArray &schemapath);

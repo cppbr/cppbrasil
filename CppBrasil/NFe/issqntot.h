@@ -25,7 +25,7 @@ limitations under the License.
 #include <CppBrasil/cpputility.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT IssQNtot
+class CPPNFE_EXPORT IssQNtot
 {
 public:
     IssQNtot();

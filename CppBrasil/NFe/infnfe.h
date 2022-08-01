@@ -44,7 +44,7 @@ limitations under the License.
 #include <CppBrasil/NFe/infresptec.h>
 #include <CppBrasil/NFe/infintermed.h>
 
-class CPPBRASIL_EXPORT InfNFe
+class CPPNFE_EXPORT InfNFe
 {
 public:
     InfNFe();

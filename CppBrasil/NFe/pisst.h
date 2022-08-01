@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/NFe/convnf.h>
 
 
-class CPPBRASIL_EXPORT PisST
+class CPPNFE_EXPORT PisST
 {
 public:
     PisST();

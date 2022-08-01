@@ -28,7 +28,7 @@ limitations under the License.
 #include <qtrpt.h>
 
 
-class CPPBRASIL_EXPORT CppDanfeQtRPT: public QObject, public CppDanfe
+class CPPDANFE_EXPORT CppDanfeQtRPT: public QObject, public CppDanfe
 {
     Q_OBJECT
 

@@ -29,7 +29,7 @@ limitations under the License.
 #include <CppBrasil/NFe/obsfisco.h>
 #include <CppBrasil/NFe/procref.h>
 
-class CPPBRASIL_EXPORT InfAdic
+class CPPNFE_EXPORT InfAdic
 {
 public:
     InfAdic();

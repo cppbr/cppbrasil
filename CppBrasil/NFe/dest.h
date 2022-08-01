@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/enderdest.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT Dest
+class CPPNFE_EXPORT Dest
 {
 public:
     Dest();

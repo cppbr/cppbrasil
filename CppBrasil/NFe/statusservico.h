@@ -9,7 +9,7 @@
 #include <CppBrasil/NFe/retconsstatserv.h>
 
 
-class CPPBRASIL_EXPORT StatusServico : public QObject
+class CPPNFE_EXPORT StatusServico : public QObject
 {
     Q_OBJECT
 public:

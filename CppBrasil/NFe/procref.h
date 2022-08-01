@@ -25,7 +25,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT ProcRef
+class CPPNFE_EXPORT ProcRef
 {
 public:
     ProcRef();

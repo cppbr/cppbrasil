@@ -29,7 +29,7 @@ limitations under the License.
 #include <CppBrasil/NFe/impostodevol.h>
 #include <CppBrasil/NFe/obsitem.h>
 
-class CPPBRASIL_EXPORT Det
+class CPPNFE_EXPORT Det
 {
 public:
     Det();

@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/container.h>
 #include <CppBrasil/NFe/detpag.h>
 
-class CPPBRASIL_EXPORT Pag
+class CPPNFE_EXPORT Pag
 {
 public:
     Pag();

@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/cpputility.h>
 
-class CPPBRASIL_EXPORT Dup
+class CPPNFE_EXPORT Dup
 {
 public:
     Dup();

@@ -24,7 +24,7 @@ limitations under the License.
 #include <QString>
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT Retirada
+class CPPNFE_EXPORT Retirada
 {
 public:
     Retirada();

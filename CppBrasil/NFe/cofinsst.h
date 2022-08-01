@@ -24,7 +24,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/NFe/convnf.h>
 
-class CPPBRASIL_EXPORT CofinsST
+class CPPNFE_EXPORT CofinsST
 {
 public:
     CofinsST();

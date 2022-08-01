@@ -22,7 +22,7 @@ limitations under the License.
 #define FORDIA_H
 #include <CppBrasil/cppbrasil_global.h>
 
-class CPPBRASIL_EXPORT ForDia
+class CPPNFE_EXPORT ForDia
 {
 public:
     ForDia();

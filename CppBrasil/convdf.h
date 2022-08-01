@@ -42,7 +42,7 @@ enum class TpAmb {None = -1, Producao = 1, Homologacao = 2};
 //tipo de log
 enum class TipoMsgLog{MsgErro, MsgEnvio, MsgRetorno};
 
-class CPPBRASIL_EXPORT ConvDF
+class CPPNFE_EXPORT ConvDF
 {
 public:
     ConvDF();

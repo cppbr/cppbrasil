@@ -360,12 +360,12 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
             if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CNPJ().isEmpty())
             {
                 _numDoc = CppUtility::formatCNPJ(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CNPJ());
-                _nomeDoc = "CPF do Consumidor: ";
+                _nomeDoc = "CNPJ do Consumidor: ";
             }
             else
             {
                 _numDoc = CppUtility::formatCPF(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CPF());
-                _nomeDoc = "CNPJ do Consumidor: ";
+                _nomeDoc = "CPF do Consumidor: ";
             }
             //se NFCe, já deve ir formatado com o nome do documento. NFe somente número.
             if (this->m_mod == ModeloDF::NFCe)

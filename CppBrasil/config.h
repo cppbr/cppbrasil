@@ -35,7 +35,7 @@ limitations under the License.
 #include <CppBrasil/httpclient.h>
 
 
-class CPPBRASIL_EXPORT ConfCertificado
+class CPPNFE_EXPORT ConfCertificado
 {
 public:
     ConfCertificado();
@@ -69,7 +69,7 @@ private:
 
 //---------------------------------------------------
 
-class CPPBRASIL_EXPORT ConfArquivos
+class CPPNFE_EXPORT ConfArquivos
 {
 public:
     ConfArquivos();
@@ -112,7 +112,7 @@ private:
 
 //---------------------------------------------------
 
-class CPPBRASIL_EXPORT ConfWebServices
+class CPPNFE_EXPORT ConfWebServices
 {
  public:
     ConfWebServices();

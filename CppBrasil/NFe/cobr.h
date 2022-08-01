@@ -27,7 +27,7 @@ limitations under the License.
 #include <CppBrasil/NFe/fat.h>
 #include <CppBrasil/NFe/dup.h>
 
-class CPPBRASIL_EXPORT Cobr
+class CPPNFE_EXPORT Cobr
 {
 public:
     Cobr();

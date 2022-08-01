@@ -25,16 +25,19 @@ limitations under the License.
 #include <QPixmap>
 #include <QPainter>
 #include <QSvgRenderer>
+#include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/cpputility.h>
 #include <CppBrasil/cppbarcode.h>
 #include <CppBrasil/convdf.h>
 #include <CppBrasil/qrcodegen.hpp>
 #include <CppBrasil/NFe/cppnfe.h>
-
+#ifdef _WIN32
+ #include <sstream>
+#endif
 using namespace qrcodegen;
 
 
-class CppDanfe
+class CPPDANFE_EXPORT CppDanfe
 {
 public:
     CppDanfe(const CppNFe *cppnfe, const int &recNo = 0);

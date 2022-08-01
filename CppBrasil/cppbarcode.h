@@ -22,11 +22,12 @@ limitations under the License.
 #define CPPBARCODE_H
 #include <QPainter>
 #include <QGraphicsItem>
+#include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/code128.h>
 
 //enum class BarType { DYNAMIC, A, B, C };
 enum class BarType {DYNAMIC, Bar128A, Bar128B, Bar128C };
-class CppBarCode : public QGraphicsItem
+class CPPDANFE_EXPORT CppBarCode : public QGraphicsItem
 {
 public:
     CppBarCode();

@@ -31,7 +31,7 @@ limitations under the License.
 #include <CppBrasil/httpopenssl.h>
 #include <CppBrasil/cppcrypto.h>
 
-class CPPBRASIL_EXPORT WebServices : public QObject
+class CPPNFE_EXPORT WebServices : public QObject
 {
     Q_OBJECT
 

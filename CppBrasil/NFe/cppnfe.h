@@ -28,7 +28,7 @@ limitations under the License.
 #include <CppBrasil/NFe/notafiscal.h>
 #include <CppBrasil/NFe/eventos.h>
 
-class CPPBRASIL_EXPORT CppNFe : public QObject
+class CPPNFE_EXPORT CppNFe : public QObject
 {
     Q_OBJECT
 public:

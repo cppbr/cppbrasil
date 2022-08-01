@@ -28,7 +28,7 @@ limitations under the License.
 #include <CppBrasil/NFe/refnfp.h>
 #include <CppBrasil/NFe/refecf.h>
 
-class CPPBRASIL_EXPORT NFRef
+class CPPNFE_EXPORT NFRef
 {
 public:
     NFRef();

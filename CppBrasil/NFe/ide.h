@@ -30,7 +30,7 @@ limitations under the License.
 #include <CppBrasil/container.h>
 #include <CppBrasil/cpputility.h>
 
-class CPPBRASIL_EXPORT Ide
+class CPPNFE_EXPORT Ide
 {
 
 public:

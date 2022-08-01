@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/httpclient.h>
 
-class CPPBRASIL_EXPORT HttpQt : public HttpClient
+class CPPNFE_EXPORT HttpQt : public HttpClient
 {
     Q_OBJECT
 public:

@@ -23,6 +23,8 @@ limitations under the License.
 
 #include <QString>
 #include <QList>
+#include <CppBrasil/cppbrasil_global.h>
+
 
 enum class TYPES { DYNAMIC, A, B, C };
 enum class COLUMN { COLUMN_VALUE, COLUMN_A, COLUMN_B, COLUMN_C, COLUMN_ENCODING };
@@ -38,9 +40,8 @@ struct element_t
 
 };
 
-class Code128
+class CPPDANFE_EXPORT Code128
 {
-
 public:
     Code128(const QString &toEncode);
     Code128(const QString &toEncode, const TYPES &types);

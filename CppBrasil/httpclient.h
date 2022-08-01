@@ -35,7 +35,7 @@ limitations under the License.
 
 enum class HttpType{None = -1, HttpQt, HttpOpenSSL};
 
-class CPPBRASIL_EXPORT HttpClient : public QObject
+class CPPNFE_EXPORT HttpClient : public QObject
 
 {
     Q_OBJECT

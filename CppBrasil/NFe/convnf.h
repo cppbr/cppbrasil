@@ -198,7 +198,7 @@ enum class IndProc {None = -1, SEFAZ = 0, JusticaFederal = 1,
 enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspecifica=12 };
 
 
-class CPPBRASIL_EXPORT ConvNF : public ConvDF
+class CPPNFE_EXPORT ConvNF : public ConvDF
 {
 public:
     ConvNF();

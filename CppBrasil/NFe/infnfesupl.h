@@ -25,7 +25,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/cpputility.h>
 
-class CPPBRASIL_EXPORT InfNFeSupl
+class CPPNFE_EXPORT InfNFeSupl
 {
     friend class Nfe;
 public:
