@@ -358,7 +358,7 @@ install(TARGETS CppNFe
 #)
 #link libs no windows ou linux
 if (CMAKE_SYSTEM MATCHES "Windows")
-    target_link_libraries(CppNFe  PRIVATE libcrypto libssl libiconv libxml2 zlib)
+    target_link_libraries(CppNFe  PRIVATE libcrypto libssl libiconv libxml2 zdll)
 elseif (CMAKE_SYSTEM MATCHES "Linux")
     target_link_libraries(CppNFe  PRIVATE -lcrypto -lssl  -lxml2 -lz)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") #Darwin para Mac OS
