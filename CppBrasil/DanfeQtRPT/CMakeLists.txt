@@ -12,13 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Gui Xml Charts Qml Sql Svg PrintSupport)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Gui Xml Charts Qml Sql Svg PrintSupport)
 
-#Caso necessário, informe os diretório dos Header Files openssl, libxml2, zlib, libIconv(caso esteja no windows), libCppNFe e libQtRPT
+#Caso necessário, informe os diretório dos Header Files openssl, libxml2, zlib, libIconv(caso esteja no windows) e libQtRPT
 #include_directories(
 #/usr/include/openssl
 #/usr/include/libxml2
 #/usr/include/zlib
 #/usr/include/libIconv
-#/usr/include/CppBrasil/NFe
 #/usr/include/QtRPT
 #)
 
@@ -68,7 +67,14 @@ target_link_libraries(CppDanfeQtRPT PRIVATE
     Qt${QT_VERSION_MAJOR}::PrintSupport
 )
 
-target_compile_definitions(CppDanfeQtRPT PRIVATE CPPBRASIL_LIBRARY)
+target_compile_definitions(CppDanfeQtRPT PRIVATE CPPDANFE_LIBRARY)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    if (CMAKE_SYSTEM MATCHES "Linux")
+        set(CMAKE_INSTALL_PREFIX
+            "/usr" CACHE PATH "CppBrasil default install prefix" FORCE)
+    endif()         
+endif()
 
 install(TARGETS CppDanfeQtRPT
     LIBRARY

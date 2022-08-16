@@ -28,7 +28,11 @@ void Nota::configurar()
     m_nfe->configuracoes->set_indicadorSincrono(IndSinc::Nao);
 
     //arquivos
-    m_nfe->configuracoes->arquivos->set_caminhoSchema("/home/cppnfeTestes/schemaNFe/");
+#if defined(Q_OS_LINUX)
+    m_nfe->configuracoes->arquivos->set_caminhoSchema("/home/schemaNFe/");
+#elif defined(Q_OS_WIN)
+    m_nfe->configuracoes->arquivos->set_caminhoSchema("C:/cppbrasil/schema");
+#endif
 
     //salvar
     m_nfe->configuracoes->arquivos->set_salvar(true);
@@ -42,18 +46,33 @@ void Nota::configurar()
     //m_nfe->configuracoes->arquivos->set_salvarPorDia(1); //dd
 
     //obs: se não informar o lugar para salvar, será salvo na pasta do executável.
+#if defined(Q_OS_LINUX)
     m_nfe->configuracoes->arquivos->set_caminhoSalvar("/home/cppnfeTestes/exemplo/xml");
-
+#elif defined(Q_OS_WIN)
+    m_nfe->configuracoes->arquivos->set_caminhoSalvar("C:/cppbrasil/xml");
+#endif
 
     m_nfe->configuracoes->certificado->set_cryptoLib(CryptoType::OpenSSL);
     //configuração certificado
+#if defined(Q_OS_LINUX)
     m_nfe->configuracoes->certificado->set_caminhoCertificado("/home/certificado/certificado.pfx");
     m_nfe->configuracoes->certificado->set_senhaCertificado("senha");
+#elif defined(Q_OS_WIN)
+    m_nfe->configuracoes->certificado->set_caminhoCertificado("C:/cppbrasil/certificado/certificado.pfx");
+    m_nfe->configuracoes->certificado->set_senhaCertificado("1234");
+#endif
     //certificados AC
+#if defined(Q_OS_LINUX)
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("/home/joao/certificado/icp-brasil/ICP-Brasil.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("/home/joao/certificado/icp-brasil/ICP-Brasilv2.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("/home/joao/certificado/icp-brasil/ICP-Brasilv5.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("/home/joao/certificado/icp-brasil/ICP-Brasilv10.crt");
+#elif defined(Q_OS_WIN)
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("C:/cppbrasil/certificado/icp-brasil/ICP-Brasil.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("C:/cppbrasil/certificado/icp-brasil/ICP-Brasilv2.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("C:/cppbrasil/certificado/icp-brasil/ICP-Brasilv5.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC("C:/cppbrasil/certificado/icp-brasil/ICP-Brasilv10.crt");
+#endif
 
     if (!m_nfe->configuracoes->certificado->carregarCertificado())
     {
@@ -110,7 +129,7 @@ void Nota::ide()
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_natOp("VENDA AO CONSUMIDOR");
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_mod(m_nfe->configuracoes->get_ModeloDF());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_serie(1);
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(21);
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(1);
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhEmi(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhSaiEnt(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpNF(ConvNF::strToTpNF("1"));
@@ -968,4 +987,9 @@ void Nota::onWSChange(const WebServicesNF &webServicesNF)
     emit  retWSChange(_ws);
 
 
+}
+
+const CppNFe *Nota::getCppNFe()
+{
+    return this->m_nfe;
 }

@@ -335,6 +335,13 @@ endif()
 
 target_compile_definitions(CppNFe PRIVATE CPPNFE_LIBRARY)
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    if (CMAKE_SYSTEM MATCHES "Linux")
+        set(CMAKE_INSTALL_PREFIX
+            "/usr" CACHE PATH "CppBrasil default install prefix" FORCE)
+    endif()         
+endif()
+
 install(TARGETS CppNFe
     LIBRARY
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -356,6 +363,7 @@ install(TARGETS CppNFe
 #    PRIVATE "/home/usuario/zlib"
 #    PRIVATE "/home/usuario/libiconv" 
 #)
+
 #link libs no windows ou linux
 if (CMAKE_SYSTEM MATCHES "Windows")
     target_link_libraries(CppNFe  PRIVATE libcrypto libssl libiconv libxml2 zdll)

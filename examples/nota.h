@@ -65,7 +65,8 @@ public slots:
 private slots:
     void onWSChange(const WebServicesNF &webServicesNF);
 
-
+public:
+    const CppNFe *getCppNFe();
 
 };
 

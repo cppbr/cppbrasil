@@ -85,7 +85,7 @@ void CppDanfeQtRPT::print()
     QObject::connect(&*m_report, &QtRPT::setValueImage, this, &CppDanfeQtRPT::setValueImage);
     QObject::connect(&*m_report, &QtRPT::setDSInfo, this, &CppDanfeQtRPT::setDSInfo);
 
-    m_report->printExec(true);
+    m_report->printExec(false);
 }
 
 void CppDanfeQtRPT::loadRetEnt()
