@@ -17,9 +17,19 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(/usr/include/libxml2)
-include_directories(/home/usuario/cppnfeTestes/include)
-
+if (CMAKE_SYSTEM MATCHES "Linux")
+    include_directories(
+        /usr/include/libxml2
+    )
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    include_directories(
+        ../../include
+        ../../third-party/windows/OpenSSL1.1.1q/include
+        ../../third-party/windows/libxml2-v2.9.13/include/libxml2
+        ../../third-party/windows/libiconv-for-Windows/include
+        ../../third-party/windows/zlib-1.2.12/include
+    )
+endif()
 
 set(PROJECT_SOURCES
         main.cpp
@@ -70,5 +80,16 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(WidgetsNFe)
 endif()
 
-target_link_directories(WidgetsNFe PRIVATE "/home/usuario/cppnfeTestes/lib/linux_64")
-target_link_libraries(WidgetsNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)
+if (CMAKE_SYSTEM MATCHES "Linux")
+    target_link_libraries(WidgetsNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    target_link_directories(WidgetsNFe
+        PRIVATE ../../lib
+        PRIVATE ../../third-party/windows/OpenSSL1.1.1q/lib
+        PRIVATE ../../third-party/windows/libxml2-v2.9.13/lib
+        PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
+        PRIVATE ../../third-party/windows/zlib-1.2.12/lib
+        PRIVATE ../../third-party/windows/QtRptProject3.0/lib/debug/lib
+    )
+    target_link_libraries(WidgetsNFe PRIVATE CppNFe libcrypto libssl libxml2 zdll)
+endif()
