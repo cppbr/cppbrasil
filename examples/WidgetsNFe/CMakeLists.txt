@@ -89,7 +89,6 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         PRIVATE ../../third-party/windows/libxml2-v2.9.13/lib
         PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
         PRIVATE ../../third-party/windows/zlib-1.2.12/lib
-        PRIVATE ../../third-party/windows/QtRptProject3.0/lib/debug/lib
     )
-    target_link_libraries(WidgetsNFe PRIVATE CppNFe libcrypto libssl libxml2 zdll)
+    target_link_libraries(WidgetsNFe PRIVATE CppNFe libcrypto libssl libiconv libxml2 zdll)
 endif()

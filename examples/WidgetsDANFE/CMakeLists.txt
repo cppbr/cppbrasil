@@ -98,7 +98,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         PRIVATE ../../third-party/windows/zlib-1.2.12/lib
         PRIVATE ../../third-party/windows/QtRptProject3.0/lib/debug/lib
     )
-    target_link_libraries(WidgetsDANFE  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libxml2 zdll)
+    target_link_libraries(WidgetsDANFE  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libiconv libxml2 zdll)
 
 endif()
 
