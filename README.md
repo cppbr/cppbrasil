@@ -36,11 +36,7 @@ Windows
 João Elson.
 
 
-**Site do Projeto.**
+**Site do Projeto e fórum para suporte, interação e sugestões**
 - https://cppbrasil.com.br
-
-**Fórum para suporte, interação, sugestões e etc.**
-- https://forum.cppbrasil.com.br
-
 
 
