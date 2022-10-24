@@ -37,7 +37,7 @@ int CppUtility::dvModulo11(const QString &str)
 
     int _soma = 0;
     int _n_peso = sizeof(_peso) / sizeof(int);
-    for (int i = 0; i < _n_peso; i++)
+    for (int i = 0; i < _n_peso; ++i)
     {
         QString _schave = str.data()[i];
         int _ichave = _schave.toInt();
@@ -117,6 +117,18 @@ QString CppUtility::extractStr(const QString &str, const QString &beginStr, cons
 
     _result = _result.left(_iend);
     return _result;
+}
+
+int CppUtility::findString(const QString &str, const QString &strValue)
+{
+    int _pos;
+    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        _pos = str.indexOf(QRegExp(strValue));
+    #else
+        _pos = str.indexOf(QRegularExpression(strValue));
+    #endif
+
+    return _pos;
 }
 
 bool CppUtility::fileExists(const QString &caminho)

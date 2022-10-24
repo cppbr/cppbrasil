@@ -35,7 +35,7 @@ limitations under the License.
 class CPPNFE_EXPORT CppLibXml2: public CppXML
 {
 public:
-    CppLibXml2(CppCrypto *cppcrypto, QByteArray &schemapath);
+    CppLibXml2(CppCrypto *cppcrypto, const QByteArray &schemapath);
     ~CppLibXml2();
 
     // CppXML interface
@@ -52,7 +52,7 @@ public:
                          const QByteArray &URI, const XMLReturnType &returntype,
                          QByteArray &output);
 private:
-    CppCrypto *m_cppcrypto;
+    CppCrypto *cppcrypto;
     QByteArray m_schemapath;
 
     bool c14n(const xmlDoc *xml_doc, const char *node_name,

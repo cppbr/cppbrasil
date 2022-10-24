@@ -63,7 +63,7 @@ signals:
 private:
     int m_tError;
     QString m_error;
-    ConfigNFe *m_config;
+    ConfigNFe *config;
     void tratarRetorno();
     bool importXML(const QByteArray &xml);
     void set_error(const QString &error, const int &tError = 0);

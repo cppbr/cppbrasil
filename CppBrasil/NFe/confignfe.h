@@ -34,6 +34,8 @@ class CPPNFE_EXPORT Certificado: public ConfCertificado
     friend class Nfe;
     friend class NotaFiscal;
     friend class StatusServico;
+    friend class EnvEvento;
+    friend class EnvEventoEvento;
 public:
      Certificado();
      ~Certificado();
@@ -47,6 +49,8 @@ class CPPNFE_EXPORT ConfigNFe
     friend class NotaFiscal;
     friend class WSNFeBase;
     friend class ProtNFe;
+    friend class EnvEvento;
+    friend class EnvEventoEvento;
 public:
     ConfigNFe();
     ~ConfigNFe();
@@ -72,6 +76,7 @@ public:
 protected:
     QString get_caminhoNF() const;
     QString get_caminhoLogs() const;
+    QString get_caminhoEvento() const;
 private:
     ModeloDF m_ModeloDF;
     VersaoNF m_VersaoNF;
@@ -80,7 +85,9 @@ private:
     VersaoQrCodeNF m_VersaoQRCodeNF;
     IndSinc m_indSinc;
     TpEmis m_tipoEmissao;
-    QString get_caminhoBase(const QString &pastaBase) const;
+    QString get_caminho(const QString &pastaBase, const bool &porCNPJ, const bool &porModelo,
+                        const bool &porAnoMesDia, const bool &porAnoMes, const bool &porAno,
+                        const bool &porMes, const bool &porDia) const;
 };
 
 #endif // CONFIGNFE_H

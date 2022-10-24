@@ -2,18 +2,19 @@ QT -= gui
 QT += network
 
 TEMPLATE = lib
-TARGET = cppnfe
+TARGET = CppNFe
+CONFIG += c++17
 
 #Para estática descomente o DEFINES abaixo. Voce também deve incluir esse DEFINES em
 #seu aplicativo caso use a lib estática.
-#DEFINES += CPPBRASIL_STATIC
+#DEFINES += CPPNFE_STATIC
 
-contains(DEFINES, CPPBRASIL_STATIC) {
+contains(DEFINES, CPPNFE_STATIC) {
     CONFIG += staticlib
 
     message(STATIC LIBRARY...)
 }else{
-    DEFINES += CPPBRASIL_LIBRARY
+    DEFINES += CPPNFE_LIBRARY
 
     win32{
         CONFIG += dll
@@ -33,8 +34,34 @@ contains(DEFINES, CPPBRASIL_STATIC) {
     message(SHARED LIBRARY...)
 }
 
+DEST_DIRECTORY = $$PWD/../..
+CONFIG(debug, debug|release) {
+    MBUILD_TYPE = debug
+}
+CONFIG(release, debug|release) {
+    MBUILD_TYPE = release
+}
 
-CONFIG += c++11
+win32 {
+    MOC_DIR = $${DEST_DIRECTORY}/tmp-win32
+    UI_DIR = $${DEST_DIRECTORY}/tmp-win32
+    UI_HEADERS_DIR = $${DEST_DIRECTORY}/tmp-win32
+    UI_SOURCES_DIR = $${DEST_DIRECTORY}/tmp-win32
+    OBJECTS_DIR = $${DEST_DIRECTORY}/tmp-win32
+    RCC_DIR = $${DEST_DIRECTORY}/tmp-win32
+}
+
+linux {
+    MOC_DIR = $${DEST_DIRECTORY}/tmp-lin64
+    UI_DIR = $${DEST_DIRECTORY}/tmp-lin64
+    UI_HEADERS_DIR = $${DEST_DIRECTORY}/tmp-lin64
+    UI_SOURCES_DIR = $${DEST_DIRECTORY}/tmp-lin64
+    OBJECTS_DIR = $${DEST_DIRECTORY}/tmp-lin64
+    RCC_DIR = $${DEST_DIRECTORY}/tmp-lin64
+}
+
+DLLDESTDIR = $${DEST_DIRECTORY}
+DESTDIR    = $${DEST_DIRECTORY}/bin/lib/$${MBUILD_TYPE}
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -88,7 +115,8 @@ SOURCES += \
     enderdest.cpp \
     enderemit.cpp \
     entrega.cpp \
-    eventos.cpp \
+    envevento.cpp \
+    eventosnf.cpp \
     exporta.cpp \
     exportind.cpp \
     fat.cpp \
@@ -127,6 +155,7 @@ SOURCES += \
     refnf.cpp \
     refnfp.cpp \
     retconsstatserv.cpp \
+    retenvevento.cpp \
     retirada.cpp \
     retornonfe.cpp \
     rettransp.cpp \
@@ -185,7 +214,8 @@ HEADERS += \
     enderdest.h \
     enderemit.h \
     entrega.h \
-    eventos.h \
+    envevento.h \
+    eventosnf.h \
     exporta.h \
     exportind.h \
     fat.h \
@@ -224,6 +254,7 @@ HEADERS += \
     refnf.h \
     refnfp.h \
     retconsstatserv.h \
+    retenvevento.h \
     retirada.h \
     retornonfe.h \
     rettransp.h \
@@ -244,13 +275,13 @@ RESOURCES += \
        resourcenfe.qrc
 
 # Default rules for deployment.
+INCLUDEPATH += $$PWD/../..
 unix {
-    INCLUDEPATH += $$PWD/..
     INCLUDEPATH += /usr/include \
                    /usr/include/libxml2
-    target.path = /usr/lib
+    #target.path = /usr/lib
 
-    LIB += -lcrypt -lssl -lz
+    LIB += -lcrypto -lssl -lxml2 -lz
 }
 !isEmpty(target.path): INSTALLS += target
 

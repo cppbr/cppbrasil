@@ -174,7 +174,7 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
                 //caso o resto da divisão por 5 seja maior que zero, acrescenta um ao total de registros.
                 _tReg = (_count / 5);
                 if ((_count % 5) > 0)
-                    _tReg += 1;
+                    _tReg++;
             }
 
            dsInfo.recordCount = _tReg;

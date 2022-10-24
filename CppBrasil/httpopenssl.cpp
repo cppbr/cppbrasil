@@ -173,7 +173,7 @@ int HttpOpenSSL::receivePacket(SSL *ssl, int len)
 {
     int _head = 650; //post command + soap envelop + namespace soap
     int _sizeBf = _head + len;
-    //char _buffer[_bf]; só funciona o g++ Variable-length arrays estilo C99.
+    //char _buffer[_sizeBf]; só funciona no g++. Variable-length arrays estilo C99.
     QByteArray _buffer;
     _buffer.resize(_sizeBf);
 

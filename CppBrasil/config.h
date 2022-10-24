@@ -57,7 +57,7 @@ public:
     void addCaminhoCertificadoAC(const QString &caminho);
     void clearListaCertificadoAC();
 protected:
-    CppCrypto *get_cryptoLib() const;
+    CppCrypto *get_cryptoLib();
 private:
     CppCrypto* m_crypto;
     CryptoType m_cryptotype;

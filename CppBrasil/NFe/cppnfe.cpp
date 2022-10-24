@@ -23,7 +23,7 @@ limitations under the License.
 CppNFe::CppNFe():
     configuracoes(new ConfigNFe),
     notafiscal(new NotaFiscal(this->configuracoes.get())),
-    eventos(new Eventos(this->configuracoes.get(), this->notafiscal.get()))
+    eventos(new EventosNF(this->configuracoes.get(), this->notafiscal.get()))
 {
    connect(notafiscal.get(), SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
    connect(notafiscal.get(), SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));

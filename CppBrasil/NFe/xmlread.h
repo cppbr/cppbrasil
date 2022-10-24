@@ -33,7 +33,7 @@ public:
 
     bool import() const;
 private:
-    Nfe *m_nfe;
+    Nfe *nota;
     const QByteArray &m_xml;
 
     bool nfe() const; //TAG raiz da NF-e

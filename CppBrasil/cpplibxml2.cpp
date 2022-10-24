@@ -19,8 +19,8 @@ limitations under the License.
 
 
 #include "cpplibxml2.h"
-CppLibXml2::CppLibXml2(CppCrypto *cppcrypto, QByteArray &schemapath)
-    :m_cppcrypto(cppcrypto), m_schemapath(schemapath)
+CppLibXml2::CppLibXml2(CppCrypto *cppcrypto, const QByteArray &schemapath)
+    :cppcrypto(cppcrypto), m_schemapath(schemapath)
 {
 }
 
@@ -49,7 +49,7 @@ bool CppLibXml2::addChildXML(const QByteArray &xml_doc, const QByteArray &xml_ch
     //copy result to output
     output.clear();
     int _len = strlen(_res);
-    for(int i = 0; i < _len; i++)
+    for(int i = 0; i < _len; ++i)
     {
         //remove caracter new line
         if (_res[i] != '\n')
@@ -81,7 +81,7 @@ bool CppLibXml2::addChildXML(QByteArray &xml_doc, const QByteArray &xml_child, c
     //copy result
     xml_doc.clear();
     int _len = strlen(_res);
-    for(int i = 0; i < _len; i++)
+    for(int i = 0; i < _len; ++i)
     {
         //remove caracter new line
         if (_res[i] != '\n')
@@ -208,7 +208,7 @@ bool CppLibXml2::setNode(const QByteArray &xml_doc, const QByteArray &node_name,
     {
         xmlDocDumpMemoryEnc(_xml, &_res, &_len,"UTF-8");
         
-        for(int i = 0; i < _len; i++)
+        for(int i = 0; i < _len; ++i)
         {
             //remove o caracter new line
             if (_res[i] != '\n')
@@ -253,7 +253,7 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
       _ret = false;
 
 
-    _x509.append(this->m_cppcrypto->get_certBase64().toLocal8Bit());
+    _x509.append(this->cppcrypto->get_certBase64().toLocal8Bit());
 
     if ((xml_doc.isEmpty()) || (node_doc.isEmpty()) || (node_sign.isEmpty()))
     {
@@ -273,10 +273,10 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
 
     if (_ret)
     {
-        if (!this->m_cppcrypto->digest(_sha, QByteArray::fromRawData(_ret_xml_doc,strlen(_ret_xml_doc)), true, _digestvalue))
+        if (!this->cppcrypto->digest(_sha, QByteArray::fromRawData(_ret_xml_doc,strlen(_ret_xml_doc)), true, _digestvalue))
         {
             //get error crypto class
-            this->set_error(this->m_cppcrypto->get_error());
+            this->set_error(this->cppcrypto->get_error());
             _ret = false;
         }
     }
@@ -308,10 +308,10 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
     }
     if (_ret)
     {
-        if (!this->m_cppcrypto->signature(_sha, _ret_xml_sigin, true, _signature))
+        if (!this->cppcrypto->signature(_sha, _ret_xml_sigin, true, _signature))
         {
             //get error crypto class
-            this->set_error(this->m_cppcrypto->get_error());
+            this->set_error(this->cppcrypto->get_error());
             _ret = false;
         }
     }
@@ -332,7 +332,7 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
            {
 
                _len = strlen(_ret_xml_complete);
-               for(int i = 0; i < _len; i++)
+               for(int i = 0; i < _len; ++i)
                {
                    //remove caracter new line
                    if (_ret_xml_complete[i] != '\n')

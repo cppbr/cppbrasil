@@ -131,7 +131,7 @@ void ConfCertificado::clearListaCertificadoAC()
     this->m_caList.clear();
 }
 
-CppCrypto *ConfCertificado::get_cryptoLib() const
+CppCrypto *ConfCertificado::get_cryptoLib()
 {
     return this->m_crypto;
 }

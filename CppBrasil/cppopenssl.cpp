@@ -147,7 +147,7 @@ bool CppOpenSSL::certToBase64(X509 *cert)
             _bio_out = (char*) calloc(_len + 1, sizeof(char));
             if (BIO_read(_bio, _bio_out, _len))
             {
-                for(int i = 0; i < _len; i++)
+                for(int i = 0; i < _len; ++i)
                 {
                   _b64.append(_bio_out[i]);
                 }
@@ -193,7 +193,7 @@ bool CppOpenSSL::issuerName(X509 *cert)
             _str_issuer = (char*) calloc(_len + 1, sizeof(char));
             if (BIO_read(_bio, _str_issuer, _len))
             {
-                for(int i = 0; i < _len; i++)
+                for(int i = 0; i < _len; ++i)
                 {
                     _res.append(_str_issuer[i]);
                 }
@@ -231,14 +231,14 @@ bool CppOpenSSL::serialNumber(X509 *cert)
     try{
         _bio = BIO_new(BIO_s_mem());
         _serial = X509_get_serialNumber(cert);
-        for(int i=0; i < _serial->length; i++) {
+        for(int i=0; i < _serial->length; ++i) {
              BIO_printf(_bio, "%02x", _serial->data[i] );
         }
         _len = BIO_pending(_bio);
         _str_serial = (char*) calloc(_len + 1, sizeof(char));
         if (BIO_read(_bio, _str_serial, _len))
         {
-            for(int i = 0; i < _len; i++)
+            for(int i = 0; i < _len; ++i)
             {
                 _res.append(_str_serial[i]);
             }
@@ -280,7 +280,7 @@ bool CppOpenSSL::subjectName(X509 *cert)
             _str_subject = (char*) calloc(_len + 1, sizeof(char));
             if (BIO_read(_bio, _str_subject, _len))
             {
-                for(int i = 0; i < _len; i++)
+                for(int i = 0; i < _len; ++i)
                 {
                     _res.append(_str_subject[i]);
                 }

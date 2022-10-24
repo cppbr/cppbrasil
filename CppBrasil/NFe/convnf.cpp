@@ -53,6 +53,38 @@ QString ConvNF::webServicesNFToMetodo(const WebServicesNF &value)
     }
 }
 
+QString ConvNF::versaoLayout(const WebServicesNF &value)
+{ //retorna a ultima versão do layout de cada serviço
+
+    switch (value) {
+        case WebServicesNF::NFeAutorizacao :
+            return "4.00";
+            break;
+        case WebServicesNF::NFeConsultaCadastro :
+            return "2.00";
+            break;
+        case WebServicesNF::NFeConsultaProtocolo :
+            return "4.00";
+            break;
+        case WebServicesNF::NFeInutilizacao :
+            return "4.00";
+            break;
+        case WebServicesNF::NFeRecepcaoEvento :
+            return "1.00";
+            break;
+        case WebServicesNF::NFeRetAutorizacao :
+            return "4.00";
+            break;
+        case WebServicesNF::NFeStatusServico :
+            return "4.00";
+            break;
+        case WebServicesNF::NFeDistribuicaoDFe :
+            return "9.99";
+            break;
+        default: return "";
+    }
+}
+
 QString ConvNF::versaoNFToStr(const VersaoNF &value)
 {
     if (value == VersaoNF::v400)
@@ -817,5 +849,64 @@ TpAto ConvNF::strToTpAto(const QString &value)
         return TpAto::None;
     else
         return static_cast<TpAto>(_r[_i].toInt());
+}
+
+QString ConvNF::tpEventoToStr(const TpEvento &value)
+{
+    if(value == TpEvento::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpEvento ConvNF::strToTpEvento(const QString &value)
+{
+    QList<QString> _r = {"-1", "110110", "110111", "110112", "110140", "111500", "111501",
+                         "111502", "111503", "110150", "210200", "210210", "210220", "210240"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpEvento::None;
+    else
+        return static_cast<TpEvento>(_r[_i].toInt());
+
+}
+
+QString ConvNF::tpAutorToStr(const TpAutor &value)
+{
+    if(value == TpAutor::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+
+}
+
+TpAutor ConvNF::strToTpAutor(const QString &value)
+{
+    QList<QString> _r = {"-1", "1", "2", "3", "5", "6", "9"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpAutor::None;
+    else
+        return static_cast<TpAutor>(_r[_i].toInt());
+
+}
+
+QString ConvNF::tpAutorizacaoToStr(const TpAutorizacao &value)
+{
+    if(value == TpAutorizacao::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+
+}
+
+TpAutorizacao ConvNF::strToTpAutorizacao(const QString &value)
+{
+    QList<QString> _r = {"-1", "0", "1"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpAutorizacao::None;
+    else
+        return static_cast<TpAutorizacao>(_r[_i].toInt());
 
 }

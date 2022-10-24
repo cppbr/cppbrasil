@@ -111,13 +111,6 @@ QString ProtNFe::get_xml() const
     return this->m_xml;
 }
 
-void ProtNFe::salvarXML(const ConfigNFe *config)
-{
-    QString path = config->get_caminhoNF();
-    QString nome = get_chNFe() + "-nfe";
-    CppUtility::saveFile(path, nome, TipoArquivo::XML, m_xml.toLocal8Bit());
-}
-
 void ProtNFe::salvarXML(const QString &caminho, const QString &nomeArquivo)
 {
     QString nome;
@@ -320,7 +313,3 @@ void RetConsReciNFe::set_xMsg(const QString &xMsg)
     this->m_xMsg = xMsg;
 }
 
-void RetConsReciNFe::finalizarXML()
-{
-
-}

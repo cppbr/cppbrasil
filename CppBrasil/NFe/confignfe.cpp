@@ -114,110 +114,29 @@ void ConfigNFe::set_TipoEmissao(const TpEmis &tipoEmissao)
 
 QString ConfigNFe::get_caminhoNF() const
 {
-
-    QDate _date = QDate::currentDate();
-    QString _path = get_caminhoBase("nfe");
-    QDir _dir;
-
-    //unica forma de obter o cnpj sem ter que criar nenhum parametro nesta função é obter do
-    //certificado digital.
-    if (!certificado->get_cnpj().isEmpty())
-    {
-         _path += (certificado->get_cnpj() + "/");
-         if (!CppUtility::parsePath(_path))
-         {
-             if (!_dir.mkdir(_path))
-                 return "";
-         }
-    }
-
-    if (arquivos->get_salvarPorModelo())
-    {
-        _path += (ConvDF::modeloDFToStr(get_ModeloDF()) + "/");
-        if (!CppUtility::parsePath(_path))
-        {
-            if (!_dir.mkdir(_path))
-                return "";
-        }
-    }
-
-    //quando escolher PorAnoMesDia, não pode existir outras datas separadas
-    if (arquivos->get_salvarPorAnoMesDia())
-    {
-        _path += (QString::number(_date.year()));
-        _path += (QString("0" + QString::number(_date.month())).right(2));
-        _path += (QString("0" + QString::number(_date.day())).right(2));
-        _path += "/"; //fechamento
-        if (!CppUtility::parsePath(_path))
-        {
-            if (!_dir.mkdir(_path))
-                return "";
-        }
-
-    } else
-    {
-        //quando escolher PorAnoMes, somente o dia pode ser separado
-        if (arquivos->get_salvarPorAnoMes())
-        {
-            _path += (QString::number(_date.year()));
-            _path += (QString("0" + QString::number(_date.month())).right(2));
-            _path += "/"; //fechamento
-            if (!CppUtility::parsePath(_path))
-            {
-                if (!_dir.mkdir(_path))
-                    return "";
-            }
-
-        } else
-        {
-            //datas separadas.
-            //ano separado
-            if (arquivos->get_salvarPorAno())
-            {
-              _path += (QString::number(_date.year()) + "/");
-              if (!CppUtility::parsePath(_path))
-              {
-                  if (!_dir.mkdir(_path))
-                      return "";
-              }
-            }
-            //mes separado
-            if (arquivos->get_salvarPorMes())
-            {
-                //mes com 2 digitos
-                _path += (QString("0" + QString::number(_date.month())).right(2) + "/");
-                if (!CppUtility::parsePath(_path))
-                {
-                    if (!_dir.mkdir(_path))
-                        return "";
-                }
-            }
-        }
-        // o dia pode ser separado quando escolher PorAnoMes, por isso está fora da condição acima
-        if (arquivos->get_salvarPorDia())
-        {
-            //dia com 2 digitos
-            _path += (QString("0" + QString::number(_date.day())).right(2) + "/");
-            if (!CppUtility::parsePath(_path))
-            {
-                if (!_dir.mkdir(_path))
-                    return "";
-            }
-        }
-    }
-
-   return _path;
+    return get_caminho("nfe", arquivos->get_salvarPorCNPJ(), arquivos->get_salvarPorModelo(), arquivos->get_salvarPorAnoMesDia(), arquivos->get_salvarPorAnoMes(),
+                       arquivos->get_salvarPorAno(), arquivos->get_salvarPorMes(), arquivos->get_salvarPorDia());
 }
 
 QString ConfigNFe::get_caminhoLogs() const
 {
-    return get_caminhoBase("logs");
+    return get_caminho("logs", false, false, false, false, false, false, false);
 }
 
-QString ConfigNFe::get_caminhoBase(const QString &pastaBase) const
+QString ConfigNFe::get_caminhoEvento() const
+{
+    //evento não deve salvar por documento, somente nfe/nfce
+    return get_caminho("evento", arquivos->get_salvarPorCNPJ(), false, arquivos->get_salvarPorAnoMesDia(), arquivos->get_salvarPorAnoMes(),
+                       arquivos->get_salvarPorAno(), arquivos->get_salvarPorMes(), arquivos->get_salvarPorDia());
+}
+
+QString ConfigNFe::get_caminho(const QString &pastaBase, const bool &porCNPJ, const bool &porModelo,
+                               const bool &porAnoMesDia, const bool &porAnoMes, const bool &porAno,
+                               const bool &porMes, const bool &porDia) const
 {
     QString _path;
     QDir _dir;
+    QDate _date = QDate::currentDate();
 
     _path = arquivos->get_caminhoSalvar();
 
@@ -237,5 +156,96 @@ QString ConfigNFe::get_caminhoBase(const QString &pastaBase) const
                 return "";
         }
     }
+
+    if (porCNPJ)
+    {
+        //unica forma de obter o cnpj sem ter que criar nenhum parametro nesta função é obter do
+        //certificado digital.
+        if (!certificado->get_cnpj().isEmpty())
+        {
+             _path += (certificado->get_cnpj() + "/");
+             if (!CppUtility::parsePath(_path))
+             {
+                 if (!_dir.mkdir(_path))
+                     return "";
+             }
+        }
+    }
+
+    if (porModelo)
+    {
+        _path += (ConvDF::modeloDFToStr(get_ModeloDF()) + "/");
+        if (!CppUtility::parsePath(_path))
+        {
+            if (!_dir.mkdir(_path))
+                return "";
+        }
+    }
+
+    //quando escolher PorAnoMesDia, não pode existir outras datas separadas
+    if (porAnoMesDia)
+    {
+        _path += (QString::number(_date.year()));
+        _path += (QString("0" + QString::number(_date.month())).right(2));
+        _path += (QString("0" + QString::number(_date.day())).right(2));
+        _path += "/"; //fechamento
+        if (!CppUtility::parsePath(_path))
+        {
+            if (!_dir.mkdir(_path))
+                return "";
+        }
+
+    } else
+    {
+        //quando escolher PorAnoMes, somente o dia pode ser separado
+        if (porAnoMes)
+        {
+            _path += (QString::number(_date.year()));
+            _path += (QString("0" + QString::number(_date.month())).right(2));
+            _path += "/"; //fechamento
+            if (!CppUtility::parsePath(_path))
+            {
+                if (!_dir.mkdir(_path))
+                    return "";
+            }
+
+        } else
+        {
+            //datas separadas.
+            //ano separado
+            if (porAno)
+            {
+              _path += (QString::number(_date.year()) + "/");
+              if (!CppUtility::parsePath(_path))
+              {
+                  if (!_dir.mkdir(_path))
+                      return "";
+              }
+            }
+            //mes separado
+            if (porMes)
+            {
+                //mes com 2 digitos
+                _path += (QString("0" + QString::number(_date.month())).right(2) + "/");
+                if (!CppUtility::parsePath(_path))
+                {
+                    if (!_dir.mkdir(_path))
+                        return "";
+                }
+            }
+        }
+        // o dia pode ser separado quando escolher PorAnoMes, por isso, ficará fora da condição acima
+        if (porDia)
+        {
+            //dia com 2 digitos
+            _path += (QString("0" + QString::number(_date.day())).right(2) + "/");
+            if (!CppUtility::parsePath(_path))
+            {
+                if (!_dir.mkdir(_path))
+                    return "";
+            }
+        }
+    }
+
     return _path;
 }

@@ -58,7 +58,6 @@ public:
     int get_cMsg() const;
     QString get_xMsg() const;
     QString get_xml() const;
-    void salvarXML(const ConfigNFe *config);
     void salvarXML(const QString &caminho, const QString &nomeArquivo);
 
 protected:
@@ -127,7 +126,6 @@ protected:
     void set_dhRecbto(const QDateTime &dhRecbto);
     void set_cMsg(const int &cMsg);
     void set_xMsg(const QString &xMsg);
-    void finalizarXML(); //gera o xml junto com o retorno e salva
 
 private:
     QString m_versao;

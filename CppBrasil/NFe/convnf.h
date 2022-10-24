@@ -27,7 +27,8 @@ limitations under the License.
 
 //Tipo de serviço utilizados pela projeto NFe/NFCe
 enum class WebServicesNF{None = -1, NFeInutilizacao, NFeConsultaProtocolo,  NFeStatusServico,
-                         NFeConsultaCadastro, NFeRecepcaoEvento, NFeAutorizacao, NFeRetAutorizacao};
+                         NFeConsultaCadastro, NFeRecepcaoEvento, NFeAutorizacao, NFeRetAutorizacao,
+                         NFeDistribuicaoDFe};
 
 //versao NFe/NFCe
 enum class VersaoNF{None = -1, v400};
@@ -197,6 +198,23 @@ enum class IndProc {None = -1, SEFAZ = 0, JusticaFederal = 1,
 //tpAto - Tipo do ato concessório
 enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspecifica=12 };
 
+//tpEvento - Eventos Registrados pelo Emitente / Eventos Registrados pelo Destinatário
+enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
+                     CancelamentoSubstituicao = 110112, EPEC = 110140,
+                     PedidoProrrogacao1 = 111500, PedidoProrrogacao2 = 111501,
+                     CancelaPedidoProrrogacao1 = 111502, CancelaPedidoProrrogacao2 = 111503,
+                     AtorInteressadoNFeTransp = 110150, ConfirmacaoOperacaoDest = 210200,
+                     CienciaOperacaoDest = 210210,  DesconhecimentoOperacaoDest = 210220,
+                     OperacaoNaoRealizadaDest = 210240};
+
+//tpAutor - Tipo de autor do evento
+//obs: 3-EmpresaTerceiros, serve para terceiros como no caso de evento Ator Interessado. 3=Empresa Transportadora.
+enum class TpAutor {None = -1, EmpresaEmitente = 1, EmpresaDestinataria = 2, EmpresaTerceiros = 3,
+                    Fisco = 5, RFB = 6, OutrosOrgaos = 9};
+
+//tpAutorizacao - tipo de autorização para o transportador
+enum class TpAutorizacao {None = -1, NaoPermite = 0, PermiteTranspAutTransp = 1};
+
 
 class CPPNFE_EXPORT ConvNF : public ConvDF
 {
@@ -205,6 +223,7 @@ public:
 
     //CONVERSÕES NFe-NFCe
     static QString webServicesNFToMetodo(const WebServicesNF &value);
+    static QString versaoLayout(const WebServicesNF &value);
     static QString versaoNFToStr(const VersaoNF &value);
     static VersaoNF strToVersaoNF(const QString &value);
     static QString versaoQrCodeNFToStr(const VersaoQrCodeNF &value);
@@ -287,7 +306,12 @@ public:
     static IndProc strToIndProc(const QString &value);
     static QString tpAtoToStr(const TpAto &value);
     static TpAto strToTpAto(const QString &value);
-
+    static QString tpEventoToStr(const TpEvento &value);
+    static TpEvento strToTpEvento(const QString &value);
+    static QString tpAutorToStr(const TpAutor &value);
+    static TpAutor strToTpAutor(const QString &value);
+    static QString tpAutorizacaoToStr(const TpAutorizacao &value);
+    static TpAutorizacao strToTpAutorizacao(const QString &value);
 };
 
 #endif // CONVNF_H

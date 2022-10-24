@@ -44,12 +44,13 @@ public:
     QString get_chNFe() const;
     QString get_XMLOriginal() const;
     QString get_XMLAssinado() const;
-    void salvarXML(const ConfigNFe *config);
-    void salvarXML(const QString &caminho, const QString &nomeArquivo);
 
     void assinarXML(const ConfigNFe *config);
     void gerarXML(const ConfigNFe *config);
     void validarXML(const ConfigNFe *config);
+
+    QString get_XMLAutorizado() const;
+    void set_XMLAutorizado(const QString &xmlAutorizado);
 
     std::shared_ptr<InfNFe> infNFe;
     std::shared_ptr<ProtNFe> protNFe;
@@ -61,6 +62,7 @@ private:
     QString m_chaveacesso;
     QString m_xml_original;
     QString m_xml_assinado;
+    QString m_xml_autorizado;
     QString m_error;
     void gerarChaveAcesso();
 

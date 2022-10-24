@@ -106,8 +106,10 @@ set(cppnfe_SRC
     enderemit.cpp
     entrega.h
     entrega.cpp
-    eventos.h
-    eventos.cpp
+    envevento.h
+    envevento.cpp
+    eventosnf.h
+    eventosnf.cpp
     exporta.h
     exporta.cpp
     exportind.h
@@ -184,6 +186,8 @@ set(cppnfe_SRC
     refnfp.cpp
     retconsstatserv.h
     retconsstatserv.cpp
+    retenvevento.h
+    retenvevento.cpp
     retirada.h
     retirada.cpp
     retornonfe.h
@@ -262,7 +266,8 @@ set(HEADER_NFE
     enderdest.h
     enderemit.h
     entrega.h
-    eventos.h
+    envevento.h
+    eventosnf.h
     exporta.h
     exportind.h
     fat.h
@@ -301,6 +306,7 @@ set(HEADER_NFE
     refnf.h
     refnfp.h
     retconsstatserv.h
+    retenvevento.h
     retirada.h
     retornonfe.h
     rettransp.h

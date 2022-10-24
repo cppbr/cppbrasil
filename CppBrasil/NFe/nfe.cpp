@@ -34,6 +34,7 @@ void Nfe::clear()
     this->m_error.clear();
     this->m_xml_original.clear();
     this->m_xml_assinado.clear();
+    this->m_xml_autorizado.clear();
     this->infNFe->clear();
     this->protNFe->clear();
     this->infNFeSupl->clear();
@@ -57,23 +58,6 @@ QString Nfe::get_XMLOriginal() const
 QString Nfe::get_XMLAssinado() const
 {
     return this->m_xml_assinado;
-}
-
-void Nfe::salvarXML(const ConfigNFe *config)
-{
-    QString path = config->get_caminhoNF();
-    QString nome = get_chNFe() + "-nfe";
-    CppUtility::saveFile(path, nome, TipoArquivo::XML, this->m_xml_assinado.toLocal8Bit());
-}
-
-void Nfe::salvarXML(const QString &caminho, const QString &nomeArquivo)
-{
-    QString nome;
-    if (nomeArquivo.isEmpty())
-        nome = get_chNFe() + "-nfe";
-    else
-        nome = nomeArquivo;
-    CppUtility::saveFile(caminho, nome, TipoArquivo::XML, this->m_xml_assinado.toLocal8Bit());
 }
 
 void Nfe::assinarXML(const ConfigNFe *config)
@@ -189,7 +173,10 @@ void Nfe::assinarXML(const ConfigNFe *config)
 void Nfe::gerarXML(const ConfigNFe *config)
 {
     QByteArray _output;
-    protNFe->clear();//limpando dados caso o xml seja importada
+    //limpando dados caso o xml seja importado
+    this->m_xml_autorizado.clear();
+    this->protNFe->clear();
+
     this->gerarChaveAcesso();
     std::unique_ptr<XmlWrite> xml(new XmlWrite(this->infNFe.get(), config));
     if (xml->gerarXML(&_output))
@@ -211,10 +198,20 @@ void Nfe::validarXML(const ConfigNFe *config)
     if (!_libxml->parseXML(this->m_xml_assinado.toLocal8Bit(), _schemaName))
     {
        this->m_error = _libxml->get_error();
-       qWarning() << this->m_error; //remover isso
+       //qWarning() << this->m_error; //remover isso
     }
 
     delete _libxml;
+}
+
+QString Nfe::get_XMLAutorizado() const
+{
+    return this->m_xml_autorizado;
+}
+
+void Nfe::set_XMLAutorizado(const QString &xmlAutorizado)
+{
+    this->m_xml_autorizado = xmlAutorizado;
 }
 
 void Nfe::set_chNFe(const QString &chNFe)

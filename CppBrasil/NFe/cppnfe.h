@@ -26,7 +26,7 @@ limitations under the License.
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/NFe/confignfe.h>
 #include <CppBrasil/NFe/notafiscal.h>
-#include <CppBrasil/NFe/eventos.h>
+#include <CppBrasil/NFe/eventosnf.h>
 
 class CPPNFE_EXPORT CppNFe : public QObject
 {
@@ -37,7 +37,7 @@ public:
     void clear();
     std::shared_ptr<ConfigNFe> configuracoes;
     std::shared_ptr<NotaFiscal> notafiscal;
-    std::shared_ptr<Eventos> eventos;
+    std::shared_ptr<EventosNF> eventos;
 
 signals:
     void errorOccurred(const QString &error);

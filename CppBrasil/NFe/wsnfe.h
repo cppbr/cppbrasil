@@ -33,7 +33,9 @@ limitations under the License.
 #include <CppBrasil/NFe/retconsstatserv.h>
 #include <CppBrasil/NFe/urlnfe.h>
 #include <CppBrasil/NFe/convnf.h>
+#include <CppBrasil/NFe/retenvevento.h>
 
+//obs: A versão do Layout do xml, nem sempre é a mesma versão do Web Services.
 class CPPNFE_EXPORT WSNFeBase : public WebServices
 {
     Q_OBJECT
@@ -41,18 +43,18 @@ public:
     WSNFeBase(ConfigNFe* confgNFe, CppCrypto* crypto);
     virtual ~WSNFeBase();
     QByteArray get_mensagemRetorno() const;
-
+    QString get_verLayout() const;//versão layout
+    void set_verLayout(const QString &verLayout);
 protected:
     QByteArray m_msgEnvio;
     QByteArray m_msgRetorno;
-    ConfigNFe* m_confgNFe;
-    CppCrypto* m_crypto;
+    ConfigNFe* confgNFe;
+    CppCrypto* crypto;
     enum StatusRetorno{Erro = -1, EmProcessamento, Processado};
     QString get_namespaceBase() const;
     QString get_urlNamespaceBase() const;
     QString get_urlNamespaceWS(const WebServicesNF &webServicesNF) const;
     QString get_urlServidorWS(const WebServicesNF &webServicesNF) const;
-    QString get_versaoSchema(const QString &schemaName);
     bool validarXML(const QString &schemaName, const QString &nomeGrupo, const QByteArray &xml);
     void salvarLogs(const TipoArquivo &tipolog, const TipoMsgLog &msglog,
                     const QString &nomeGrupo, const WebServicesNF &webServicesNF,
@@ -63,6 +65,7 @@ signals:
 private:
     QString m_nameSpaceBase = "nfeDadosMsg";
     QString m_urlNameSpaceBase = "http://www.portalfiscal.inf.br/nfe";
+    QString m_verLayout;
 };
 
 
@@ -72,11 +75,11 @@ public:
     WSNFe(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsReciNFe* retorno);
     ~WSNFe();
 
-    bool send(const int &numLote, const QByteArray &xml, const int &totDoc);
+    bool send(const int &numLote, const QByteArray &xml, const int &totDoc, const QString &verLayout);
 
 private:
     enum TipoRetorno {retEnviNFe, retConsReciNFe};
-    RetConsReciNFe* m_retorno;
+    RetConsReciNFe* retorno;
     bool gerarXMLlote(const int &numLote, const QByteArray &xml);
     bool gerarXMLrecibo();
     StatusRetorno tratarRetorno(const TipoRetorno &tipo);
@@ -105,12 +108,26 @@ public:
     WSStatus(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsStatServ* retorno);
     ~WSStatus();
 
-   bool send();
+   bool send(const QString &verLayout);
 
 private:
-    RetConsStatServ* m_retorno;
+    RetConsStatServ* retorno;
     bool gerarXML();
     StatusRetorno tratarRetorno();
+};
+
+class CPPNFE_EXPORT WSEvento : public WSNFeBase
+{
+public:
+    WSEvento(ConfigNFe* confgNFe, CppCrypto* crypto, RetEnvEvento* retorno);
+    ~WSEvento();
+    bool send(const QByteArray &xml, const int &totDoc, const QString &verLayout);
+
+private:
+    RetEnvEvento* retorno;
+    bool gerarXML(const QByteArray &xml);
+    StatusRetorno tratarRetorno();
+
 };
 
 #endif // WSNFE_H

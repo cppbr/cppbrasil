@@ -210,7 +210,7 @@ void XmlWrite::get_NFref()
 {   //NFref - BA01 - container 0-500
     if (this->m_infNFe->ide->NFref->items->count() > 0)
     {
-        for(int i = 0; i < this->m_infNFe->ide->NFref->items->count(); i++)
+        for(int i = 0; i < this->m_infNFe->ide->NFref->items->count(); ++i)
         {
             this->m_xmlw->writeStartElement("NFref");//abertura grupo NFref
             if (!this->m_infNFe->ide->NFref->items->value(i)->get_refNFe().isEmpty())
@@ -497,7 +497,7 @@ void XmlWrite::get_autXML()
 {   //autXML - GA01 - container 0-10
     if (this->m_infNFe->autXML->items->count() > 0)
     {
-        for(int i = 0; i < this->m_infNFe->autXML->items->count(); i++)
+        for(int i = 0; i < this->m_infNFe->autXML->items->count(); ++i)
         {
             this->m_xmlw->writeStartElement("autXML"); //abertura grupo autXML
             if (!this->m_infNFe->autXML->items->value(i)->get_CNPJ().isEmpty())
@@ -511,7 +511,7 @@ void XmlWrite::get_autXML()
 
 void XmlWrite::get_det()
 {   //det - H01 - container 1-990
-    for(int i = 0; i < this->m_infNFe->det->items->count(); i++)
+    for(int i = 0; i < this->m_infNFe->det->items->count(); ++i)
     {
         this->m_xmlw->writeStartElement("det"); //abertura grupo det
         get_prod(i);
@@ -579,7 +579,7 @@ void XmlWrite::get_prod(const int &i)
     //DI - I18 - container 0-100
     if (this->m_infNFe->det->items->value(i)->prod->DI->items->count() > 0)
     {
-        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->DI->items->count() ; j++)
+        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->DI->items->count() ; ++j)
         {
             this->m_xmlw->writeStartElement("DI");//abertura grupo DI
             this->m_xmlw->writeTextElement("nDI", this->m_infNFe->det->items->value(i)->prod->DI->items->value(j)->get_nDI());
@@ -603,7 +603,7 @@ void XmlWrite::get_prod(const int &i)
             //adi - I25 - container 1-100
             if (this->m_infNFe->det->items->value(i)->prod->DI->items->value(j)->adi->items->count() > 0)
             {
-                for(int l = 0; l < this->m_infNFe->det->items->value(i)->prod->DI->items->value(j)->adi->items->count() ; l++)
+                for(int l = 0; l < this->m_infNFe->det->items->value(i)->prod->DI->items->value(j)->adi->items->count() ; ++l)
                 {
                     this->m_xmlw->writeStartElement("adi");//abertura grupo adi
                     this->m_xmlw->writeTextElement("nAdicao", QString::number(this->m_infNFe->det->items->value(i)->prod->DI->items->value(j)->adi->items->value(l)->get_nAdicao()));
@@ -623,7 +623,7 @@ void XmlWrite::get_prod(const int &i)
     //detExport - I50 - container 0-500
     if (this->m_infNFe->det->items->value(i)->prod->detExport->items->count() > 0)
     {
-        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->detExport->items->count() ; j++)
+        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->detExport->items->count() ; ++j)
         {
             this->m_xmlw->writeStartElement("detExport");//abertura grupo detExport
             if (!this->m_infNFe->det->items->value(i)->prod->detExport->items->value(j)->get_nDraw().isEmpty())
@@ -653,7 +653,7 @@ void XmlWrite::get_prod(const int &i)
     //rastro - I80 - container 0-500
     if (this->m_infNFe->det->items->value(i)->prod->rastro->items->count() > 0)
     {
-        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->rastro->items->count() ; j++)
+        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->rastro->items->count() ; ++j)
         {
             this->m_xmlw->writeStartElement("rastro");//abertura grupo rastro
             this->m_xmlw->writeTextElement("nLote",this->m_infNFe->det->items->value(i)->prod->rastro->items->value(j)->get_nLote());
@@ -714,7 +714,7 @@ void XmlWrite::get_prod(const int &i)
     //arma - L01 - container 1-500
     if (this->m_infNFe->det->items->value(i)->prod->arma->items->count() > 0)
     {
-        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->arma->items->count() ; j++)
+        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->arma->items->count() ; ++j)
         {
             this->m_xmlw->writeStartElement("arma");//abertura grupo arma
             this->m_xmlw->writeTextElement("tpArma", ConvNF::tpArmaToStr(this->m_infNFe->det->items->value(i)->prod->arma->items->value(j)->get_tpArma()));
@@ -1890,7 +1890,7 @@ void XmlWrite::get_transp()
     //reboque - X22
     if (this->m_infNFe->transp->reboque->items->count() > 0)
     {
-        for(int i = 0; i < this->m_infNFe->transp->reboque->items->count(); i++)
+        for(int i = 0; i < this->m_infNFe->transp->reboque->items->count(); ++i)
         {
             this->m_xmlw->writeStartElement("reboque");//abertura grupo reboque
             this->m_xmlw->writeTextElement("placa", this->m_infNFe->transp->reboque->items->value(i)->get_placa());
@@ -1908,7 +1908,7 @@ void XmlWrite::get_transp()
     //vol - X26
     if (this->m_infNFe->transp->vol->items->count() > 0)
     {
-        for(int i = 0; i < this->m_infNFe->transp->vol->items->count(); i++)
+        for(int i = 0; i < this->m_infNFe->transp->vol->items->count(); ++i)
         {
             this->m_xmlw->writeStartElement("vol");//abertura grupo vol
             if (this->m_infNFe->transp->vol->items->value(i)->get_qVol() > 0)
@@ -1926,7 +1926,7 @@ void XmlWrite::get_transp()
             //lacres - X33
             if (this->m_infNFe->transp->vol->items->value(i)->lacres->items->count() > 0)
             {
-                for(int j = 0; j < this->m_infNFe->transp->vol->items->value(i)->lacres->items->count(); j++)
+                for(int j = 0; j < this->m_infNFe->transp->vol->items->value(i)->lacres->items->count(); ++j)
                 {
                     this->m_xmlw->writeStartElement("lacres");//abertura grupo lacres
                     this->m_xmlw->writeTextElement("nLacre", this->m_infNFe->transp->vol->items->value(i)->lacres->items->value(j)->get_nLacre());
@@ -1969,7 +1969,7 @@ void XmlWrite::get_cobr()
         //dup - Y07
         if (this->m_infNFe->cobr->dup->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->cobr->dup->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->cobr->dup->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("dup");//abertura grupo dup
                 if (!this->m_infNFe->cobr->dup->items->value(i)->get_nDup().isEmpty())
@@ -1993,7 +1993,7 @@ void XmlWrite::get_pag()
         //detPag - YA01a
         if (this->m_infNFe->pag->detPag->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->pag->detPag->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->pag->detPag->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("detPag");//abertura grupo detPag
                 if (this->m_infNFe->pag->detPag->items->value(i)->get_indPag() != IndPag::None)
@@ -2057,7 +2057,7 @@ void XmlWrite::get_infAdic()
         //obsCont - Z04
         if (this->m_infNFe->infAdic->obsCont->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->infAdic->obsCont->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->infAdic->obsCont->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("obsCont");//abertura grupo obsCont
                 this->m_xmlw->writeTextElement("xCampo", this->m_infNFe->infAdic->obsCont->items->value(i)->get_xCampo());
@@ -2068,7 +2068,7 @@ void XmlWrite::get_infAdic()
         //obsFisco - Z07
         if (this->m_infNFe->infAdic->obsFisco->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->infAdic->obsFisco->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->infAdic->obsFisco->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("obsFisco");//abertura grupo obsFisco
                 this->m_xmlw->writeTextElement("xCampo", this->m_infNFe->infAdic->obsFisco->items->value(i)->get_xCampo());
@@ -2079,7 +2079,7 @@ void XmlWrite::get_infAdic()
         //procRef - Z10
         if (this->m_infNFe->infAdic->procRef->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->infAdic->procRef->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->infAdic->procRef->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("procRef");//abertura grupo procRef
                 this->m_xmlw->writeTextElement("nProc", this->m_infNFe->infAdic->procRef->items->value(i)->get_nProc());
@@ -2138,7 +2138,7 @@ void XmlWrite::get_cana()
         //forDia - ZC04
         if (this->m_infNFe->cana->forDia->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->cana->forDia->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->cana->forDia->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("forDia");//abertura grupo forDia
                 this->m_xmlw->writeTextElement("dia", QString::number(this->m_infNFe->cana->forDia->items->value(i)->get_dia()));
@@ -2154,7 +2154,7 @@ void XmlWrite::get_cana()
         //deduc - ZC10
         if (this->m_infNFe->cana->deduc->items->count() > 0)
         {
-            for(int i = 0; i < this->m_infNFe->cana->deduc->items->count(); i++)
+            for(int i = 0; i < this->m_infNFe->cana->deduc->items->count(); ++i)
             {
                 this->m_xmlw->writeStartElement("deduc");//abertura grupo deduc
                 this->m_xmlw->writeTextElement("xDed", this->m_infNFe->cana->deduc->items->value(i)->get_xDed());

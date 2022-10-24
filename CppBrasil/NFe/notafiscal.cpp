@@ -23,7 +23,7 @@ limitations under the License.
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)
 
 NotaFiscal::NotaFiscal(ConfigNFe *config): NFe(new Container<Nfe>),
-    retorno(new RetConsReciNFe), m_tError(0), m_config(config)
+    retorno(new RetConsReciNFe), m_tError(0), config(config)
 {
 }
 
@@ -41,14 +41,19 @@ void NotaFiscal::clear()
 bool NotaFiscal::assinar()
 {
     int _err = 0;
-    for(int i = 0; i < this->NFe->items->count(); i++)
+    for(int i = 0; i < this->NFe->items->count(); ++i)
     {
-       this->NFe->items->value(i)->assinarXML(this->m_config);
+       this->NFe->items->value(i)->assinarXML(this->config);
        if (!this->NFe->items->value(i)->get_error().isEmpty())
             _err += 1;
        //caso esteja configurado para salvar, será salvo automático após assinar
-       if (this->m_config->arquivos->get_salvar())
-            this->NFe->items->value(i)->salvarXML(this->m_config);
+       if (this->config->arquivos->get_salvar())
+       {
+            CppUtility::saveFile(this->config->get_caminhoNF(),
+                                 QString(this->NFe->items->value(i)->get_chNFe() + "-nfe"),
+                                 TipoArquivo::XML,
+                                 this->NFe->items->value(i)->get_XMLAssinado().toLocal8Bit());
+       }
     }
 
     if(_err > 0)
@@ -60,9 +65,9 @@ bool NotaFiscal::assinar()
 bool NotaFiscal::gerar()
 {
     int _err = 0;
-    for(int i = 0; i < this->NFe->items->count(); i++)
+    for(int i = 0; i < this->NFe->items->count(); ++i)
     {
-       this->NFe->items->value(i)->gerarXML(this->m_config);
+       this->NFe->items->value(i)->gerarXML(this->config);
        if (!this->NFe->items->value(i)->get_error().isEmpty())
           _err += 1;
     }
@@ -76,9 +81,9 @@ bool NotaFiscal::gerar()
 bool NotaFiscal::validar()
 {
     int _err = 0;
-    for(int i = 0; i < this->NFe->items->count(); i++)
+    for(int i = 0; i < this->NFe->items->count(); ++i)
     {
-       this->NFe->items->value(i)->validarXML(this->m_config);
+       this->NFe->items->value(i)->validarXML(this->config);
        if (!this->NFe->items->value(i)->get_error().isEmpty())
           _err += 1;
     }
@@ -93,15 +98,15 @@ bool NotaFiscal::enviar(const int &numLote)
 {
     QString _notas;
 
-    for(int i = 0; i < this->NFe->items->count(); i++)
+    for(int i = 0; i < this->NFe->items->count(); ++i)
     {
         _notas.append(CppUtility::extractStr(this->NFe->items->value(i)->get_XMLAssinado(),
                                              "<NFe xmlns", "</NFe>"));
 
     }
 
-    WSNFe* _ws = new WSNFe(this->m_config,
-                           this->m_config->certificado->get_cryptoLib(),
+    WSNFe* _ws = new WSNFe(this->config,
+                           this->config->certificado->get_cryptoLib(),
                            this->retorno.get());
 
     connect(_ws, SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
@@ -109,7 +114,9 @@ bool NotaFiscal::enviar(const int &numLote)
         set_error(error, 1);
     } );
 
-    bool _ret = _ws->send(numLote, _notas.toLocal8Bit(), this->NFe->items->count());
+    bool _ret = _ws->send(numLote, _notas.toLocal8Bit(),
+                          this->NFe->items->count(),
+                          ConvNF::versaoNFToStr(this->config->get_VersaoNF()));
 
     if (_ret)
       tratarRetorno();
@@ -180,8 +187,8 @@ void NotaFiscal::tratarRetorno()
     {
         QString _chNFe;
         QByteArray _nfeProc, _protNFe, _xmlOriginal, _schema;
-        _schema.append(m_config->arquivos->get_caminhoSchema().toLocal8Bit());
-        CppXML * _libxml = new CppLibXml2(m_config->certificado->get_cryptoLib(), _schema);
+        _schema.append(this->config->arquivos->get_caminhoSchema().toLocal8Bit());
+        CppXML * _libxml = new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema);
 
         for(int i = 0; i < this->retorno->protNFe->items->count(); ++i)
         {
@@ -228,9 +235,11 @@ void NotaFiscal::tratarRetorno()
                             {
                                 //atualiza o xml de protNFe da classe Retorno
                                 this->retorno->protNFe->items->value(i)->set_xml(_nfeProc);
+                                //atualiza xml de NFe
+                                this->NFe->items->value(j)->set_XMLAutorizado(_nfeProc);
                                 //caso esteja configurado para salvar
-                                if (this->m_config->arquivos->get_salvar())
-                                     this->retorno->protNFe->items->value(i)->salvarXML(this->m_config);
+                                if (this->config->arquivos->get_salvar())
+                                     this->retorno->protNFe->items->value(i)->salvarXML(this->config->get_caminhoNF(), "" );
                             }
                         }
                     }
@@ -248,9 +257,7 @@ void NotaFiscal::tratarRetorno()
                     this->NFe->items->value(j)->protNFe->set_xMotivo(this->retorno->protNFe->items->value(i)->get_xMotivo());
                     this->NFe->items->value(j)->protNFe->set_cMsg(this->retorno->protNFe->items->value(i)->get_cMsg());
                     this->NFe->items->value(j)->protNFe->set_xMsg(this->retorno->protNFe->items->value(i)->get_xMsg());
-                    //só atualiza o xml caso volte autorizado
-                    if (_cStat == 100 || _cStat == 150)
-                      this->NFe->items->value(j)->protNFe->set_xml(_nfeProc);
+                    this->NFe->items->value(j)->protNFe->set_xml(_nfeProc);
 
                     break;
                 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <QObject>
 #include <CppBrasil/cppbrasil_global.h>
+#include <CppBrasil/NFe/convnf.h>
 #include <CppBrasil/NFe/confignfe.h>
 #include <CppBrasil/NFe/wsnfe.h>
 #include <CppBrasil/NFe/retconsstatserv.h>
@@ -26,7 +27,7 @@ signals:
     void wsChange(const WebServicesNF &webServicesNF);
 
 private:
-    ConfigNFe* m_config;
+    ConfigNFe* config;
     QString m_error;
 };
 

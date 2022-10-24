@@ -26,7 +26,7 @@ WSNFeBase::WSNFeBase(ConfigNFe* confgNFe, CppCrypto* crypto):
                 confgNFe->webservices->get_httpType(),
                 confgNFe->webservices->get_timeoutConexao(),
                 confgNFe->webservices->get_verificarSslSocket()),
-    m_confgNFe(confgNFe), m_crypto(crypto)
+    confgNFe(confgNFe), crypto(crypto)
 {
 }
 
@@ -38,6 +38,16 @@ QByteArray WSNFeBase::get_mensagemRetorno() const
 {
     return this->m_msgRetorno;
 
+}
+
+QString WSNFeBase::get_verLayout() const
+{
+    return this->m_verLayout;
+}
+
+void WSNFeBase::set_verLayout(const QString &verLayout)
+{
+    this->m_verLayout = verLayout;
 }
 
 QString WSNFeBase::get_namespaceBase() const
@@ -54,38 +64,31 @@ QString WSNFeBase::get_urlNamespaceWS(const WebServicesNF &webServicesNF) const
 {
     //pega o nome do webservices e coloca a versão no final da string
     //com apenas o primeiro numero
-    QString _versao = ConvNF::versaoNFToStr(m_confgNFe->get_VersaoNF());
-    _versao = (_versao.isEmpty() ? "4" : QString(_versao.at(0)));
+    QString _versaoWS = ConvNF::versaoNFToStr(confgNFe->get_VersaoNF());
+    _versaoWS = (_versaoWS.isEmpty() ? "4" : QString(_versaoWS.at(0)));
     QString _res = get_urlNamespaceBase() +
                    QStringLiteral("/wsdl/") +
-                   ConvNF::webServicesNFToMetodo(webServicesNF) + _versao;
+                   ConvNF::webServicesNFToMetodo(webServicesNF) + _versaoWS;
     return _res;
 }
 
 QString WSNFeBase::get_urlServidorWS(const WebServicesNF &webServicesNF) const
 {
-    QString _url = UrlNFe::get_urlServidor(m_confgNFe->webservices->get_uf(),
-                                           m_confgNFe->webservices->get_tpAmb(),
-                                           m_confgNFe->get_TipoEmissao(),
-                                           m_confgNFe->get_ModeloDF(),
-                                           m_confgNFe->get_VersaoNF(),
+    QString _url = UrlNFe::get_urlServidor(confgNFe->webservices->get_uf(),
+                                           confgNFe->webservices->get_tpAmb(),
+                                           confgNFe->get_TipoEmissao(),
+                                           confgNFe->get_ModeloDF(),
+                                           confgNFe->get_VersaoNF(),
                                            webServicesNF);
     return _url;
 
 }
 
-QString WSNFeBase::get_versaoSchema(const QString &schemaName)
-{
-    QString _versao = ConvNF::versaoNFToStr(this->m_confgNFe->get_VersaoNF());
-    QString _schema = schemaName + "_v" + _versao + ".xsd";
-    return _schema;
-}
-
 bool WSNFeBase::validarXML(const QString &schemaName, const QString &nomeGrupo, const QByteArray &xml)
 {
-    QByteArray _schemaPath(this->m_confgNFe->arquivos->get_caminhoSchema().toLocal8Bit());
+    QByteArray _schemaPath(this->confgNFe->arquivos->get_caminhoSchema().toLocal8Bit());
     bool _ret = true;
-    CppXML * _libxml = new CppLibXml2(this->m_crypto, _schemaPath);
+    CppXML * _libxml = new CppLibXml2(this->crypto, _schemaPath);
 
     if (nomeGrupo.isEmpty())
     {
@@ -116,7 +119,7 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
                            const QByteArray &dadosLog)
 {
 
-    if (m_confgNFe->arquivos->get_salvarLogs())
+    if (confgNFe->arquivos->get_salvarLogs())
     {
         //para não fazer nenhum tipo de validação aqui nesta função, será melhor que
         //receba o formato que deverá ser salvo. Lembrando que o web services retornará html,
@@ -141,13 +144,13 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
         //se não tiver o nome do grupo, será salvo o xml da forma que retornar do web services
         if (nomeGrupo.isEmpty())
         {
-            CppUtility::saveFile(m_confgNFe->get_caminhoLogs(), _file, tipoArquivo, dadosLog);
+            CppUtility::saveFile(confgNFe->get_caminhoLogs(), _file, tipoArquivo, dadosLog);
         } else
         {
             QString _xml;
             _xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             _xml.append(CppUtility::extractStr(dadosLog, "<" + nomeGrupo, nomeGrupo + ">"));
-            CppUtility::saveFile(m_confgNFe->get_caminhoLogs(), _file, tipoArquivo, _xml.toLocal8Bit());
+            CppUtility::saveFile(confgNFe->get_caminhoLogs(), _file, tipoArquivo, _xml.toLocal8Bit());
         }
     }
 }
@@ -155,7 +158,7 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
 //WSNFe---------------------------------------------------
 
 WSNFe::WSNFe(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsReciNFe* retorno):
-    WSNFeBase(confgNFe, crypto), m_retorno(retorno)
+    WSNFeBase(confgNFe, crypto), retorno(retorno)
 {
 }
 
@@ -163,18 +166,20 @@ WSNFe::~WSNFe()
 {
 }
 
-bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc)
+bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc, const QString &verLayout)
 {
+    //versão do layout
+    set_verLayout(verLayout);
     //tamanho do BUF para armazenamento de retorno. somente para OpenSSL
     int _lenRet = 0, _retEnviNFe = 570, _retConsReciNFe = 780, _protNFe = 850;
     StatusRetorno _ret = StatusRetorno::EmProcessamento;
     QString _url = get_urlServidorWS(WebServicesNF::NFeAutorizacao);
     //se não for informado quantas tentativas, o padrão será ao menos 2
-    int _tentativas = this->m_confgNFe->webservices->get_tentativas();
+    int _tentativas = this->confgNFe->webservices->get_tentativas();
     if (_tentativas <= 0)
       _tentativas = 2;
     //se não for informado o timeout, o padrão será 8000 milisegundos (8 segundos)
-    int _timeout = this->m_confgNFe->webservices->get_timeoutAssincrono();
+    int _timeout = this->confgNFe->webservices->get_timeoutAssincrono();
     if (_timeout <= 0)
       _timeout = 8000;
 
@@ -190,7 +195,7 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc)
         if (this->get_error().isEmpty())
         {
             //caso seja sincrono, apenas trata o retorno já que o lote vem junto
-            if (this->m_confgNFe->get_indicadorSincrono() == IndSinc::Sim)
+            if (this->confgNFe->get_indicadorSincrono() == IndSinc::Sim)
             {
                 _ret = tratarRetorno(TipoRetorno::retEnviNFe);
             } else
@@ -248,8 +253,8 @@ bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml)
     //envelop soap
     QString _namespace = get_namespaceBase();
     QString _urlNamespace = get_urlNamespaceWS(WebServicesNF::NFeAutorizacao);
-    QString _versao = ConvNF::versaoNFToStr(this->m_confgNFe->get_VersaoNF());
-    QString _indSinc = ConvNF::indSincToStr(this->m_confgNFe->get_indicadorSincrono());
+    QString _versao = ConvNF::versaoNFToStr(this->confgNFe->get_VersaoNF());
+    QString _indSinc = ConvNF::indSincToStr(this->confgNFe->get_indicadorSincrono());
     QString _env;
     _env += QStringLiteral("<enviNFe xmlns=\"") + get_urlNamespaceBase() + QStringLiteral("\" versao=\"") + _versao + QStringLiteral("\">");
     _env += QStringLiteral("<idLote>") + QString::number(numLote) +  QStringLiteral("</idLote>");
@@ -258,15 +263,15 @@ bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml)
     _env += QStringLiteral("</enviNFe>");
 
     //nome do schema
-    QString _schemaName = get_versaoSchema("enviNFe");
+    QString _schemaName = "enviNFe_v" + get_verLayout() + ".xsd";
     //validar xml com schema
     bool _ret = validarXML(_schemaName, "", _env.toLocal8Bit());
     if (_ret)
     {
         //se deseja compactar
-        if (this->m_confgNFe->webservices->get_compactar())
+        if (this->confgNFe->webservices->get_compactar())
         {
-            int _size = this->m_confgNFe->webservices->get_compactarAcimaDe();
+            int _size = this->confgNFe->webservices->get_compactarAcimaDe();
             //size dever ser ao menos 1
             if (_size <= 0)
                _size = 1;
@@ -307,9 +312,9 @@ bool WSNFe::gerarXMLrecibo()
 {
     //envelop soap
     QString _urlBodyElement = get_urlNamespaceWS(WebServicesNF::NFeRetAutorizacao);
-    QString _versao = ConvNF::versaoNFToStr(this->m_confgNFe->get_VersaoNF());
-    QString _tpAmb = ConvNF::tpAmbToStr(this->m_confgNFe->webservices->get_tpAmb());
-    QString _nRec = this->m_retorno->get_nRec();
+    QString _versao = ConvNF::versaoNFToStr(this->confgNFe->get_VersaoNF());
+    QString _tpAmb = ConvNF::tpAmbToStr(this->confgNFe->webservices->get_tpAmb());
+    QString _nRec = this->retorno->get_nRec();
     QString _rec;
     _rec += QStringLiteral("<consReciNFe xmlns=\"") + get_urlNamespaceBase() + QStringLiteral("\" versao=\"") + _versao + QStringLiteral("\">");
     _rec += QStringLiteral("<tpAmb>") + _tpAmb +  QStringLiteral("</tpAmb>");
@@ -317,7 +322,7 @@ bool WSNFe::gerarXMLrecibo()
     _rec += QStringLiteral("</consReciNFe>");
 
     //nome do schema
-    QString _schemaName = get_versaoSchema("consReciNFe");
+    QString _schemaName = "consReciNFe_v" + get_verLayout() + ".xsd";
     //validar xml com schema
     bool _ret = validarXML(_schemaName,"", _rec.toLocal8Bit());
     if (_ret)
@@ -343,7 +348,7 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
     QString _parent = (tipo == TipoRetorno::retEnviNFe) ? "retEnviNFe" : "retConsReciNFe";
 
     //consultar schema e analizar o resultado
-    QString _schemaName = get_versaoSchema(_parent);
+    QString _schemaName = _parent + "_v" + get_verLayout() + ".xsd";
     StatusRetorno _ret = (validarXML(_schemaName, _parent, this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro);
     if (_ret == StatusRetorno::Processado)
     {
@@ -362,31 +367,32 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
             {
                 _valor = attributes.value("versao").toString();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_versao(_valor);
+                    this->retorno->set_versao(_valor);
             }
 
             if(_xml.name() == QStringLiteral("tpAmb"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                    this->retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
             }
             if(_xml.name() == QStringLiteral("verAplic"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_verAplic(_valor);
+                    this->retorno->set_verAplic(_valor);
             }
-            if(_xml.name() == QStringLiteral("nRec"))            {
+            if(_xml.name() == QStringLiteral("nRec"))
+            {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_nRec(_valor);
+                    this->retorno->set_nRec(_valor);
             }
             if(_xml.name() == QStringLiteral("cStat"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_cStat(_valor.toInt());
+                    this->retorno->set_cStat(_valor.toInt());
 
                 if (_valor.toInt() == 105) //Lote em processamento
                     _ret = StatusRetorno::EmProcessamento;
@@ -395,31 +401,31 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_xMotivo(_valor);
+                    this->retorno->set_xMotivo(_valor);
             }
             if(_xml.name() == QStringLiteral("cUF"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_cUF(_valor.toInt());
+                    this->retorno->set_cUF(_valor.toInt());
             }
             if(_xml.name() == QStringLiteral("dhRecbto"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                  this->m_retorno->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                  this->retorno->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
             }
             if(_xml.name() == QStringLiteral("cMsg"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                    this->m_retorno->set_cMsg(_valor.toInt());
+                    this->retorno->set_cMsg(_valor.toInt());
             }
             if(_xml.name() == QStringLiteral("xMsg"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                  this->m_retorno->set_xMsg(_valor);
+                  this->retorno->set_xMsg(_valor);
             }
             //assincrono retorna o numero do recibo como filho do elemento infRec
             if(_xml.name() == QStringLiteral("infRec"))
@@ -430,7 +436,7 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
                     {
                         _valor = _xml.readElementText();
                         if (!_valor.isEmpty())
-                          this->m_retorno->set_nRec(_valor);
+                          this->retorno->set_nRec(_valor);
                     }
                     _xml.readNext();
                 }
@@ -445,7 +451,7 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
                     {
                         _valor = attributes.value("versao").toString();
                         if (!_valor.isEmpty())
-                            this->m_retorno->protNFe->obj->set_versao(_valor);
+                            this->retorno->protNFe->obj->set_versao(_valor);
                     }
                     if(_xml.name() == QStringLiteral("infProt"))
                     {
@@ -456,70 +462,70 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
                             {
                                 _valor = attributes.value("Id").toString();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_Id(_valor);
+                                    this->retorno->protNFe->obj->set_Id(_valor);
                             }
 
                             if(_xml.name() == QStringLiteral("tpAmb"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                                    this->retorno->protNFe->obj->set_tpAmb(ConvNF::strToTpAmb(_valor));
                             }
                             if(_xml.name() == QStringLiteral("verAplic"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_verAplic(_valor);
+                                    this->retorno->protNFe->obj->set_verAplic(_valor);
                             }
                             if(_xml.name() == QStringLiteral("chNFe"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_chNFe(_valor);
+                                    this->retorno->protNFe->obj->set_chNFe(_valor);
                             }
                             if(_xml.name() == QStringLiteral("dhRecbto"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                   this->m_retorno->protNFe->obj->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                                   this->retorno->protNFe->obj->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
                             }
                             if(_xml.name() == QStringLiteral("nProt"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                  this->m_retorno->protNFe->obj->set_nProt(_valor);
+                                  this->retorno->protNFe->obj->set_nProt(_valor);
                             }
                             if(_xml.name() == QStringLiteral("digVal"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_digVal(_valor);
+                                    this->retorno->protNFe->obj->set_digVal(_valor);
                             }
                             if(_xml.name() == QStringLiteral("cStat"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_cStat(_valor.toInt());
+                                    this->retorno->protNFe->obj->set_cStat(_valor.toInt());
                             }
                             if(_xml.name() == QStringLiteral("xMotivo"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_xMotivo(_valor);
+                                    this->retorno->protNFe->obj->set_xMotivo(_valor);
                             }
                             //Sequência XML - PR13 - dentro de PR03
                             if(_xml.name() == QStringLiteral("cMsg"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_cMsg(_valor.toInt());
+                                    this->retorno->protNFe->obj->set_cMsg(_valor.toInt());
 
                             }
                             if(_xml.name() == QStringLiteral("xMsg"))
                             {
                                 _valor = _xml.readElementText();
                                 if (!_valor.isEmpty())
-                                    this->m_retorno->protNFe->obj->set_xMsg(_valor);
+                                    this->retorno->protNFe->obj->set_xMsg(_valor);
                             }
 
                             _xml.readNext();
@@ -529,7 +535,7 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
                     _xml.readNext();
                 }
 
-                this->m_retorno->protNFe->add();
+                this->retorno->protNFe->add();
             }
 
             _xml.readNext();
@@ -553,7 +559,7 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
 //WSStatus---------------------------------------------------
 
 WSStatus::WSStatus(ConfigNFe *confgNFe, CppCrypto *crypto, RetConsStatServ *retorno) :
-  WSNFeBase(confgNFe, crypto), m_retorno(retorno)
+  WSNFeBase(confgNFe, crypto), retorno(retorno)
 {
 }
 
@@ -561,8 +567,9 @@ WSStatus::~WSStatus()
 {
 }
 
-bool WSStatus::send()
+bool WSStatus::send(const QString &verLayout)
 {
+    set_verLayout(verLayout);
     int _lenRet = 651;
     StatusRetorno _ret;
     if (gerarXML())
@@ -588,9 +595,9 @@ bool WSStatus::gerarXML()
 {
     //envelop soap
     QString _urlBodyElement = get_urlNamespaceWS(WebServicesNF::NFeStatusServico);
-    QString _versao = ConvNF::versaoNFToStr(this->m_confgNFe->get_VersaoNF());
-    QString _tpAmb = ConvNF::tpAmbToStr(this->m_confgNFe->webservices->get_tpAmb());
-    int _cUF = ConvNF::ufToInt(this->m_confgNFe->webservices->get_uf());
+    QString _versao = ConvNF::versaoNFToStr(this->confgNFe->get_VersaoNF());
+    QString _tpAmb = ConvNF::tpAmbToStr(this->confgNFe->webservices->get_tpAmb());
+    int _cUF = ConvNF::ufToInt(this->confgNFe->webservices->get_uf());
     QString _env;
     _env += QStringLiteral("<consStatServ xmlns=\"") + get_urlNamespaceBase() + QStringLiteral("\" versao=\"") + _versao + QStringLiteral("\">");
     _env += QStringLiteral("<tpAmb>") + _tpAmb +  QStringLiteral("</tpAmb>");
@@ -599,7 +606,7 @@ bool WSStatus::gerarXML()
     _env += QStringLiteral("</consStatServ>");
 
     //validar o _env
-    QString _schemaName = get_versaoSchema("consStatServ");
+    QString _schemaName = "consStatServ_v" + get_verLayout() + ".xsd";
     bool _ret = validarXML(_schemaName, "", _env.toLocal8Bit());
     if (_ret)
     {
@@ -623,7 +630,7 @@ bool WSStatus::gerarXML()
 WSNFeBase::StatusRetorno WSStatus::tratarRetorno()
 {
     //consultar schema e analizar o resultado
-    QString _schemaName = get_versaoSchema("retConsStatServ");
+    QString _schemaName = "retConsStatServ_v" + get_verLayout() + ".xsd";
     StatusRetorno _ret = (validarXML(_schemaName, "retConsStatServ", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
 
     if (_ret == StatusRetorno::Processado)
@@ -641,62 +648,62 @@ WSNFeBase::StatusRetorno WSStatus::tratarRetorno()
             {
                  _valor = attributes.value("versao").toString();
                  if (!_valor.isEmpty())
-                    this->m_retorno->set_versao(_valor);
+                    this->retorno->set_versao(_valor);
             }
 
             if(_xml.name() == QStringLiteral("tpAmb"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                   this->retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
             }
             if(_xml.name() == QStringLiteral("verAplic"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_verAplic(_valor);
+                   this->retorno->set_verAplic(_valor);
             }
             if(_xml.name() == QStringLiteral("cStat"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_cStat(_valor.toInt());
+                   this->retorno->set_cStat(_valor.toInt());
             }
             if(_xml.name() == QStringLiteral("xMotivo"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_xMotivo(_valor);
+                   this->retorno->set_xMotivo(_valor);
             }
             if(_xml.name() == QStringLiteral("cUF"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_cUF(_valor.toInt());
+                   this->retorno->set_cUF(_valor.toInt());
             }
             if(_xml.name() == QStringLiteral("dhRecbto"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                  this->m_retorno->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                  this->retorno->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
             }
             if(_xml.name() == QStringLiteral("tMed"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_tMed(_valor.toInt());
+                   this->retorno->set_tMed(_valor.toInt());
             }
             if(_xml.name() == QStringLiteral("dhRetorno"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                  this->m_retorno->set_dhRetorno(QDateTime::fromString(_valor, Qt::ISODate));
+                  this->retorno->set_dhRetorno(QDateTime::fromString(_valor, Qt::ISODate));
             }
             if(_xml.name() == QStringLiteral("xObs"))
             {
                 _valor = _xml.readElementText();
                 if (!_valor.isEmpty())
-                   this->m_retorno->set_xObs(_valor);
+                   this->retorno->set_xObs(_valor);
             }
 
             _xml.readNext();
@@ -715,3 +722,314 @@ WSNFeBase::StatusRetorno WSStatus::tratarRetorno()
     return _ret;
 }
 
+//WSStatus---------------------------------------------------
+
+WSEvento::WSEvento(ConfigNFe *confgNFe, CppCrypto *crypto, RetEnvEvento *retorno):
+    WSNFeBase(confgNFe, crypto), retorno(retorno)
+{
+
+}
+
+WSEvento::~WSEvento()
+{
+
+}
+
+bool WSEvento::send(const QByteArray &xml, const int &totDoc, const QString &verLayout)
+{
+    set_verLayout(verLayout);
+    //tamanho do BUF para armazenamento de retorno. somente para OpenSSL
+    //_retEvento é uma base do tamanho para cada evento, já que o evento não tem tamanho fixo e são vários tipos de eventos
+    int _lenRet = 0, _retEvento = 800;
+    StatusRetorno _ret = StatusRetorno::EmProcessamento;
+    QString _url = get_urlServidorWS(WebServicesNF::NFeRecepcaoEvento);
+    //gera xml do lote na var m_msgEnvio
+    if (gerarXML(xml))
+    {
+        //enviando mensagem
+        _lenRet = _retEvento * totDoc; //calcula pelo total de eventos que será enviado
+        emit wsChange(WebServicesNF::NFeRecepcaoEvento);
+        this->m_msgRetorno.clear();
+        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio, _lenRet);
+        //se não houver erro
+        if (this->get_error().isEmpty())
+        {
+            //envio de eventos é síncrono
+            _ret = tratarRetorno();
+        } else
+        {
+            _ret = StatusRetorno::Erro;
+            set_error("Erro ao enviar evento.");
+        }
+    }
+    emit wsChange(WebServicesNF::None);
+    return (_ret == StatusRetorno::Erro) ? false : true;
+}
+
+bool WSEvento::gerarXML(const QByteArray &xml)
+{
+    //só será necessário gerar o envelop soap, já que o xml foi assinado e validado na sua criação
+    bool _ret = true;
+    //envelop soap
+    QString _urlBodyElement = get_urlNamespaceWS(WebServicesNF::NFeRecepcaoEvento);
+
+    this->m_msgEnvio.clear();
+    _ret = get_soapEnvelop(xml, get_namespaceBase().toLocal8Bit(),
+                                _urlBodyElement.toLocal8Bit(), this->m_msgEnvio);
+    //salva log
+    salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgEnvio ,"envEvento",
+               WebServicesNF::NFeRecepcaoEvento, this->m_msgEnvio);
+
+    return _ret;
+}
+
+WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
+{
+    //consultar schema e analizar o resultado
+    QString _schemaName = "retEnvEvento_v" + get_verLayout() + ".xsd";
+    StatusRetorno _ret = (validarXML(_schemaName, "retEnvEvento", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
+
+    if (_ret == StatusRetorno::Processado)
+    {
+        QXmlStreamReader _xml(this->m_msgRetorno);
+        QString _valor;
+        //salvar log do retorno
+        salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgRetorno ,"retEnvEvento",
+                   WebServicesNF::NFeRecepcaoEvento, this->m_msgRetorno);
+        QXmlStreamAttributes attributes;
+        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEnvEvento")))
+        {
+            attributes = _xml.attributes();
+            if(attributes.hasAttribute("versao"))
+            {
+                 _valor = attributes.value("versao").toString();
+                 if (!_valor.isEmpty())
+                    this->retorno->set_versao(_valor);
+            }
+            if(_xml.name() == QStringLiteral("idLote"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_idLote(_valor.toInt());
+            }
+            if(_xml.name() == QStringLiteral("tpAmb"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
+            }
+            if(_xml.name() == QStringLiteral("verAplic"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_verAplic(_valor);
+            }
+            if(_xml.name() == QStringLiteral("cOrgao"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_cOrgao(_valor.toInt());
+            }
+            if(_xml.name() == QStringLiteral("cStat"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_cStat(_valor.toInt());
+            }
+            if(_xml.name() == QStringLiteral("xMotivo"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                   this->retorno->set_xMotivo(_valor);
+            }
+            if(_xml.name() == QStringLiteral("retEvento"))
+            {
+                //montando xml apenas do retEvento.
+                QByteArray _strXMLRetEvento;
+                QXmlStreamWriter _xmlRetEvento(&_strXMLRetEvento);
+                _xmlRetEvento.writeStartElement("retEvento");
+
+                if(attributes.hasAttribute("versao"))
+                {
+                    _valor = attributes.value("versao").toString();
+                    if (!_valor.isEmpty())
+                       this->retorno->retEvento->obj->set_versao(_valor);
+                    _xmlRetEvento.writeAttribute("versao", _valor);
+                }
+
+                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEvento")))
+                {
+
+
+                    if(_xml.name() == QStringLiteral("infEvento"))
+                    {
+
+                        _xmlRetEvento.writeStartElement("infEvento");
+
+                        //attributes = _xml.attributes();
+                        if(attributes.hasAttribute("Id"))
+                        {
+                           _valor = attributes.value("Id").toString();
+                           if (!_valor.isEmpty())
+                               this->retorno->retEvento->obj->infEvento->set_Id(_valor);
+
+                           _xmlRetEvento.writeAttribute("Id", _valor);
+                        }
+
+                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infEvento")))
+                        {
+                            if(_xml.name() == QStringLiteral("tpAmb"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_tpAmb(ConvNF::strToTpAmb(_valor));
+
+                                _xmlRetEvento.writeTextElement("tpAmb", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("verAplic"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_verAplic(_valor);
+
+                                _xmlRetEvento.writeTextElement("verAplic", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cOrgao"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                   this->retorno->retEvento->obj->infEvento->set_cOrgao(_valor.toInt());
+
+                                _xmlRetEvento.writeTextElement("cOrgao", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cStat"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_cStat(_valor.toInt());
+
+                                _xmlRetEvento.writeTextElement("cStat", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("xMotivo"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_xMotivo(_valor);
+
+                                _xmlRetEvento.writeTextElement("xMotivo", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("chNFe"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_chNFe(_valor);
+
+                                _xmlRetEvento.writeTextElement("chNFe", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("tpEvento"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_tpEvento(ConvNF::strToTpEvento(_valor));
+
+                                _xmlRetEvento.writeTextElement("tpEvento", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("xEvento"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_xEvento(_valor);
+
+                                _xmlRetEvento.writeTextElement("xEvento", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("nSeqEvento"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_nSeqEvento(_valor.toInt());
+
+                                _xmlRetEvento.writeTextElement("nSeqEvento", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cOrgaoAutor"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_cOrgaoAutor(_valor.toInt());
+
+                                _xmlRetEvento.writeTextElement("cOrgaoAutor", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("CNPJDest"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_CNPJDest(_valor);
+
+                                _xmlRetEvento.writeTextElement("CNPJDest", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("CPFDest"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_CPFDest(_valor);
+
+                                _xmlRetEvento.writeTextElement("CPFDest", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("emailDest"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_emailDest(_valor);
+
+                                _xmlRetEvento.writeTextElement("emailDest", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("dhRegEvento"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_dhRegEvento(QDateTime::fromString(_valor, Qt::ISODate));
+
+                                _xmlRetEvento.writeTextElement("dhRegEvento", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("nProt"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_nProt(_valor);
+
+                                _xmlRetEvento.writeTextElement("nProt", _valor);
+                            }
+                            if(_xml.name() == QStringLiteral("chNFePend"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retEvento->obj->infEvento->set_chNFePend(_valor);
+
+                                _xmlRetEvento.writeTextElement("chNFePend", _valor);
+                            }
+
+                            _xml.readNext();
+                        }
+
+                        _xmlRetEvento.writeEndElement(); //fechamento infEvento
+                    }
+
+                    _xml.readNext();
+                }
+                _xmlRetEvento.writeEndElement(); //fechamento retEvento
+                this->retorno->retEvento->obj->set_XML(_strXMLRetEvento);
+                this->retorno->retEvento->add();
+            }
+
+            _xml.readNext();
+        }
+    } else
+    {
+        set_error("Erro: O XML retornado pelo web services não é válido.");
+        //caso errado, salvar log do retorno em formato html
+        salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
+                   WebServicesNF::NFeRecepcaoEvento, this->m_msgRetorno);
+
+    }
+
+    return _ret;
+}
