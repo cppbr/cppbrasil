@@ -15,8 +15,21 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Widgets Gui Xml C
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Widgets Gui Xml Charts Qml Sql Svg PrintSupport)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(/usr/include/libxml2)
-include_directories(/usr/include/QtRPT)
+if (CMAKE_SYSTEM MATCHES "Linux")
+    include_directories(
+        /usr/include/libxml2
+        /usr/include/QtRPT
+    )
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    include_directories(
+        ../../../include
+        ../../../third-party/windows/OpenSSL1.1.1q/include
+        ../../../third-party/windows/libxml2-v2.9.13/include/libxml2
+        ../../../third-party/windows/libiconv-for-Windows/include
+        ../../../third-party/windows/zlib-1.2.12/include
+        ../../../third-party/windows/QtRptProject3.0/include/QtRPT
+    )
+endif()
 
 set(PROJECT_SOURCES
         main.cpp

@@ -15,13 +15,20 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Network)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if(CMAKE_SYSTEM MATCHES Android)
-    include_directories(/media/Secundario/AndroidSDK/android_openssl/static/include)
-    include_directories(/home/joao/Lib/libxml2-v2.9.13/out/include/libxml2)
-    include_directories(/home/joao/Lib/zlib-1.2.11/build-clang/include)
-    include_directories(/home/joao/cppbrasil)
+    include_directories(/home/usuario/AndroidSDK/android_openssl/static/include)
+    include_directories(/home/usuario/cppbrasil/third-party/android/libxml2/include/libxml2)
+    include_directories(/home/usuario/cppbrasil/third-party/android/zlib/include)
+    include_directories(/home/usuario/cppbrasil)
 elseif(CMAKE_SYSTEM MATCHES Linux)
- #   include_directories(/home/joao/cppbrasil)
     include_directories(/usr/include/libxml2)
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    include_directories(
+        ../../../include
+        ../../../third-party/windows/OpenSSL1.1.1q/include
+        ../../../third-party/windows/libxml2-v2.9.13/include/libxml2
+        ../../../third-party/windows/libiconv-for-Windows/include
+        ../../../third-party/windows/zlib-1.2.12/include
+    )
 endif()
 
 
