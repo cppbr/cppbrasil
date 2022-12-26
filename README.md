@@ -39,7 +39,7 @@ João Elson.
 **Site do Projeto e fórum para suporte, interação e sugestões**
 - https://cppbrasil.com.br
 
-** Grupo no Telegram
+**Grupo no Telegram
 - https://t.me/cppbr
 
 
