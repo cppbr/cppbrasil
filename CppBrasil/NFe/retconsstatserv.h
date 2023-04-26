@@ -31,32 +31,31 @@ limitations under the License.
 
 class CPPNFE_EXPORT RetConsStatServ
 {
-    friend class WSStatus;
 public:
     RetConsStatServ();
     ~RetConsStatServ();
     void clear();
     QString get_versao() const;
-    TpAmb get_tpAmb() const;
-    QString get_verAplic() const;
-    int get_cStat() const;
-    QString get_xMotivo() const;
-    int get_cUF() const;
-    QDateTime get_dhRecbto() const;
-    int get_tMed() const;
-    QDateTime get_dhRetorno() const;
-    QString get_xObs() const;
-protected:
     void set_versao(const QString &versao);
+    TpAmb get_tpAmb() const;
     void set_tpAmb(const TpAmb &tpAmb);
+    QString get_verAplic() const;
     void set_verAplic(const QString &verAplic);
+    int get_cStat() const;
     void set_cStat(const int &cStat);
+    QString get_xMotivo() const;
     void set_xMotivo(const QString &xMotivo);
+    int get_cUF() const;
     void set_cUF(const int &cUF);
+    QDateTime get_dhRecbto() const;
     void set_dhRecbto(const QDateTime &dhRecbto);
+    int get_tMed() const;
     void set_tMed(const int &tMed);
+    QDateTime get_dhRetorno() const;
     void set_dhRetorno(const QDateTime &dhRetorno);
+    QString get_xObs() const;
     void set_xObs(const QString &xObs);
+
 private:
     QString m_versao;
     TpAmb m_tpAmb;
@@ -68,7 +67,6 @@ private:
     int m_tMed;
     QDateTime m_dhRetorno;
     QString m_xObs;
-
 };
 
 

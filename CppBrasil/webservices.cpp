@@ -57,7 +57,7 @@ bool WebServices::timeout(const int &time)
 void WebServices::set_error(const QString &error)
 {
     this->m_error = error;
-    emit onError(this->m_error);
+    emit errorOccurred(error);
 }
 
 bool WebServices::get_soapEnvelop(const QByteArray &dados, const QByteArray &NameSpace,
@@ -86,8 +86,7 @@ bool WebServices::get_soapEnvelop(const QByteArray &dados, const QByteArray &Nam
     }
 }
 
-QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data,
-                                const int &lenReturn)
+QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
 {
     this->m_error.clear();
     QByteArray _output;
@@ -101,7 +100,7 @@ QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data,
     }
 
     connect(_http, &HttpClient::errorOccurred, this, &WebServices::onError);
-    _output.append(_http->send(host, data, lenReturn));
+    _output.append(_http->send(host, data));
 
     delete _http;
     return _output;
@@ -111,5 +110,4 @@ void WebServices::onError(const QString &error)
 {
     this->m_error = error;
     emit errorOccurred(error);
-
 }

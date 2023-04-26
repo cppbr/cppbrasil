@@ -42,16 +42,16 @@ public:
     ~WebServices();
     QString get_error() const;
 
+signals:
+    void errorOccurred(const QString &error);
+
 protected:
     bool timeout(const int &time);
     void set_error(const QString &error);
     bool get_soapEnvelop(const QByteArray &data, const QByteArray &NameSpace,
                                const QByteArray &urlNamespace, QByteArray &output);
 
-    QByteArray sendMsg(const QByteArray &host, const QByteArray &data, const int &lenReturn = 0);
-
-signals:
-    void errorOccurred(const QString &error);
+    QByteArray sendMsg(const QByteArray &host, const QByteArray &data);
 
 private slots:
     void onError(const QString &error);

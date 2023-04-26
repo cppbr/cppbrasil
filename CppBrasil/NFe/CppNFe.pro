@@ -101,6 +101,7 @@ SOURCES += \
     comb.cpp \
     compra.cpp \
     confignfe.cpp \
+    conssitnfe.cpp \
     convnf.cpp \
     cppnfe.cpp \
     deduc.cpp \
@@ -116,7 +117,8 @@ SOURCES += \
     enderemit.cpp \
     entrega.cpp \
     envevento.cpp \
-    eventosnf.cpp \
+    enveventoevento.cpp \
+    eventonotafiscal.cpp \
     exporta.cpp \
     exportind.cpp \
     fat.cpp \
@@ -154,6 +156,7 @@ SOURCES += \
     refecf.cpp \
     refnf.cpp \
     refnfp.cpp \
+    retconssitnfe.cpp \
     retconsstatserv.cpp \
     retenvevento.cpp \
     retirada.cpp \
@@ -200,6 +203,7 @@ HEADERS += \
     comb.h \
     compra.h \
     confignfe.h \
+    conssitnfe.h \
     convnf.h \
     cppnfe.h \
     deduc.h \
@@ -215,7 +219,8 @@ HEADERS += \
     enderemit.h \
     entrega.h \
     envevento.h \
-    eventosnf.h \
+    enveventoevento.h \
+    eventonotafiscal.h \
     exporta.h \
     exportind.h \
     fat.h \
@@ -253,6 +258,7 @@ HEADERS += \
     refecf.h \
     refnf.h \
     refnfp.h \
+    retconssitnfe.h \
     retconsstatserv.h \
     retenvevento.h \
     retirada.h \
@@ -280,8 +286,12 @@ unix {
     INCLUDEPATH += /usr/include \
                    /usr/include/libxml2
     #target.path = /usr/lib
+    #INCLUDEPATH += /home/joao/Lib/openssl-1.1.1s/out/include/
 
-    LIB += -lcrypto -lssl -lxml2 -lz
+    #LIBS += -L/home/joao/Lib/openssl-1.1.1s/out/lib/ -lcrypto -lssl
+    #LIBS += -lxml2 -lz
+    LIBS += -lcrypto -lssl -lxml2 -lz
+
 }
 !isEmpty(target.path): INSTALLS += target
 

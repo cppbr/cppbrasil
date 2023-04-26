@@ -80,6 +80,8 @@ set(cppnfe_SRC
     compra.cpp
     confignfe.h
     confignfe.cpp
+    conssitnfe.h
+    conssitnfe.cpp
     convnf.h
     convnf.cpp
     deduc.h
@@ -108,8 +110,10 @@ set(cppnfe_SRC
     entrega.cpp
     envevento.h
     envevento.cpp
-    eventosnf.h
-    eventosnf.cpp
+    enveventoevento.h
+    enveventoevento.cpp
+    eventonotafiscal.h
+    eventonotafiscal.cpp
     exporta.h
     exporta.cpp
     exportind.h
@@ -184,6 +188,8 @@ set(cppnfe_SRC
     refnf.cpp
     refnfp.h
     refnfp.cpp
+    retconssitnfe.h
+    retconssitnfe.cpp
     retconsstatserv.h
     retconsstatserv.cpp
     retenvevento.h
@@ -253,6 +259,7 @@ set(HEADER_NFE
     comb.h
     compra.h
     confignfe.h
+    conssitnfe.h
     convnf.h
     deduc.h
     dest.h
