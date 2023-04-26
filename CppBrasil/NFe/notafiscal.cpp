@@ -49,7 +49,7 @@ bool NotaFiscal::assinar()
        //caso esteja configurado para salvar, será salvo automático após assinar
        if (this->config->arquivos->get_salvar())
        {
-            CppUtility::saveFile(this->config->get_caminhoNF(),
+            CppUtility::saveFile(this->config->arquivos->get_caminhoNF(),
                                  QString(this->NFe->items->value(i)->get_chNFe() + "-nfe"),
                                  TipoArquivo::XML,
                                  this->NFe->items->value(i)->get_XMLAssinado().toLocal8Bit());
@@ -110,12 +110,12 @@ bool NotaFiscal::enviar(const int &numLote)
                            this->retorno.get());
 
     connect(_ws, SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
-    connect(_ws, &WSNFe::errorOccurred, [=]( const QString &error ) {
+    connect(_ws, &WSNFe::errorOccurred, this,
+            [=]( const QString &error ) {
         set_error(error, 1);
     } );
 
     bool _ret = _ws->send(numLote, _notas.toLocal8Bit(),
-                          this->NFe->items->count(),
                           ConvNF::versaoNFToStr(this->config->get_VersaoNF()));
 
     if (_ret)
@@ -239,7 +239,7 @@ void NotaFiscal::tratarRetorno()
                                 this->NFe->items->value(j)->set_XMLAutorizado(_nfeProc);
                                 //caso esteja configurado para salvar
                                 if (this->config->arquivos->get_salvar())
-                                     this->retorno->protNFe->items->value(i)->salvarXML(this->config->get_caminhoNF(), "" );
+                                     this->retorno->protNFe->items->value(i)->salvarXML(this->config->arquivos->get_caminhoNF(), "" );
                             }
                         }
                     }

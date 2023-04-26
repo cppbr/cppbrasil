@@ -18,20 +18,24 @@ limitations under the License.
 */
 
 
-#include "eventosnf.h"
+#include "eventonotafiscal.h"
 
 
-EventosNF::EventosNF(ConfigNFe* confgNFe, NotaFiscal* notafiscal) :
-    statusServico(new StatusServico(confgNFe)), envEvento(new EnvEvento(confgNFe, notafiscal))
+EventoNotaFiscal::EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal) :
+    statusServico(new StatusServico(confgNFe)), envEvento(new EnvEvento(confgNFe, notafiscal)),
+    consSitNFe(new ConsSitNFe(confgNFe, notafiscal))
 {
     connect(statusServico.get(), SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
     connect(statusServico.get(), SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
     //pode ser feito da forma acima, mas serve apenas para saber que estamos conectando um signal a outro signal
-    connect(envEvento.get(), &EnvEvento::wsChange, this, &EventosNF::wsChange);
-    connect(envEvento.get(), &EnvEvento::errorOccurred, this, &EventosNF::errorOccurred);
+    connect(envEvento.get(), &EnvEvento::wsChange, this, &EventoNotaFiscal::wsChange);
+    connect(envEvento.get(), &EnvEvento::errorOccurred, this, &EventoNotaFiscal::errorOccurred);
+
+    connect(consSitNFe.get(), &ConsSitNFe::wsChange, this, &EventoNotaFiscal::wsChange);
+    connect(consSitNFe.get(), &ConsSitNFe::errorOccurred, this, &EventoNotaFiscal::errorOccurred);
 
 }
 
-EventosNF::~EventosNF()
+EventoNotaFiscal::~EventoNotaFiscal()
 {
 }

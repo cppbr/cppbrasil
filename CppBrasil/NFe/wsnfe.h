@@ -34,6 +34,7 @@ limitations under the License.
 #include <CppBrasil/NFe/urlnfe.h>
 #include <CppBrasil/NFe/convnf.h>
 #include <CppBrasil/NFe/retenvevento.h>
+#include <CppBrasil/NFe/retconssitnfe.h>
 
 //obs: A versão do Layout do xml, nem sempre é a mesma versão do Web Services.
 class CPPNFE_EXPORT WSNFeBase : public WebServices
@@ -45,6 +46,10 @@ public:
     QByteArray get_mensagemRetorno() const;
     QString get_verLayout() const;//versão layout
     void set_verLayout(const QString &verLayout);
+
+signals:
+    void wsChange(const WebServicesNF &webServicesNF);
+
 protected:
     QByteArray m_msgEnvio;
     QByteArray m_msgRetorno;
@@ -59,9 +64,6 @@ protected:
     void salvarLogs(const TipoArquivo &tipolog, const TipoMsgLog &msglog,
                     const QString &nomeGrupo, const WebServicesNF &webServicesNF,
                     const QByteArray &dadosLog);
-signals:
-    void wsChange(const WebServicesNF &webServicesNF);
-
 private:
     QString m_nameSpaceBase = "nfeDadosMsg";
     QString m_urlNameSpaceBase = "http://www.portalfiscal.inf.br/nfe";
@@ -75,7 +77,7 @@ public:
     WSNFe(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsReciNFe* retorno);
     ~WSNFe();
 
-    bool send(const int &numLote, const QByteArray &xml, const int &totDoc, const QString &verLayout);
+    bool send(const int &numLote, const QByteArray &xml, const QString &verLayout);
 
 private:
     enum TipoRetorno {retEnviNFe, retConsReciNFe};
@@ -83,22 +85,22 @@ private:
     bool gerarXMLlote(const int &numLote, const QByteArray &xml);
     bool gerarXMLrecibo();
     StatusRetorno tratarRetorno(const TipoRetorno &tipo);
-    //função para testes, pode ser excluida
-    /*
-    void openFile(const QString &path){
-        this->m_msgRetorno.clear();
-        QFile file(path);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                return;
 
-        while (!file.atEnd())
-        {
-            this->m_msgRetorno.append(file.readLine());
-        }
-        qInfo() << m_msgRetorno;
-        file.close();
-    }
-    */
+//    função para testes, pode ser excluida
+//    void openFile(const QString &path){
+//        this->m_msgRetorno.clear();
+//        QFile file(path);
+//        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+//                return;
+
+//        while (!file.atEnd())
+//        {
+//            this->m_msgRetorno.append(file.readLine());
+//        }
+//        qInfo() << m_msgRetorno;
+//        file.close();
+//    }
+
 };
 
 
@@ -121,10 +123,23 @@ class CPPNFE_EXPORT WSEvento : public WSNFeBase
 public:
     WSEvento(ConfigNFe* confgNFe, CppCrypto* crypto, RetEnvEvento* retorno);
     ~WSEvento();
-    bool send(const QByteArray &xml, const int &totDoc, const QString &verLayout);
+    bool send(const QByteArray &xml, const QString &verLayout);
 
 private:
     RetEnvEvento* retorno;
+    bool gerarXML(const QByteArray &xml);
+    StatusRetorno tratarRetorno();
+
+};
+
+class CPPNFE_EXPORT WSConsultaProtocolo : public WSNFeBase
+{
+public:
+    WSConsultaProtocolo(ConfigNFe* confgNFe, CppCrypto* crypto, RetConsSitNFe *retorno);
+    bool send(const QByteArray &xml, const QString &verLayout);
+
+private:
+    RetConsSitNFe* retorno;
     bool gerarXML(const QByteArray &xml);
     StatusRetorno tratarRetorno();
 

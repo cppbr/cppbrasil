@@ -18,8 +18,8 @@ limitations under the License.
 */
 
 
-#ifndef EVENTOSNF_H
-#define EVENTOSNF_H
+#ifndef EVENTONOTAFISCAL_H
+#define EVENTONOTAFISCAL_H
 
 #include <memory>
 #include <QObject>
@@ -29,16 +29,18 @@ limitations under the License.
 #include <CppBrasil/NFe/statusservico.h>
 #include <CppBrasil/NFe/notafiscal.h>
 #include <CppBrasil/NFe/envevento.h>
+#include <CppBrasil/NFe/conssitnfe.h>
 
 
-class CPPNFE_EXPORT EventosNF : public QObject
+class CPPNFE_EXPORT EventoNotaFiscal : public QObject
 {
     Q_OBJECT
 public:
-    EventosNF(ConfigNFe* confgNFe, NotaFiscal* notafiscal);
-    ~EventosNF();
+    EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal);
+    ~EventoNotaFiscal();
     std::shared_ptr<StatusServico> statusServico;
     std::shared_ptr<EnvEvento> envEvento;
+    std::shared_ptr<ConsSitNFe> consSitNFe;
 
 signals:
     void errorOccurred(const QString &error);
@@ -46,4 +48,4 @@ signals:
 
 };
 
-#endif // EVENTOSNF_H
+#endif // EVENTONOTAFISCAL_H

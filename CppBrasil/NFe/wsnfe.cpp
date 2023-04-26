@@ -144,13 +144,13 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
         //se não tiver o nome do grupo, será salvo o xml da forma que retornar do web services
         if (nomeGrupo.isEmpty())
         {
-            CppUtility::saveFile(confgNFe->get_caminhoLogs(), _file, tipoArquivo, dadosLog);
+            CppUtility::saveFile(confgNFe->arquivos->get_caminhoLogs(), _file, tipoArquivo, dadosLog);
         } else
         {
             QString _xml;
             _xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             _xml.append(CppUtility::extractStr(dadosLog, "<" + nomeGrupo, nomeGrupo + ">"));
-            CppUtility::saveFile(confgNFe->get_caminhoLogs(), _file, tipoArquivo, _xml.toLocal8Bit());
+            CppUtility::saveFile(confgNFe->arquivos->get_caminhoLogs(), _file, tipoArquivo, _xml.toLocal8Bit());
         }
     }
 }
@@ -166,12 +166,10 @@ WSNFe::~WSNFe()
 {
 }
 
-bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc, const QString &verLayout)
+bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLayout)
 {
     //versão do layout
     set_verLayout(verLayout);
-    //tamanho do BUF para armazenamento de retorno. somente para OpenSSL
-    int _lenRet = 0, _retEnviNFe = 570, _retConsReciNFe = 780, _protNFe = 850;
     StatusRetorno _ret = StatusRetorno::EmProcessamento;
     QString _url = get_urlServidorWS(WebServicesNF::NFeAutorizacao);
     //se não for informado quantas tentativas, o padrão será ao menos 2
@@ -187,10 +185,9 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc, c
     if (gerarXMLlote(numLote, xml))
     {
         //enviando mensagem
-        _lenRet = _retEnviNFe + _protNFe; //_protNFe caso sincrono
         emit wsChange(WebServicesNF::NFeAutorizacao);
         this->m_msgRetorno.clear();
-        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio, _lenRet);
+        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
         //se não houver erro
         if (this->get_error().isEmpty())
         {
@@ -216,10 +213,9 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const int &totDoc, c
                             {
                                 _url = get_urlServidorWS(WebServicesNF::NFeRetAutorizacao);
                                 //enviando mensagem
-                                _lenRet = _retConsReciNFe + (_protNFe * totDoc);
                                 emit wsChange(WebServicesNF::NFeRetAutorizacao);
                                 this->m_msgRetorno.clear();
-                                this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio, _lenRet);
+                                this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
                                 //se não houver erro
                                 if (this->get_error().isEmpty())
                                 {
@@ -570,13 +566,12 @@ WSStatus::~WSStatus()
 bool WSStatus::send(const QString &verLayout)
 {
     set_verLayout(verLayout);
-    int _lenRet = 651;
     StatusRetorno _ret;
     if (gerarXML())
     {
         QString _url = get_urlServidorWS(WebServicesNF::NFeStatusServico);
         emit wsChange(WebServicesNF::NFeStatusServico);
-        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio, _lenRet);
+        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
 
         //se não houve erro no envio, trata o retorno
         if (this->get_error().isEmpty())
@@ -735,22 +730,18 @@ WSEvento::~WSEvento()
 
 }
 
-bool WSEvento::send(const QByteArray &xml, const int &totDoc, const QString &verLayout)
+bool WSEvento::send(const QByteArray &xml, const QString &verLayout)
 {
     set_verLayout(verLayout);
-    //tamanho do BUF para armazenamento de retorno. somente para OpenSSL
-    //_retEvento é uma base do tamanho para cada evento, já que o evento não tem tamanho fixo e são vários tipos de eventos
-    int _lenRet = 0, _retEvento = 800;
     StatusRetorno _ret = StatusRetorno::EmProcessamento;
     QString _url = get_urlServidorWS(WebServicesNF::NFeRecepcaoEvento);
     //gera xml do lote na var m_msgEnvio
     if (gerarXML(xml))
     {
         //enviando mensagem
-        _lenRet = _retEvento * totDoc; //calcula pelo total de eventos que será enviado
         emit wsChange(WebServicesNF::NFeRecepcaoEvento);
         this->m_msgRetorno.clear();
-        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio, _lenRet);
+        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
         //se não houver erro
         if (this->get_error().isEmpty())
         {
@@ -1028,6 +1019,90 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
         //caso errado, salvar log do retorno em formato html
         salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
                    WebServicesNF::NFeRecepcaoEvento, this->m_msgRetorno);
+
+    }
+
+    return _ret;
+}
+
+//WSConsultaProtocolo---------------------------------------------------
+
+WSConsultaProtocolo::WSConsultaProtocolo(ConfigNFe *confgNFe, CppCrypto *crypto, RetConsSitNFe *retorno) :
+   WSNFeBase(confgNFe, crypto), retorno(retorno)
+{
+
+}
+
+bool WSConsultaProtocolo::send(const QByteArray &xml, const QString &verLayout)
+{
+    set_verLayout(verLayout);
+    StatusRetorno _ret = StatusRetorno::EmProcessamento;
+    QString _url = get_urlServidorWS(WebServicesNF::NFeConsultaProtocolo);
+    //gera xml do lote na var m_msgEnvio
+    if (gerarXML(xml))
+    {
+        //enviando mensagem
+        emit wsChange(WebServicesNF::NFeConsultaProtocolo);
+        this->m_msgRetorno.clear();
+        this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
+        //se não houver erro
+        if (this->get_error().isEmpty())
+        {
+            //envio de consulta é síncrono
+            _ret = tratarRetorno();
+        } else
+        {
+            _ret = StatusRetorno::Erro;
+            set_error("Erro ao enviar evento.");
+        }
+    }
+    emit wsChange(WebServicesNF::None);
+    return (_ret == StatusRetorno::Erro) ? false : true;
+
+}
+
+bool WSConsultaProtocolo::gerarXML(const QByteArray &xml)
+{
+    //só será necessário gerar o envelop soap, já que o xml foi assinado e validado na sua criação
+    bool _ret = true;
+    //envelop soap
+    QString _urlBodyElement = get_urlNamespaceWS(WebServicesNF::NFeConsultaProtocolo);
+
+    this->m_msgEnvio.clear();
+    _ret = get_soapEnvelop(xml, get_namespaceBase().toLocal8Bit(),
+                                _urlBodyElement.toLocal8Bit(), this->m_msgEnvio);
+    //salva log
+    salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgEnvio ,"consSitNFe",
+               WebServicesNF::NFeConsultaProtocolo, this->m_msgEnvio);
+
+    return _ret;
+
+}
+
+WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
+{
+    //consultar schema e analizar o resultado
+    QString _schemaName = "retConsSitNFe_v" + get_verLayout() + ".xsd";
+    StatusRetorno _ret = (validarXML(_schemaName, "retConsSitNFe", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
+
+    if (_ret == StatusRetorno::Processado)
+    {
+        QXmlStreamReader _xml(this->m_msgRetorno);
+        QString _valor;
+        //salvar log do retorno
+        salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgRetorno ,"retConsSitNFe",
+                   WebServicesNF::NFeConsultaProtocolo, this->m_msgRetorno);
+        QXmlStreamAttributes attributes;
+        //while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retConsSitNFe")))
+        //{
+        //...
+        //}
+    } else
+    {
+        set_error("Erro: O XML retornado pelo web services não é válido.");
+        //caso errado, salvar log do retorno em formato html
+        salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
+                   WebServicesNF::NFeConsultaProtocolo, this->m_msgRetorno);
 
     }
 

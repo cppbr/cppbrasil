@@ -42,6 +42,7 @@ public:
     void clear();
     QString get_error() const;
     QString get_chNFe() const;
+    void set_chNFe(const QString &chNFe);
     QString get_XMLOriginal() const;
     QString get_XMLAssinado() const;
 
@@ -56,8 +57,6 @@ public:
     std::shared_ptr<ProtNFe> protNFe;
     std::shared_ptr<InfNFeSupl> infNFeSupl;
 
-protected:
-    void set_chNFe(const QString &chNFe);
 private:
     QString m_chaveacesso;
     QString m_xml_original;

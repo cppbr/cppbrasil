@@ -51,9 +51,19 @@ QString ProtNFe::get_versao() const
     return this->m_versao;
 }
 
+void ProtNFe::set_versao(const QString &versao)
+{
+    this->m_versao = versao;
+}
+
 QString ProtNFe::get_Id() const
 {
     return this->m_Id;
+}
+
+void ProtNFe::set_Id(const QString &Id)
+{
+    this->m_Id = Id;
 }
 
 TpAmb ProtNFe::get_tpAmb() const
@@ -61,9 +71,19 @@ TpAmb ProtNFe::get_tpAmb() const
     return this->m_tpAmb;
 }
 
+void ProtNFe::set_tpAmb(const TpAmb &tpAmb)
+{
+    this->m_tpAmb = tpAmb;
+}
+
 QString ProtNFe::get_verAplic() const
 {
     return this->m_verAplic;
+}
+
+void ProtNFe::set_verAplic(const QString &verAplic)
+{
+    this->m_verAplic = verAplic;
 }
 
 QString ProtNFe::get_chNFe() const
@@ -71,9 +91,19 @@ QString ProtNFe::get_chNFe() const
     return this->m_chNFe;
 }
 
+void ProtNFe::set_chNFe(const QString &chNFe)
+{
+    this->m_chNFe = chNFe;
+}
+
 QDateTime ProtNFe::get_dhRecbto() const
 {
     return this->m_dhRecbto;
+}
+
+void ProtNFe::set_dhRecbto(const QDateTime &dhRecbto)
+{
+    this->m_dhRecbto = dhRecbto;
 }
 
 QString ProtNFe::get_nProt() const
@@ -81,9 +111,19 @@ QString ProtNFe::get_nProt() const
     return this->m_nProt;
 }
 
+void ProtNFe::set_nProt(const QString &nProt)
+{
+    this->m_nProt = nProt;
+}
+
 QString ProtNFe::get_digVal() const
 {
     return this->m_digVal;
+}
+
+void ProtNFe::set_digVal(const QString &digVal)
+{
+    this->m_digVal = digVal;
 }
 
 int ProtNFe::get_cStat() const
@@ -91,9 +131,19 @@ int ProtNFe::get_cStat() const
     return this->m_cStat;
 }
 
+void ProtNFe::set_cStat(const int &cStat)
+{
+    this->m_cStat = cStat;
+}
+
 QString ProtNFe::get_xMotivo() const
 {
     return this->m_xMotivo;
+}
+
+void ProtNFe::set_xMotivo(const QString &xMotivo)
+{
+    this->m_xMotivo = xMotivo;
 }
 
 int ProtNFe::get_cMsg() const
@@ -101,14 +151,29 @@ int ProtNFe::get_cMsg() const
     return this->m_cMsg;
 }
 
+void ProtNFe::set_cMsg(const int &cMsg)
+{
+    this->m_cMsg = cMsg;
+}
+
 QString ProtNFe::get_xMsg() const
 {
     return this->m_xMsg;
 }
 
+void ProtNFe::set_xMsg(const QString &xMsg)
+{
+    this->m_xMsg = xMsg;
+}
+
 QString ProtNFe::get_xml() const
 {
     return this->m_xml;
+}
+
+void ProtNFe::set_xml(const QString &xml)
+{
+    this->m_xml = xml;
 }
 
 void ProtNFe::salvarXML(const QString &caminho, const QString &nomeArquivo)
@@ -121,70 +186,6 @@ void ProtNFe::salvarXML(const QString &caminho, const QString &nomeArquivo)
     CppUtility::saveFile(caminho, nome, TipoArquivo::XML, m_xml.toLocal8Bit());
 }
 
-void ProtNFe::set_versao(const QString &versao)
-{
-    this->m_versao = versao;
-}
-
-void ProtNFe::set_Id(const QString &Id)
-{
-    this->m_Id = Id;
-}
-
-void ProtNFe::set_tpAmb(const TpAmb &tpAmb)
-{
-    this->m_tpAmb = tpAmb;
-}
-
-void ProtNFe::set_verAplic(const QString &verAplic)
-{
-    this->m_verAplic = verAplic;
-}
-
-void ProtNFe::set_chNFe(const QString &chNFe)
-{
-    this->m_chNFe = chNFe;
-}
-
-void ProtNFe::set_dhRecbto(const QDateTime &dhRecbto)
-{
-    this->m_dhRecbto = dhRecbto;
-}
-
-void ProtNFe::set_nProt(const QString &nProt)
-{
-    this->m_nProt = nProt;
-}
-
-void ProtNFe::set_digVal(const QString &digVal)
-{
-    this->m_digVal = digVal;
-}
-
-void ProtNFe::set_cStat(const int &cStat)
-{
-    this->m_cStat = cStat;
-}
-
-void ProtNFe::set_xMotivo(const QString &xMotivo)
-{
-    this->m_xMotivo = xMotivo;
-}
-
-void ProtNFe::set_cMsg(const int &cMsg)
-{
-    this->m_cMsg = cMsg;
-}
-
-void ProtNFe::set_xMsg(const QString &xMsg)
-{
-    this->m_xMsg = xMsg;
-}
-
-void ProtNFe::set_xml(const QString &xml)
-{
-    this->m_xml = xml;
-}
 
 //class RetConsReciNFe------------------------------------------------
 
@@ -218,54 +219,14 @@ QString RetConsReciNFe::get_versao() const
     return this->m_versao;
 }
 
-TpAmb RetConsReciNFe::get_tpAmb() const
-{
-    return this->m_tpAmb;
-}
-
-QString RetConsReciNFe::get_verAplic() const
-{
-    return this->m_verAplic;
-}
-
-QString RetConsReciNFe::get_nRec() const
-{
-    return this->m_nRec;
-}
-
-int RetConsReciNFe::get_cStat() const
-{
-    return this->m_cStat;
-}
-
-QString RetConsReciNFe::get_xMotivo() const
-{
-    return this->m_xMotivo;
-}
-
-int RetConsReciNFe::get_cUF() const
-{
-    return this->m_cUF;
-}
-
-QDateTime RetConsReciNFe::get_dhRecbto() const
-{
-    return this->m_dhRecbto;
-}
-
-int RetConsReciNFe::get_cMsg() const
-{
-    return this->m_cMsg;
-}
-
-QString RetConsReciNFe::get_xMsg() const
-{
-    return this->m_xMsg;
-}
-
 void RetConsReciNFe::set_versao(const QString &versao)
 {
     this->m_versao = versao;
+}
+
+TpAmb RetConsReciNFe::get_tpAmb() const
+{
+    return this->m_tpAmb;
 }
 
 void RetConsReciNFe::set_tpAmb(const TpAmb &tpAmb)
@@ -273,9 +234,19 @@ void RetConsReciNFe::set_tpAmb(const TpAmb &tpAmb)
     this->m_tpAmb = tpAmb;
 }
 
+QString RetConsReciNFe::get_verAplic() const
+{
+    return this->m_verAplic;
+}
+
 void RetConsReciNFe::set_verAplic(const QString &verAplic)
 {
     this->m_verAplic = verAplic;
+}
+
+QString RetConsReciNFe::get_nRec() const
+{
+    return this->m_nRec;
 }
 
 void RetConsReciNFe::set_nRec(const QString &nRec)
@@ -283,9 +254,19 @@ void RetConsReciNFe::set_nRec(const QString &nRec)
     this->m_nRec = nRec;
 }
 
+int RetConsReciNFe::get_cStat() const
+{
+    return this->m_cStat;
+}
+
 void RetConsReciNFe::set_cStat(const int &cStat)
 {
     this->m_cStat = cStat;
+}
+
+QString RetConsReciNFe::get_xMotivo() const
+{
+    return this->m_xMotivo;
 }
 
 void RetConsReciNFe::set_xMotivo(const QString &xMotivo)
@@ -293,9 +274,19 @@ void RetConsReciNFe::set_xMotivo(const QString &xMotivo)
     this->m_xMotivo = xMotivo;
 }
 
+int RetConsReciNFe::get_cUF() const
+{
+    return this->m_cUF;
+}
+
 void RetConsReciNFe::set_cUF(const int &cUF)
 {
     this->m_cUF = cUF;
+}
+
+QDateTime RetConsReciNFe::get_dhRecbto() const
+{
+    return this->m_dhRecbto;
 }
 
 void RetConsReciNFe::set_dhRecbto(const QDateTime &dhRecbto)
@@ -303,13 +294,22 @@ void RetConsReciNFe::set_dhRecbto(const QDateTime &dhRecbto)
     this->m_dhRecbto = dhRecbto;
 }
 
+int RetConsReciNFe::get_cMsg() const
+{
+    return this->m_cMsg;
+}
+
 void RetConsReciNFe::set_cMsg(const int &cMsg)
 {
     this->m_cMsg = cMsg;
+}
+
+QString RetConsReciNFe::get_xMsg() const
+{
+    return this->m_xMsg;
 }
 
 void RetConsReciNFe::set_xMsg(const QString &xMsg)
 {
     this->m_xMsg = xMsg;
 }
-

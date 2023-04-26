@@ -200,9 +200,10 @@ enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspeci
 
 //tpEvento - Eventos Registrados pelo Emitente / Eventos Registrados pelo Destinatário
 enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
-                     CancelamentoSubstituicao = 110112, EPEC = 110140,
+                     CancelamentoSubstituicao = 110112, ComprovanteEntregaNFe = 110130,
+                     CancelComprovanteEntregaNFe = 110131, EPEC = 110140,
                      PedidoProrrogacao1 = 111500, PedidoProrrogacao2 = 111501,
-                     CancelaPedidoProrrogacao1 = 111502, CancelaPedidoProrrogacao2 = 111503,
+                     CancelPedidoProrrogacao1 = 111502, CancelPedidoProrrogacao2 = 111503,
                      AtorInteressadoNFeTransp = 110150, ConfirmacaoOperacaoDest = 210200,
                      CienciaOperacaoDest = 210210,  DesconhecimentoOperacaoDest = 210220,
                      OperacaoNaoRealizadaDest = 210240};

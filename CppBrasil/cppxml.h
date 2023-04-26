@@ -52,15 +52,14 @@ public:
                          const QByteArray &node_doc, const QByteArray &node_sign,
                          const QByteArray &URI, const XMLReturnType &returntype,
                          QByteArray &output);
+signals:
+    void errorOccurred(const QString &error);
+
 protected:
     void set_error(const QString &error);
     QString get_signNode(const HashType &hashType, const QByteArray &URI,
                       const QByteArray &X509cert, const QByteArray &digest,
                       const QByteArray &signature);
-
-signals:
-    void errorOccurred(const QString &error);
-
 private:
     QString m_error;
 };

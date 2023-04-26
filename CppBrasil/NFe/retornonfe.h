@@ -38,42 +38,37 @@ limitations under the License.
 
 class CPPNFE_EXPORT ProtNFe
 {
-    friend class WSNFe;
-    friend class NotaFiscal;
-    friend class XmlRead;
 public:
     ProtNFe();
     ~ProtNFe();
     void clear();
     QString get_versao() const;
-    QString get_Id() const;
-    TpAmb get_tpAmb() const;
-    QString get_verAplic() const;
-    QString get_chNFe() const;
-    QDateTime get_dhRecbto() const;
-    QString get_nProt() const;
-    QString get_digVal() const;
-    int get_cStat() const;
-    QString get_xMotivo() const;
-    int get_cMsg() const;
-    QString get_xMsg() const;
-    QString get_xml() const;
-    void salvarXML(const QString &caminho, const QString &nomeArquivo);
-
-protected:
     void set_versao(const QString &versao);
+    QString get_Id() const;
     void set_Id(const QString &Id);
+    TpAmb get_tpAmb() const;
     void set_tpAmb(const TpAmb &tpAmb);
+    QString get_verAplic() const;
     void set_verAplic(const QString &verAplic);
+    QString get_chNFe() const;
     void set_chNFe(const QString &chNFe);
+    QDateTime get_dhRecbto() const;
     void set_dhRecbto(const QDateTime &dhRecbto);
+    QString get_nProt() const;
     void set_nProt(const QString &nProt);
+    QString get_digVal() const;
     void set_digVal(const QString &digVal);
+    int get_cStat() const;
     void set_cStat(const int &cStat);
+    QString get_xMotivo() const;
     void set_xMotivo(const QString &xMotivo);
+    int get_cMsg() const;
     void set_cMsg(const int &cMsg);
+    QString get_xMsg() const;
     void set_xMsg(const QString &xMsg);
+    QString get_xml() const;
     void set_xml(const QString &xml);
+    void salvarXML(const QString &caminho, const QString &nomeArquivo);
 
 private:
     //protNFe
@@ -96,36 +91,32 @@ private:
 
 class CPPNFE_EXPORT RetConsReciNFe
 {
-    friend class WSNFe;
-    friend class NotaFiscal;
 public:
     RetConsReciNFe();
     ~RetConsReciNFe();
     void clear();
     QString get_versao() const;
+    void set_versao(const QString &versao);
     TpAmb get_tpAmb() const;
+    void set_tpAmb(const TpAmb &tpAmb);
     QString get_verAplic() const;
+    void set_verAplic(const QString &verAplic);
     QString get_nRec() const;
+    void set_nRec(const QString &nRec);
     int get_cStat() const;
+    void set_cStat(const int &cStat);
     QString get_xMotivo() const;
+    void set_xMotivo(const QString &xMotivo);
     int get_cUF() const;
+    void set_cUF(const int &cUF);
     QDateTime get_dhRecbto() const;
+    void set_dhRecbto(const QDateTime &dhRecbto);
     int get_cMsg() const;
+    void set_cMsg(const int &cMsg);
     QString get_xMsg() const;
+    void set_xMsg(const QString &xMsg);
 
     std::shared_ptr<Container<ProtNFe>> protNFe;
-
-protected:
-    void set_versao(const QString &versao);
-    void set_tpAmb(const TpAmb &tpAmb);
-    void set_verAplic(const QString &verAplic);
-    void set_nRec(const QString &nRec);
-    void set_cStat(const int &cStat);
-    void set_xMotivo(const QString &xMotivo);
-    void set_cUF(const int &cUF);
-    void set_dhRecbto(const QDateTime &dhRecbto);
-    void set_cMsg(const int &cMsg);
-    void set_xMsg(const QString &xMsg);
 
 private:
     QString m_versao;

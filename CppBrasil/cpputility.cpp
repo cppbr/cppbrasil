@@ -119,6 +119,15 @@ QString CppUtility::extractStr(const QString &str, const QString &beginStr, cons
     return _result;
 }
 
+QByteArray CppUtility::extractStr(const QByteArray &str, const QByteArray &beginStr, const QByteArray &endStr)
+{
+    QString _res = extractStr(QString::fromLocal8Bit(str, str.size()),
+                              QString::fromLocal8Bit(beginStr, beginStr.size()),
+                              QString::fromLocal8Bit(endStr, endStr.size()));
+    return _res.toLocal8Bit();
+
+}
+
 int CppUtility::findString(const QString &str, const QString &strValue)
 {
     int _pos;

@@ -164,7 +164,6 @@ void ConfArquivos::set_caminhoSalvar(const QString &caminhoSalvar)
     this->m_caminhoSalvar = caminhoSalvar;
 }
 
-
 QString ConfArquivos::get_caminhoSchema() const
 {
     return this->m_caminhoSchema;

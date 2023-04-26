@@ -31,106 +31,68 @@ Certificado::~Certificado()
 
 //---------------------------------------------------------------
 
-ConfigNFe::ConfigNFe(): certificado(new Certificado), arquivos(new ConfArquivos),
-    webservices(new ConfWebServices)
+ArquivosNF::ArquivosNF(Certificado *certificado):
+    certificado(certificado)
 {
 
 }
 
-ConfigNFe::~ConfigNFe()
+ArquivosNF::~ArquivosNF()
 {
-}
-
-ModeloDF ConfigNFe::get_ModeloDF() const
-{
-    return this->m_ModeloDF;
-}
-
-void ConfigNFe::set_ModeloDF(const ModeloDF &modeloDF)
-{
-    this->m_ModeloDF = modeloDF;
-}
-
-VersaoNF ConfigNFe::get_VersaoNF() const
-{
-    return this->m_VersaoNF;
-}
-
-void ConfigNFe::set_VersaoNF(const VersaoNF &VersaoNF)
-{
-    this->m_VersaoNF = VersaoNF;
-}
-
-QString ConfigNFe::get_IdCSC() const
-{
-    return this->m_IdCSC;
-}
-
-void ConfigNFe::set_IdCSC(const QString &IdCSC)
-{
-    this->m_IdCSC = IdCSC;
-}
-
-QString ConfigNFe::get_CSC() const
-{
-    return this->m_CSC;
-}
-
-void ConfigNFe::set_CSC(const QString &CSC)
-{
-    this->m_CSC = CSC;
-}
-
-VersaoQrCodeNF ConfigNFe::get_VersaoQrCodeNF() const
-{
-    return this->m_VersaoQRCodeNF;
-}
-
-void ConfigNFe::set_VersaoQrCodeNF(const VersaoQrCodeNF &versaoQRCodeNF)
-{
-    this->m_VersaoQRCodeNF = versaoQRCodeNF;
 
 }
 
-IndSinc ConfigNFe::get_indicadorSincrono() const
+QString ArquivosNF::get_caminhoSalvarEvento() const
 {
-    return this->m_indSinc;
+    return this->m_caminhoSalvarEvento;
 }
 
-void ConfigNFe::set_indicadorSincrono(const IndSinc &indSinc)
+void ArquivosNF::set_caminhoSalvarEvento(const QString &caminhoSalvarEventos)
 {
-    this->m_indSinc = indSinc;
+    this->m_caminhoSalvarEvento = caminhoSalvarEventos;
 }
 
-TpEmis ConfigNFe::get_TipoEmissao() const
+QString ArquivosNF::get_caminhoSalvarConsulta() const
 {
-    return this->m_tipoEmissao;
+    return this->m_caminhoSalvarConsulta;
 }
 
-void ConfigNFe::set_TipoEmissao(const TpEmis &tipoEmissao)
+void ArquivosNF::set_caminhoSalvarConsulta(const QString &caminhoSalvarConsulta)
 {
-    this->m_tipoEmissao = tipoEmissao;
+    this->m_caminhoSalvarConsulta = caminhoSalvarConsulta;
 }
 
-QString ConfigNFe::get_caminhoNF() const
+QString ArquivosNF::get_caminhoNF() const
 {
-    return get_caminho("nfe", arquivos->get_salvarPorCNPJ(), arquivos->get_salvarPorModelo(), arquivos->get_salvarPorAnoMesDia(), arquivos->get_salvarPorAnoMes(),
-                       arquivos->get_salvarPorAno(), arquivos->get_salvarPorMes(), arquivos->get_salvarPorDia());
+    return get_caminho("nfe", get_salvarPorCNPJ(), get_salvarPorModelo(), get_salvarPorAnoMesDia(), get_salvarPorAnoMes(),
+                       get_salvarPorAno(), get_salvarPorMes(), get_salvarPorDia());
 }
 
-QString ConfigNFe::get_caminhoLogs() const
+QString ArquivosNF::get_caminhoLogs() const
 {
     return get_caminho("logs", false, false, false, false, false, false, false);
 }
 
-QString ConfigNFe::get_caminhoEvento() const
+QString ArquivosNF::get_caminhoEvento() const
 {
     //evento não deve salvar por documento, somente nfe/nfce
-    return get_caminho("evento", arquivos->get_salvarPorCNPJ(), false, arquivos->get_salvarPorAnoMesDia(), arquivos->get_salvarPorAnoMes(),
-                       arquivos->get_salvarPorAno(), arquivos->get_salvarPorMes(), arquivos->get_salvarPorDia());
+    //QString _base =
+    return get_caminho("evento", get_salvarPorCNPJ(), false, get_salvarPorAnoMesDia(), get_salvarPorAnoMes(),
+                       get_salvarPorAno(), get_salvarPorMes(), get_salvarPorDia());
 }
 
-QString ConfigNFe::get_caminho(const QString &pastaBase, const bool &porCNPJ, const bool &porModelo,
+QString ArquivosNF::get_caminhoConsulta() const
+{
+    return get_caminho("consulta", get_salvarPorCNPJ(), get_salvarPorModelo(), get_salvarPorAnoMesDia(), get_salvarPorAnoMes(),
+                       get_salvarPorAno(), get_salvarPorMes(), get_salvarPorDia());
+}
+
+void ArquivosNF::set_ModeloDF(const ModeloDF &modeloDF)
+{
+    this->m_ModeloDF = modeloDF;
+}
+
+QString ArquivosNF::get_caminho(const QString &pastaBase, const bool &porCNPJ, const bool &porModelo,
                                const bool &porAnoMesDia, const bool &porAnoMes, const bool &porAno,
                                const bool &porMes, const bool &porDia) const
 {
@@ -138,7 +100,7 @@ QString ConfigNFe::get_caminho(const QString &pastaBase, const bool &porCNPJ, co
     QDir _dir;
     QDate _date = QDate::currentDate();
 
-    _path = arquivos->get_caminhoSalvar();
+    _path = get_caminhoSalvar();
 
     //verifica se tem barra no final
     if (_path.right(1) != "/")
@@ -174,7 +136,7 @@ QString ConfigNFe::get_caminho(const QString &pastaBase, const bool &porCNPJ, co
 
     if (porModelo)
     {
-        _path += (ConvDF::modeloDFToStr(get_ModeloDF()) + "/");
+        _path += (ConvDF::modeloDFToStr(this->m_ModeloDF) + "/");
         if (!CppUtility::parsePath(_path))
         {
             if (!_dir.mkdir(_path))
@@ -248,4 +210,88 @@ QString ConfigNFe::get_caminho(const QString &pastaBase, const bool &porCNPJ, co
     }
 
     return _path;
+}
+
+//---------------------------------------------------------------
+
+ConfigNFe::ConfigNFe(): certificado(new Certificado), arquivos(new ArquivosNF(certificado.get())),
+    webservices(new ConfWebServices)
+{
+
+}
+
+ConfigNFe::~ConfigNFe()
+{
+}
+
+ModeloDF ConfigNFe::get_ModeloDF() const
+{
+    return this->m_ModeloDF;
+}
+
+void ConfigNFe::set_ModeloDF(const ModeloDF &modeloDF)
+{
+    this->m_ModeloDF = modeloDF;
+    arquivos->set_ModeloDF(modeloDF);
+}
+
+VersaoNF ConfigNFe::get_VersaoNF() const
+{
+    return this->m_VersaoNF;
+}
+
+void ConfigNFe::set_VersaoNF(const VersaoNF &VersaoNF)
+{
+    this->m_VersaoNF = VersaoNF;
+}
+
+QString ConfigNFe::get_IdCSC() const
+{
+    return this->m_IdCSC;
+}
+
+void ConfigNFe::set_IdCSC(const QString &IdCSC)
+{
+    this->m_IdCSC = IdCSC;
+}
+
+QString ConfigNFe::get_CSC() const
+{
+    return this->m_CSC;
+}
+
+void ConfigNFe::set_CSC(const QString &CSC)
+{
+    this->m_CSC = CSC;
+}
+
+VersaoQrCodeNF ConfigNFe::get_VersaoQrCodeNF() const
+{
+    return this->m_VersaoQRCodeNF;
+}
+
+void ConfigNFe::set_VersaoQrCodeNF(const VersaoQrCodeNF &versaoQRCodeNF)
+{
+    this->m_VersaoQRCodeNF = versaoQRCodeNF;
+
+}
+
+IndSinc ConfigNFe::get_indicadorSincrono() const
+{
+    return this->m_indSinc;
+}
+
+void ConfigNFe::set_indicadorSincrono(const IndSinc &indSinc)
+{
+    this->m_indSinc = indSinc;
+}
+
+TpEmis ConfigNFe::get_TipoEmissao() const
+{
+    return this->m_tipoEmissao;
+}
+
+void ConfigNFe::set_TipoEmissao(const TpEmis &tipoEmissao)
+{
+    this->m_tipoEmissao = tipoEmissao;
 }

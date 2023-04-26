@@ -809,13 +809,13 @@ void XmlWrite::get_ICMS(const int &i)
         {
             QString cst = ConvNF::cstICMSToStr(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST());
             QString cab;
-            if (cst.count() == 2)
+            if (cst.length() == 2)
             {
                 cab = QString("%1%2").arg("ICMS", cst);
             }
             else
             {
-                if (cst.count() > 4)
+                if (cst.length() > 4)
                     cab = "ICMSPart";
                 else
                     cab = "ICMSST";

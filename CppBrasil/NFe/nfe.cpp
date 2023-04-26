@@ -50,6 +50,11 @@ QString Nfe::get_chNFe() const
     return this->m_chaveacesso;
 }
 
+void Nfe::set_chNFe(const QString &chNFe)
+{
+    this->m_chaveacesso = chNFe;
+}
+
 QString Nfe::get_XMLOriginal() const
 {
     return this->m_xml_original;
@@ -212,11 +217,6 @@ QString Nfe::get_XMLAutorizado() const
 void Nfe::set_XMLAutorizado(const QString &xmlAutorizado)
 {
     this->m_xml_autorizado = xmlAutorizado;
-}
-
-void Nfe::set_chNFe(const QString &chNFe)
-{
-    this->m_chaveacesso = chNFe;
 }
 
 void Nfe::gerarChaveAcesso()

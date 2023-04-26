@@ -49,6 +49,7 @@ public:
     static QString dateTimeToStr(const QDateTime &datetime, const DtH &dateReturn);
     static QString doubleToStrDecimal(const double &value, const int &decimalSize);
     static QString extractStr(const QString &str, const QString &beginStr, const QString &endStr); //retorna uma string extraída do str do ponto beginStr ao endStr
+    static QByteArray extractStr(const QByteArray &str, const QByteArray &beginStr, const QByteArray &endStr); //idem a de cima com tipos diferentes
     static int findString(const QString &str, const QString &strValue); //retorna o inteiro da posição do string encontrado ou -1 se não encontrar
     static bool fileExists(const QString &path);
     static bool parsePath(const QString &path, QString &output); //retorna o correto em output
