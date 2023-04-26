@@ -20,6 +20,7 @@ Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multipl
 - Android
 
 ## Requisitos
+- Qt >= 5.15.2
 - OpenSSL
 - LibXML2
 - ZLib
