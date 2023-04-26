@@ -17,8 +17,8 @@ public:
     StatusServico(ConfigNFe* confgNFe);
     ~StatusServico();
     void clear();
+    bool status();
     QString get_error() const;
-    bool get_status();
 
     std::shared_ptr<RetConsStatServ> retorno;
 
