@@ -45,13 +45,15 @@ public:
     virtual ~HttpClient();
 
     QByteArray get_lastData() const;
-    virtual QByteArray send(const QByteArray &host, const QByteArray &data,
-                            const int &lenReturn = 0);
+    virtual QByteArray send(const QByteArray &host, const QByteArray &data);
 
     void set_crypto(const CppCrypto* crypto);
     void set_proxy(const QNetworkProxy &proxy);
     void set_protocolo(const QSsl::SslProtocol &protocol);
     void set_verificarSslSocket(const bool &verifyMode);
+
+signals:
+    void errorOccurred(const QString &error);
 
 protected:
     HttpClient(const CppCrypto* crypto);
@@ -64,9 +66,6 @@ protected:
     QSsl::SslProtocol m_protocol;
     int m_timeout;
     bool m_verifyMode;
-
-signals:
-    void errorOccurred(const QString &error);
 
 };
 

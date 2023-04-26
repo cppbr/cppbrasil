@@ -33,13 +33,11 @@ QByteArray HttpClient::get_lastData() const
     return this->m_data;
 }
 
-QByteArray HttpClient::send(const QByteArray &host, const QByteArray &data,
-                            const int &lenReturn)
+QByteArray HttpClient::send(const QByteArray &host, const QByteArray &data)
 {
     emit errorOccurred("Uninitialized");
     Q_UNUSED(host);
     Q_UNUSED(data);
-    Q_UNUSED(lenReturn);
     return QByteArray();
 }
 

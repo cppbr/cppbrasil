@@ -35,8 +35,7 @@ public:
            const bool &verifyMode = true);
     ~HttpQt();
 
-    virtual QByteArray send(const QByteArray &host, const QByteArray &data,
-                            const int &lenReturn = 0);
+    virtual QByteArray send(const QByteArray &host, const QByteArray &data);
 
 private:
     void configSSL(QNetworkRequest *request);

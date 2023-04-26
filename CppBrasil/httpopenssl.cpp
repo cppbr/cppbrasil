@@ -68,8 +68,7 @@ HttpOpenSSL::~HttpOpenSSL()
         sk_X509_pop_free(m_ca, X509_free);
 }
 
-QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data,
-                             const int &lenReturn)
+QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data)
 {
     struct hostent *_hp;
     struct sockaddr_in _addr;
@@ -133,7 +132,7 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data,
 
     QByteArray _pack = getCommand(host, data);
     sendPacket(_ssl, _pack.data());
-    receivePacket(_ssl, lenReturn);
+    receivePacket(_ssl);
 #ifdef __linux__
     close(_sock);
 #elif _WIN32
@@ -146,56 +145,37 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data,
     return this->m_data;
 }
 
-int HttpOpenSSL::sendPacket(SSL *ssl, const char *buf)
+void HttpOpenSSL::sendPacket(SSL *ssl, const char *buf)
 {
     int _len = SSL_write(ssl, buf, strlen(buf));
     if (_len < 0)
     {
         int _err = SSL_get_error(ssl, _len);
-        emit errorOccurred("Erro ao enviar dados :" + QString::number(_err));
-        switch (_err)
-        {
-            case SSL_ERROR_WANT_WRITE:
-                return 0;
-            case SSL_ERROR_WANT_READ:
-                return 0;
-            case SSL_ERROR_ZERO_RETURN:
-            case SSL_ERROR_SYSCALL:
-            case SSL_ERROR_SSL:
-            default:
-                return -1;
-        }
+        emit errorOccurred("Erro ao enviar dados :" + QString::number(_err) + " - " + getErrorName(_err));
     }
-    return _len;
 }
 
-int HttpOpenSSL::receivePacket(SSL *ssl, int len)
+void HttpOpenSSL::receivePacket(SSL *ssl)
 {
-    int _head = 650; //post command + soap envelop + namespace soap
-    int _sizeBf = _head + len;
-    //char _buffer[_sizeBf]; só funciona no g++. Variable-length arrays estilo C99.
-    QByteArray _buffer;
-    _buffer.resize(_sizeBf);
+    int _len, _err;
+    QByteArray _data;
+    QByteArray _buf;
+    _buf.resize(1024 * 8);
+    while ((_len = SSL_read(ssl, _buf.data(), _buf.size())) > 0) {
+        _data.append(_buf);
+        _err = SSL_get_error(ssl, _len);
+        if ((_len < _buf.size()) || (_err != SSL_ERROR_NONE))
+            break;
+    }
 
-    int _lenBuffe = SSL_read(ssl,_buffer.data() , _buffer.size());
-    if (_lenBuffe < 0)
+    if (_err != SSL_ERROR_NONE)
     {
-        int _err = SSL_get_error(ssl, len);
-        emit errorOccurred("Erro ao ler dados retornados :" + QString::number(_err));
-        if (_err == SSL_ERROR_WANT_READ)
-            return 0;
-        if (_err == SSL_ERROR_WANT_WRITE)
-            return 0;
-        if (_err == SSL_ERROR_ZERO_RETURN || _err == SSL_ERROR_SYSCALL || _err == SSL_ERROR_SSL)
-            return -1;
+        emit errorOccurred("Erro ao ler dados retornados :" + QString::number(_err) + " - " + getErrorName(_err));
     } else
     {
-        QString _data = QString::fromLocal8Bit(_buffer, _lenBuffe);
-        QString _res = CppUtility::extractStr(_data, "\r\n\r\n", "").trimmed();
         this->m_data.clear();
-        this->m_data.append(_res.toLocal8Bit());
+        this->m_data.append(CppUtility::extractStr(_data, "\r\n\r\n", "").trimmed());
     }
-    return _lenBuffe;
 }
 
 QByteArray HttpOpenSSL::getCommand(const QByteArray &host, const QByteArray &data)
@@ -208,7 +188,7 @@ QByteArray HttpOpenSSL::getCommand(const QByteArray &host, const QByteArray &dat
     _http.append("POST "+ _server +" HTTP/1.1 \r\n");
     _http.append("Host: "+ _host +" \r\n");
     _http.append("Content-Type: text/xml; charset=utf-8\r\n");
-    _http.append("Content-Length:" + QString::number(data.length()) +"\r\n\r\n");
+    _http.append("Content-Length: " + QString::number(data.length()) +"\r\n\r\n");
     _http.append(data);
 
     return _http.toLocal8Bit();
@@ -228,5 +208,50 @@ QByteArray HttpOpenSSL::getHostName(const QByteArray &host, const THost &tipo)
         return (_host.mid(3, _host.length() - 3).toLocal8Bit());
     }
 
+}
+
+QString HttpOpenSSL::getErrorName(const int &err)
+{
+    QString _erroName;
+    switch (err)
+    {
+        case SSL_ERROR_SSL:
+            _erroName = "SSL_ERROR_SSL";
+            break;
+        case SSL_ERROR_WANT_READ:
+            _erroName = "SSL_ERROR_WANT_WRITE";
+            break;
+        case SSL_ERROR_WANT_WRITE:
+            _erroName = "SSL_ERROR_WANT_WRITE";
+            break;
+        case SSL_ERROR_WANT_X509_LOOKUP:
+            _erroName = "SSL_ERROR_WANT_X509_LOOKUP";
+            break;
+        case SSL_ERROR_SYSCALL:
+            _erroName = "SSL_ERROR_SYSCALL";
+            break;
+        case SSL_ERROR_ZERO_RETURN:
+            _erroName = "SSL_ERROR_ZERO_RETURN";
+            break;
+        case SSL_ERROR_WANT_CONNECT:
+            _erroName = "SSL_ERROR_WANT_CONNECT";
+            break;
+        case SSL_ERROR_WANT_ACCEPT:
+            _erroName = "SSL_ERROR_WANT_ACCEPT";
+            break;
+        case SSL_ERROR_WANT_ASYNC:
+            _erroName = "SSL_ERROR_WANT_ASYNC";
+            break;
+        case SSL_ERROR_WANT_ASYNC_JOB:
+            _erroName = "SSL_ERROR_WANT_ASYNC_JOB";
+            break;
+        case SSL_ERROR_WANT_CLIENT_HELLO_CB:
+            _erroName = "SSL_ERROR_WANT_CLIENT_HELLO_CB";
+            break;
+        default:
+            _erroName = "SSL_ERROR_UNIDENTIFIED";
+    }
+
+    return _erroName;
 }
 

@@ -31,10 +31,8 @@ HttpQt::~HttpQt()
 {
 }
 
-QByteArray HttpQt::send(const QByteArray &host, const QByteArray &data,
-                        const int &lenReturn)
+QByteArray HttpQt::send(const QByteArray &host, const QByteArray &data)
 {
-    Q_UNUSED(lenReturn);
     //default 15 segundos
     int _timeout = (this->m_timeout > 0) ? this->m_timeout : 15000;
     QNetworkRequest *_request = new QNetworkRequest(QUrl(host));

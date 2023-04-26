@@ -56,18 +56,18 @@ public:
     HttpOpenSSL(const CppCrypto* crypto);
     ~HttpOpenSSL();
 
-    virtual QByteArray send(const QByteArray &host, const QByteArray &data,
-                            const int &lenReturn = 0);
+    virtual QByteArray send(const QByteArray &host, const QByteArray &data);
 
 private:
     enum THost {host = 0, server = 1};
     EVP_PKEY *m_pkey = NULL;
     X509 *m_cert = NULL;
     STACK_OF(X509) *m_ca = NULL;
-    int sendPacket(SSL *ssl, const char *buf);
-    int receivePacket(SSL *ssl, int len);
+    void sendPacket(SSL *ssl, const char *buf);
+    void receivePacket(SSL *ssl);
     QByteArray getCommand(const QByteArray &host, const QByteArray &data);
     QByteArray getHostName(const QByteArray &host, const THost &tipo);
+    QString getErrorName(const int &err);
 };
 
 #endif // HTTPOPENSSL_H
