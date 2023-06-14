@@ -274,7 +274,7 @@ set(HEADER_NFE
     enderemit.h
     entrega.h
     envevento.h
-    eventosnf.h
+    eventonotafiscal.h
     exporta.h
     exportind.h
     fat.h
