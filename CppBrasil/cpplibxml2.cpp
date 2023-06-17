@@ -165,7 +165,8 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
             if (_schemError != NULL)
             {
                 set_error(QString("%1%2%3%4").arg("Erro: ",QString::number(_schemError->code), " - ", _schemError->message));
-            }else
+            }
+            else
             {
                 set_error(QString("%1%2").arg(QStringLiteral("Erro indefinido ao validar XML com o Schema: "), schema_name.data()));
             }
@@ -338,13 +339,14 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
                    if (_ret_xml_complete[i] != '\n')
                     output.append(_ret_xml_complete[i]);
                }
-           }else
+           }
+           else
            {
                this->set_error(QStringLiteral("Erro ao gerar unir xml."));
                _ret = false;
            }
-
-        }else
+        }
+        else
         {   //retorna apenas a assinatura
             _str_xmlsign.clear();
             _str_xmlsign.append(this->get_signNode(_sha, URI, _x509, _digestvalue, _signature));
@@ -497,7 +499,8 @@ bool CppLibXml2::addChildFromXMLDOC(const xmlDoc *xml_doc, const xmlDoc *xml_chi
             //find parent
             if((_parent_node = find_node(_root_node, parent)) == NULL)
               _ret = false;
-        }else //root node
+        }
+        else //root node
           _parent_node = _root_node;
     }
     //create new node
@@ -582,7 +585,8 @@ bool CppLibXml2::addChildFromString(const char *xml_doc, const char *xml_child,
             //procura parent
             if((_parent_node = find_node(_root_node, parent)) == NULL)
               _ret = false;
-        }else //root node
+        }
+        else //root node
           _parent_node = _root_node;
     }
     //new node

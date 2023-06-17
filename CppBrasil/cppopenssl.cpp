@@ -153,11 +153,13 @@ bool CppOpenSSL::certToBase64(X509 *cert)
                 }
                 set_certBase64(QString(_b64.toBase64()));
                 _b64.clear();
-            }else
+            }
+            else
             {
                 _ret = false;
             }
-        }else
+        }
+        else
           _ret = false;
 
         if (_bio != NULL)
@@ -199,9 +201,11 @@ bool CppOpenSSL::issuerName(X509 *cert)
                 }
                 set_issuerName(_res);
                 _res.clear();
-            }else
-                _ret = false;
-        }else
+            }
+            else
+               _ret = false;
+        }
+        else
             _ret = false;
 
         if (_bio != NULL)
@@ -244,7 +248,8 @@ bool CppOpenSSL::serialNumber(X509 *cert)
             }
             set_numeroSerie(_res);
             _res.clear();
-        } else
+        }
+        else
             _ret = false;
 
         if (_bio != NULL)
@@ -458,7 +463,8 @@ bool CppOpenSSL::hash(const HashType &hashtype, const QByteArray &input, EVP_PKE
                 {
                     _ret = false;
                 }
-            }else
+            }
+            else
             { //digestvalue
                 _hash = (unsigned char *) OPENSSL_malloc(EVP_MD_size(_md));//malloc(EVP_MD_size(_md));
                 if (!EVP_DigestFinal_ex(_ctx, _hash, (unsigned int *)&_len))

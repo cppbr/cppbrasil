@@ -93,7 +93,8 @@ bool WSNFeBase::validarXML(const QString &schemaName, const QString &nomeGrupo, 
     if (nomeGrupo.isEmpty())
     {
          _ret = _libxml->parseXML(xml, schemaName.toLocal8Bit());
-    } else
+    }
+    else
     {
         //caso informe o nome do grupo, deve gerar um novo xml a partir do grupo indicado.
         //Isso acontece no caso das mensagens de retorno que virá com o envelope soap
@@ -118,7 +119,6 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
                            const QString &nomeGrupo, const WebServicesNF &webServicesNF,
                            const QByteArray &dadosLog)
 {
-
     if (confgNFe->arquivos->get_salvarLogs())
     {
         //para não fazer nenhum tipo de validação aqui nesta função, será melhor que
@@ -145,7 +145,8 @@ void WSNFeBase::salvarLogs(const TipoArquivo &tipoArquivo, const TipoMsgLog &tip
         if (nomeGrupo.isEmpty())
         {
             CppUtility::saveFile(confgNFe->arquivos->get_caminhoLogs(), _file, tipoArquivo, dadosLog);
-        } else
+        }
+        else
         {
             QString _xml;
             _xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -195,7 +196,8 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
             if (this->confgNFe->get_indicadorSincrono() == IndSinc::Sim)
             {
                 _ret = tratarRetorno(TipoRetorno::retEnviNFe);
-            } else
+            }
+            else
             {
                 //trata primeiro recibo
                 _ret = tratarRetorno(TipoRetorno::retEnviNFe);
@@ -223,7 +225,8 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
                                     //se retornar algo diferente de EmProcessamento, deverá parar, já que foi processado
                                     if (_ret != StatusRetorno::EmProcessamento)
                                       break;
-                                }else
+                                }
+                                else
                                 {
                                     _ret = StatusRetorno::Erro;
                                     break;
@@ -234,7 +237,8 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
                     }
                 }
             }
-        } else
+        }
+        else
         {
             _ret = StatusRetorno::Erro;
             set_error("Erro ao enviar lote.");
@@ -285,7 +289,6 @@ bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml)
                 }
                 _namespace += "Zip";
             }
-
         }
 
         this->m_msgEnvio.clear();
@@ -294,7 +297,8 @@ bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml)
         //salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgEnvio ,_namespace,//"enviNFe",
                    WebServicesNF::NFeAutorizacao, this->m_msgEnvio);
-    } else
+    }
+    else
     {
         //caso der erro na validação, também salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgErro ,_namespace,//,"enviNFe",
@@ -329,7 +333,8 @@ bool WSNFe::gerarXMLrecibo()
         //salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgEnvio ,"consReciNFe",
                    WebServicesNF::NFeRetAutorizacao, this->m_msgEnvio);
-    } else
+    }
+    else
     {
         //caso der erro na validação, também salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgErro ,"consReciNFe",
@@ -357,7 +362,6 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
 
         while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == _parent))
         {
-
             attributes = _xml.attributes();
             if(attributes.hasAttribute("versao"))
             {
@@ -536,16 +540,14 @@ WSNFeBase::StatusRetorno WSNFe::tratarRetorno(const TipoRetorno &tipo)
 
             _xml.readNext();
         }
-
-
-    } else
+    }
+    else
     {
         _ret = StatusRetorno::Erro;
         set_error("Erro: O XML retornado pelo web services não é válido.");
         //caso errado, salvar log do retorno em formato html
         salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
                    WebServicesNF::NFeRetAutorizacao, this->m_msgRetorno);
-
     }
 
     return _ret;
@@ -578,8 +580,8 @@ bool WSStatus::send(const QString &verLayout)
             _ret = tratarRetorno();
         else
             _ret = StatusRetorno::Erro;
-
-    }else //se houve erro ao gerar xml
+    }
+    else //se houve erro ao gerar xml
        _ret = StatusRetorno::Erro;
 
     emit wsChange(WebServicesNF::None);
@@ -611,7 +613,8 @@ bool WSStatus::gerarXML()
         //salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgEnvio ,"consStatServ",
                    WebServicesNF::NFeStatusServico, this->m_msgEnvio);
-    } else
+    }
+    else
     {
         //caso der erro na validação, também salva log
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgErro ,"consStatServ",
@@ -703,9 +706,8 @@ WSNFeBase::StatusRetorno WSStatus::tratarRetorno()
 
             _xml.readNext();
         }
-
-
-    } else
+    }
+    else
     {
         set_error("Erro: O XML retornado pelo web services não é válido.");
         //caso errado, salvar log do retorno em formato html
@@ -747,7 +749,8 @@ bool WSEvento::send(const QByteArray &xml, const QString &verLayout)
         {
             //envio de eventos é síncrono
             _ret = tratarRetorno();
-        } else
+        }
+        else
         {
             _ret = StatusRetorno::Erro;
             set_error("Erro ao enviar evento.");
@@ -850,11 +853,8 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
 
                 while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEvento")))
                 {
-
-
                     if(_xml.name() == QStringLiteral("infEvento"))
                     {
-
                         _xmlRetEvento.writeStartElement("infEvento");
 
                         //attributes = _xml.attributes();
@@ -1013,13 +1013,13 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
 
             _xml.readNext();
         }
-    } else
+    }
+    else
     {
         set_error("Erro: O XML retornado pelo web services não é válido.");
         //caso errado, salvar log do retorno em formato html
         salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
                    WebServicesNF::NFeRecepcaoEvento, this->m_msgRetorno);
-
     }
 
     return _ret;
@@ -1050,7 +1050,8 @@ bool WSConsultaProtocolo::send(const QByteArray &xml, const QString &verLayout)
         {
             //envio de consulta é síncrono
             _ret = tratarRetorno();
-        } else
+        }
+        else
         {
             _ret = StatusRetorno::Erro;
             set_error("Erro ao enviar evento.");
@@ -1097,7 +1098,8 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
         //{
         //...
         //}
-    } else
+    }
+    else
     {
         set_error("Erro: O XML retornado pelo web services não é válido.");
         //caso errado, salvar log do retorno em formato html

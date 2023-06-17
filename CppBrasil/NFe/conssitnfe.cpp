@@ -43,13 +43,13 @@ bool ConsSitNFe::consultar(const QString &chNFe, const bool &salvarNotaVinculada
               tratarRetorno(salvarNotaVinculada);
 
             delete _ws;
-
-        } else
+        }
+        else
         {
             _ret = false;
         }
-
-    } else
+    }
+    else
     {
         _ret = false;
     }

@@ -152,7 +152,8 @@ QString ConfArquivos::get_caminhoSalvar() const
     if (this->m_caminhoSalvar.isNull())
     {
         return QCoreApplication::applicationDirPath();
-    }else
+    }
+    else
     {
         return this->m_caminhoSalvar;
     }

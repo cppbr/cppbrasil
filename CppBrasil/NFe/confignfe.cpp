@@ -156,8 +156,8 @@ QString ArquivosNF::get_caminho(const QString &pastaBase, const bool &porCNPJ, c
             if (!_dir.mkdir(_path))
                 return "";
         }
-
-    } else
+    }
+    else
     {
         //quando escolher PorAnoMes, somente o dia pode ser separado
         if (porAnoMes)
@@ -170,8 +170,8 @@ QString ArquivosNF::get_caminho(const QString &pastaBase, const bool &porCNPJ, c
                 if (!_dir.mkdir(_path))
                     return "";
             }
-
-        } else
+        }
+        else
         {
             //datas separadas.
             //ano separado

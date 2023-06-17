@@ -67,19 +67,20 @@ bool EnvEvento::enviarEvento(const int &idLote, const bool &salvarNotaVinculada)
               tratarRetorno(salvarNotaVinculada);
 
             delete _ws;
-
-        } else {
+        }
+        else
+        {
             emit errorOccurred(this->m_error);
             _ret = false;
         }
-
-    } else {
+    }
+    else
+    {
         emit errorOccurred(this->m_error);
         _ret = false;
     }
 
     return _ret;
-
 }
 
 QString EnvEvento::get_versao() const
@@ -117,7 +118,8 @@ bool EnvEvento::assinarEvento(const QString &evento, const QString &uri, QString
                          _returntype, _xml_assinado))
     {
         output.append(_xml_assinado);
-    } else
+    }
+    else
     {
         _ret = false;
         //retorna o erro ao invés do xml assinado
@@ -149,8 +151,9 @@ bool EnvEvento::gerarXML(const int &idLote)
         if (evento->items->value(i)->get_error().isEmpty())
         {
             _evento.append(CppUtility::extractStr(evento->items->value(i)->get_XMLAssinado(), "<evento", "/evento>"));
-
-        } else  {
+        }
+        else
+        {
             //o erro será retornado em output
             this->m_error += "Evento: " + QString::number(i) + " - " +
                              evento->items->value(i)->get_error();
@@ -183,7 +186,9 @@ void EnvEvento::updateEvento(int &index)
         (evento->items->value(index)->infEvento->get_nSeqEvento() < 10))
     {
         _strSeq = CppUtil::insZeroLeft(QString::number(evento->items->value(index)->infEvento->get_nSeqEvento()), 2);
-    } else {
+    }
+    else
+    {
         _strSeq = QString::number(evento->items->value(index)->infEvento->get_nSeqEvento());
     }
     QString _id = "ID" + ConvNF::tpEventoToStr(evento->items->value(index)->infEvento->get_tpEvento())

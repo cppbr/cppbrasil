@@ -608,7 +608,8 @@ void EnvEventoEvento::assinarXML(const ConfigNFe *config)
     {
         this->m_xml_assinado.clear();
         this->m_xml_assinado.append(_xml_assinado);
-    } else
+    }
+    else
     {
         this->m_error.append(_libxml->get_error());
     }

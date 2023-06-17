@@ -94,7 +94,8 @@ QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
     if ((this->m_httpType == HttpType::None) || (this->m_httpType == HttpType::HttpQt))
     { //qt
         _http = new HttpQt(m_crypto, m_proxy, m_protocol, m_timeout, m_verifyMode);
-    } else
+    }
+    else
     {// openssl
         _http = new HttpOpenSSL(m_crypto);
     }

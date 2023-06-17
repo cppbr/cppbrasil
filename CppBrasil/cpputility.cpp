@@ -218,7 +218,8 @@ bool CppUtility::saveFile(const QString &path, const QString &fileName,
         {
             qWarning() << "Falha ao abrir o arquivo para gravação.";
             _res = false;
-        }else
+        }
+        else
         {
             QTextStream stream( &outFile );
             stream << dados;

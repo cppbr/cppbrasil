@@ -2089,23 +2089,35 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             //se for partilha do icms
             if (_part)
             {
-                if (_valor == "10"){
+               if (_valor == "10")
+               {
                   _valor  = "Part10";
-                 } else if (_valor == "90"){
-                  _valor  = "Part90";
-                }
-                //desativando partilha
-                _part = false;
+               }
+               else
+               {
+                  if (_valor == "90")
+                  {
+                    _valor  = "Part90";
+                  }
+               }
+               //desativando partilha
+               _part = false;
             }
             //se for ICMS ST
             if (_st)
             {
-                if (_valor == "41"){
+               if (_valor == "41")
+               {
                   _valor  = "ST41";
-                } else if (_valor == "60"){
+               }
+               else
+               {
+                  if (_valor == "60")
+                  {
                     _valor  = "ST60";
-                }
-                //desativando ICMS ST
+                  }
+               }
+                 //desativando ICMS ST
                 _st = false;
             }
             if (!_valor.isEmpty())

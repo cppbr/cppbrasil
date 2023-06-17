@@ -78,8 +78,8 @@ QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &
     {
         _server =  (tpAmb == TpAmb::Homologacao) ? "WH_" : "WP_";
         _server += (tipoEmissao == TpEmis::Contingencia_SVCAN) ? "SVC-AN" : "SVC-RS";
-
-    } else
+    }
+    else
     {
         //caso não seja contingência busca por UF
         _joUF = _jvDf.toObject();
@@ -117,7 +117,8 @@ QString UrlNFe::get_infNFesupl(const TipoInfNFeSupl &tipo, const UF &uf, const T
     if (tipo == TipoInfNFeSupl::qrCode)
     {
         _sAmbiente = (tpAmb == TpAmb::Producao) ? "qrcode_p" : "qrcode_h";
-    } else
+    }
+    else
     {
         _sAmbiente = (tpAmb == TpAmb::Producao) ? "urlchave_p" : "urlchave_h";
     }

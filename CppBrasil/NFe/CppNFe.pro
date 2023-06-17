@@ -13,7 +13,9 @@ contains(DEFINES, CPPNFE_STATIC) {
     CONFIG += staticlib
 
     message(STATIC LIBRARY...)
-}else{
+}
+else
+{
     DEFINES += CPPNFE_LIBRARY
 
     win32{

@@ -1207,7 +1207,8 @@ void XmlWrite::get_ICMS(const int &i)
 
             this->m_xmlw->writeEndElement();//fechamento grupo ICMS00, ICMS10, etc->->->
 
-        }else //CSOSN Grupo CRT=1 – Simples Nacional
+        }
+        else //CSOSN Grupo CRT=1 – Simples Nacional
         {
             QString csosn = ConvNF::csosnICMSToStr(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CSOSN());
             QString cab = QString("%1%2").arg("ICMSSN", csosn);

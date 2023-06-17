@@ -98,11 +98,13 @@ void Nfe::assinarXML(const ConfigNFe *config)
             {
                 this->infNFeSupl->setFromNode(CppUtility::extractStr(_xml_online, QStringLiteral("<infNFeSupl>"), QStringLiteral("</infNFeSupl>")));
             }
-        }else
+        }
+        else
         {
             this->m_error = _libxml->get_error();
         }
-    }else
+    }
+    else
     {
         //caso NFCe contingência, deverá assinar e gerar a tag infNFeSupl após a assinatura,
         //Esta tag necessita do DigestValue para completar suas informações
@@ -139,7 +141,8 @@ void Nfe::assinarXML(const ConfigNFe *config)
                     _xml_offline.clear();
                     //passando _xml_infNFeSupl para a classe InfNFeSupl
                     this->infNFeSupl->setFromNode(QString::fromLocal8Bit(_xml_infNFeSupl));
-                }else
+                }
+                else
                 {
                     this->m_error = _libxml->get_error();
                 }
@@ -149,11 +152,13 @@ void Nfe::assinarXML(const ConfigNFe *config)
                 {
                     this->m_xml_assinado.clear();
                     this->m_xml_assinado.append(_xml_offline);
-                }else
+                }
+                else
                 {
                     this->m_error = _libxml->get_error();
                 }
-            }else
+            }
+            else
             {
                 this->m_error = _libxml->get_error();
             }

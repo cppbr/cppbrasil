@@ -171,7 +171,8 @@ void HttpOpenSSL::receivePacket(SSL *ssl)
     if (_err != SSL_ERROR_NONE)
     {
         emit errorOccurred("Erro ao ler dados retornados :" + QString::number(_err) + " - " + getErrorName(_err));
-    } else
+    }
+    else
     {
         this->m_data.clear();
         this->m_data.append(CppUtility::extractStr(_data, "\r\n\r\n", "").trimmed());
@@ -202,7 +203,8 @@ QByteArray HttpOpenSSL::getHostName(const QByteArray &host, const THost &tipo)
     {
         _host = CppUtility::extractStr(QString(host), "//", ".br");
         return (_host.mid(2, _host.length() - 2).toLocal8Bit());
-    } else
+    }
+    else
     {
         _host = CppUtility::extractStr(QString(host), ".br", "");
         return (_host.mid(3, _host.length() - 3).toLocal8Bit());
