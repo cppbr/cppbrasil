@@ -34,7 +34,7 @@ limitations under the License.
 #include <CppBrasil/NFe/notafiscal.h>
 #include <CppBrasil/NFe/wsnfe.h>
 #include <CppBrasil/NFe/retenvevento.h>
-#include <CppBrasil/NFe/enveventoevento.h>
+#include <CppBrasil/NFe/tevento.h>
 
 
 class CPPNFE_EXPORT EnvEvento : public QObject
@@ -44,12 +44,12 @@ public:
     EnvEvento(ConfigNFe* confgNFe, NotaFiscal* notafiscal);
     ~EnvEvento();
     void clear();
-    bool enviarEvento(const int &idLote, const bool &salvarNotaVinculada = false);
+    bool enviarEvento(const int &idLote);
     QString get_versao() const;
     void set_versao(const QString &versao);
     QString get_error() const;
 
-    std::shared_ptr<Container<EnvEventoEvento>> evento;
+    std::shared_ptr<Container<TEvento>> evento;
     std::shared_ptr<RetEnvEvento> retorno;
 
 signals:
@@ -66,8 +66,7 @@ private:
     bool gerarXML(const int &idLote);
     void updateEvento(int &index);
     bool validarEvento();
-    void tratarRetorno(const bool &salvarNotaVinculada = false);
-    QString nomeEvento(const TpEvento &evento);
+    void tratarRetorno();
 };
 
 

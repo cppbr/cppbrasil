@@ -206,6 +206,26 @@ void InfEventoRet::set_chNFePend(const QString &chNFePend)
     this->m_chNFePend = chNFePend;
 }
 
+QDateTime InfEventoRet::get_dhRecbto() const
+{
+    return this->m_dhRecbto;
+}
+
+void InfEventoRet::set_dhRecbto(const QDateTime &dhRecbto)
+{
+    this->m_dhRecbto = dhRecbto;
+}
+
+int InfEventoRet::get_cUF() const
+{
+    return this->m_cUF;
+}
+
+void InfEventoRet::set_cUF(const int &cUF)
+{
+    this->m_cUF = cUF;
+}
+
 //------------------------------------------------------------------------
 // RetEvento class
 //------------------------------------------------------------------------

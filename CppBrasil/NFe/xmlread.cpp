@@ -36,11 +36,12 @@ bool XmlRead::nfe() const
     QXmlStreamAttributes attributes;
     QString _valor;
     //TAG raiz da NF-e
-    //while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == "NFe"))
     while (!_xml.atEnd())
     {
+        //a tag NFe deve ficar fora do while do protNFe, caso o xml não tenha sido assinado, não conseguirá ler o xml
         if (_xml.tokenType() == QXmlStreamReader::StartElement && _xml.name() == QStringLiteral("NFe"))
         {
+            nota->set_XMLOriginal("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + CppUtility::extractStr(this->m_xml, "<NFe xmlns", "</NFe>"));
             while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("NFe")))
             {
                 _ret = true; //encontrou o grupo NFe _ret será true

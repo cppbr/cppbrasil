@@ -119,7 +119,6 @@ SOURCES += \
     enderemit.cpp \
     entrega.cpp \
     envevento.cpp \
-    enveventoevento.cpp \
     eventonotafiscal.cpp \
     exporta.cpp \
     exportind.cpp \
@@ -166,6 +165,7 @@ SOURCES += \
     rettransp.cpp \
     rettrib.cpp \
     statusservico.cpp \
+    tevento.cpp \
     total.cpp \
     transp.cpp \
     transporta.cpp \
@@ -221,7 +221,6 @@ HEADERS += \
     enderemit.h \
     entrega.h \
     envevento.h \
-    enveventoevento.h \
     eventonotafiscal.h \
     exporta.h \
     exportind.h \
@@ -268,6 +267,7 @@ HEADERS += \
     rettransp.h \
     rettrib.h \
     statusservico.h \
+    tevento.h \
     total.h \
     transp.h \
     transporta.h \

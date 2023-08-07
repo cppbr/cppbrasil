@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "envevento.h"
 
-EnvEvento::EnvEvento(ConfigNFe *confgNFe, NotaFiscal *notafiscal): evento(new Container<EnvEventoEvento>),
+EnvEvento::EnvEvento(ConfigNFe *confgNFe, NotaFiscal *notafiscal): evento(new Container<TEvento>),
    retorno(new RetEnvEvento()), config(confgNFe), notafiscal(notafiscal)
 {
 }
@@ -38,7 +38,7 @@ void EnvEvento::clear()
     this->m_versao.clear();
 }
 
-bool EnvEvento::enviarEvento(const int &idLote, const bool &salvarNotaVinculada)
+bool EnvEvento::enviarEvento(const int &idLote)
 {
 //salvarNotaVinculada serve para salvar notas onde a nota em questão foi emitida pelo próprio
 //transmissor do evento.
@@ -64,7 +64,7 @@ bool EnvEvento::enviarEvento(const int &idLote, const bool &salvarNotaVinculada)
                                   ConvNF::versaoLayout(WebServicesNF::NFeRecepcaoEvento));
 
             if (_ret)
-              tratarRetorno(salvarNotaVinculada);
+              tratarRetorno();
 
             delete _ws;
         }
@@ -224,7 +224,7 @@ bool EnvEvento::validarEvento()
     return _ret;
 }
 
-void EnvEvento::tratarRetorno(const bool &salvarNotaVinculada)
+void EnvEvento::tratarRetorno()
 {
     //atualiza e salva o xml do evento
     QByteArray _schema = this->config->arquivos->get_caminhoSchema().toLocal8Bit();
@@ -278,121 +278,12 @@ void EnvEvento::tratarRetorno(const bool &salvarNotaVinculada)
                                 }
                             }
                         }
-
-                        //cria novo xml da nota com o evento enviado
-                        if (salvarNotaVinculada && this->notafiscal->NFe->items->count() > 0)
-                        {
-                            //não será usado o l para não confundir com o i
-                            for (int m = 0; m < this->notafiscal->NFe->items->count(); ++m)
-                            {
-                                if (this->notafiscal->NFe->items->value(m)->get_chNFe() ==
-                                     retorno->retEvento->items->value(i)->infEvento->get_chNFe())
-                                {
-                                    //só atualiza caso o xml já tenha sido autorizado.
-                                    if (!this->notafiscal->NFe->items->value(m)->get_XMLAutorizado().isEmpty())
-                                    {
-                                        QByteArray _xmlNota = "<DFe></DFe>";
-                                        QByteArray _nfeProc;
-                                        _nfeProc.append("<a>");
-                                        _nfeProc.append(CppUtility::extractStr(this->notafiscal->NFe->items->value(m)->get_XMLAutorizado().toLocal8Bit(),
-                                                                               "<nfeProc", "/nfeProc>"));
-                                        _nfeProc.append("</a>");
-
-                                        if (_libxml->addChildXML(_xmlNota, _nfeProc, QByteArray("DFe")))
-                                        {
-                                            QByteArray _evento;
-                                            _evento.append("<a>");
-                                            _evento.append("<procEventoNFe>"); //criando mais um grupo para evitar o erro no procEcentoNFe
-                                            _evento.append(CppUtility::extractStr(_procEventoNFe, "<procEventoNFe", "procEventoNFe>"));
-                                            _evento.append("</procEventoNFe>");
-                                            _evento.append("</a>");
-
-                                            if (_libxml->addChildXML(_xmlNota, _evento, QByteArray("DFe")))
-                                            {
-                                                this->notafiscal->NFe->items->value(m)->set_XMLAutorizado(_xmlNota);
-                                                QString _nomeArqNota = this->notafiscal->NFe->items->value(m)->get_chNFe() + "-nfe-" +
-                                                                       nomeEvento(evento->items->value(j)->infEvento->get_tpEvento()) + "-" +
-                                                                       CppUtil::insZeroLeft(QString::number(evento->items->value(j)->infEvento->get_nSeqEvento()), 2);
-
-                                                CppUtility::saveFile(this->config->arquivos->get_caminhoNF(),
-                                                                     _nomeArqNota,
-                                                                     TipoArquivo::XML,
-                                                                     _xmlNota);
-                                            }
-                                        }
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-
-
                     }
-
                     break;
                 }
             }
-
         }
     }
-
     delete _libxml;
-}
-
-QString EnvEvento::nomeEvento(const TpEvento &evento)
-{
-//retorna o nome do evento de forma abreviada, diferente da função ConvNF::tpEventoToStr que retorna o código do evento em string
-    QString _strEvento;
-    switch (evento) {
-    case TpEvento::AtorInteressadoNFeTransp :
-        _strEvento = "AtorInter";
-        break;
-    case TpEvento::Cancelamento :
-        _strEvento =  "CancNFe";
-        break;
-    case TpEvento::CancelamentoSubstituicao :
-        _strEvento = "CancSubst";
-        break;
-    case TpEvento::CancelPedidoProrrogacao1 :
-        _strEvento = "CancPedProrroga";
-        break;
-    case TpEvento::CancelPedidoProrrogacao2 :
-        _strEvento = "CancPedProrroga";
-        break;
-    case TpEvento::CartaCorrecao :
-        _strEvento = "CCe";
-        break;
-    case TpEvento::CienciaOperacaoDest :
-        _strEvento = "CienciaOpera";
-        break;
-    case TpEvento::ConfirmacaoOperacaoDest :
-        _strEvento = "ConfirmaOpera";
-        break;
-    case TpEvento::DesconhecimentoOperacaoDest :
-        _strEvento = "DesconheciOp";
-        break;
-    case TpEvento::EPEC :
-        _strEvento = "EPEC";
-        break;
-    case TpEvento::OperacaoNaoRealizadaDest :
-        _strEvento = "OperaNaoRealizada";
-        break;
-    case TpEvento::PedidoProrrogacao1 :
-        _strEvento = "PedidoPro";
-        break;
-    case TpEvento::PedidoProrrogacao2 :
-        _strEvento = "PedidoPro";
-        break;
-    case TpEvento::ComprovanteEntregaNFe :
-        _strEvento = "EntregaNFe";
-        break;
-    case TpEvento::CancelComprovanteEntregaNFe :
-        _strEvento = "CancEntregaNFe";
-        break;
-    default: _strEvento = "";
-    }
-
-    return _strEvento;
 }
 

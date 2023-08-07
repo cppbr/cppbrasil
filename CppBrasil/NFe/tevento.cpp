@@ -1,4 +1,4 @@
-#include "enveventoevento.h"
+#include "tevento.h"
 
 
 //------------------------------------------------------------------------
@@ -535,21 +535,31 @@ void InfEvento::set_nSeqEvento(const int &nSeqEvento)
     this->m_nSeqEvento = nSeqEvento;
 }
 
+QString InfEvento::get_verEvento() const
+{
+    return this->m_verEvento;
+}
+
+void InfEvento::set_verEvento(const QString &verEvento)
+{
+    this->m_verEvento = verEvento;
+}
+
 //------------------------------------------------------------------------
-// EnvEventoEvento class
+// TEvento class
 //------------------------------------------------------------------------
 
-EnvEventoEvento::EnvEventoEvento(): infEvento(new InfEvento())
+TEvento::TEvento(): infEvento(new InfEvento())
 {
 
 }
 
-EnvEventoEvento::~EnvEventoEvento()
+TEvento::~TEvento()
 {
 
 }
 
-void EnvEventoEvento::clear()
+void TEvento::clear()
 {
     this->infEvento->clear();
     this->m_versao.clear();
@@ -558,37 +568,37 @@ void EnvEventoEvento::clear()
     this->m_error.clear();
 }
 
-QString EnvEventoEvento::get_versao() const
+QString TEvento::get_versao() const
 {
     return this->m_versao;
 }
 
-void EnvEventoEvento::set_versao(const QString &versao)
+void TEvento::set_versao(const QString &versao)
 {
     this->m_versao = versao;
 }
 
-QString EnvEventoEvento::get_XMLOriginal() const
+QString TEvento::get_XMLOriginal() const
 {
     return this->m_xml_original;
 }
 
-void EnvEventoEvento::set_XMLOriginal(const QString &xmlOriginal)
+void TEvento::set_XMLOriginal(const QString &xmlOriginal)
 {
     this->m_xml_original = xmlOriginal;
 }
 
-QString EnvEventoEvento::get_XMLAssinado() const
+QString TEvento::get_XMLAssinado() const
 {
     return this->m_xml_assinado;
 }
 
-void EnvEventoEvento::set_XMLAssinado(const QString &xmlAssinado)
+void TEvento::set_XMLAssinado(const QString &xmlAssinado)
 {
     this->m_xml_assinado = xmlAssinado;
 }
 
-void EnvEventoEvento::assinarXML(const ConfigNFe *config)
+void TEvento::assinarXML(const ConfigNFe *config)
 {
     HashType _sha1 = HashType::sha1;
     QByteArray _xmldoc, _schema, _nodedoc, _nodesign, _uri, _xml_assinado;
@@ -617,7 +627,7 @@ void EnvEventoEvento::assinarXML(const ConfigNFe *config)
     delete _libxml;
 }
 
-void EnvEventoEvento::gerarXML()
+void TEvento::gerarXML()
 {
     QByteArray _strXML;
     QXmlStreamWriter _xmlw(&_strXML);
@@ -641,7 +651,10 @@ void EnvEventoEvento::gerarXML()
     _xmlw.writeTextElement("tpEvento", ConvNF::tpEventoToStr(this->infEvento->get_tpEvento()));
     _xmlw.writeTextElement("nSeqEvento", QString::number(this->infEvento->get_nSeqEvento()));
 
-    _xmlw.writeTextElement("verEvento", this->m_versao);
+    if (this->infEvento->get_verEvento().isEmpty())
+        _xmlw.writeTextElement("verEvento", this->m_versao);
+    else
+        _xmlw.writeTextElement("verEvento", this->infEvento->get_verEvento());
 
     //grupo detalhe do evento
     _xmlw.writeStartElement("detEvento"); //abertura do grupo detEvento
@@ -747,7 +760,7 @@ void EnvEventoEvento::gerarXML()
     this->m_xml_original.append(_strXML);
 }
 
-QString EnvEventoEvento::get_error() const
+QString TEvento::get_error() const
 {
     return this->m_error;
 }

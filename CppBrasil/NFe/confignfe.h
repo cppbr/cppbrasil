@@ -36,7 +36,7 @@ class CPPNFE_EXPORT Certificado: public ConfCertificado
     friend class NotaFiscal;
     friend class StatusServico;
     friend class EnvEvento;
-    friend class EnvEventoEvento;
+    friend class TEvento;
     friend class ConsSitNFe;
 public:
      Certificado();
@@ -81,7 +81,7 @@ class CPPNFE_EXPORT ConfigNFe
     friend class WSNFeBase;
     friend class ProtNFe;
     friend class EnvEvento;
-    friend class EnvEventoEvento;
+    friend class TEvento;
     friend class ConsSitNFe;
 public:
     ConfigNFe();

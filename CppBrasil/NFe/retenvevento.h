@@ -50,6 +50,10 @@ public:
     void set_nProt(const QString &nProt);
     QString get_chNFePend() const;
     void set_chNFePend(const QString &chNFePend);
+    QDateTime get_dhRecbto() const;
+    void set_dhRecbto(const QDateTime &dhRecbto);
+    int get_cUF() const;
+    void set_cUF(const int &cUF);
 private:
     QString m_Id;
     TpAmb m_tpAmb;
@@ -68,6 +72,8 @@ private:
     QDateTime m_dhRegEvento;
     QString m_nProt;
     QString m_chNFePend;
+    QDateTime m_dhRecbto;
+    int m_cUF;
 };
 
 //-----------------------------------------------------

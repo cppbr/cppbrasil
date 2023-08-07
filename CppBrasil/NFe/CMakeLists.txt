@@ -110,8 +110,8 @@ set(cppnfe_SRC
     entrega.cpp
     envevento.h
     envevento.cpp
-    enveventoevento.h
-    enveventoevento.cpp
+    tevento.h
+    tevento.cpp
     eventonotafiscal.h
     eventonotafiscal.cpp
     exporta.h

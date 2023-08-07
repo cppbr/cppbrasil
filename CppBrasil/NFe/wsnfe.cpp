@@ -1090,14 +1090,709 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
     {
         QXmlStreamReader _xml(this->m_msgRetorno);
         QString _valor;
+        this->retorno->set_xml(CppUtility::extractStr(this->m_msgRetorno, "<retConsSitNFe", "retConsSitNFe>"));
         //salvar log do retorno
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgRetorno ,"retConsSitNFe",
-                   WebServicesNF::NFeConsultaProtocolo, this->m_msgRetorno);
+                   WebServicesNF::NFeConsultaProtocolo, this->retorno->get_xml().toLocal8Bit());
+
         QXmlStreamAttributes attributes;
-        //while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retConsSitNFe")))
-        //{
-        //...
-        //}
+        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retConsSitNFe")))
+        {
+            attributes = _xml.attributes();
+            if(attributes.hasAttribute("versao"))
+            {
+                _valor = attributes.value("versao").toString();
+                if (!_valor.isEmpty())
+                    this->retorno->set_versao(_valor);
+            }
+            if(_xml.name() == QStringLiteral("tpAmb"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_tpAmb(ConvNF::strToTpAmb(_valor));
+            }
+            if(_xml.name() == QStringLiteral("verAplic"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_verAplic(_valor);
+            }
+            if(_xml.name() == QStringLiteral("cStat"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_cStat(_valor.toInt());
+            }
+            if(_xml.name() == QStringLiteral("xMotivo"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_xMotivo(_valor);
+            }
+            if(_xml.name() == QStringLiteral("cUF"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_cUF(_valor.toInt());
+            }
+            if(_xml.name() == QStringLiteral("dhRegEvento"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+            }
+            if(_xml.name() == QStringLiteral("chNFe"))
+            {
+                _valor = _xml.readElementText();
+                if (!_valor.isEmpty())
+                    this->retorno->set_chNFe(_valor);
+            }
+
+            if(_xml.name() == QStringLiteral("protNFe"))
+            {
+                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("protNFe")))
+                {
+                    if(attributes.hasAttribute("versao"))
+                    {
+                        _valor = attributes.value("versao").toString();
+                        if (!_valor.isEmpty())
+                            this->retorno->protNFe->set_versao(_valor);
+                    }
+                    if(_xml.name() == QStringLiteral("infProt"))
+                    {
+                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infProt")))
+                        {
+                            if(attributes.hasAttribute("Id"))
+                            {
+                                _valor = attributes.value("Id").toString();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_Id(_valor);
+                            }
+
+                            if(_xml.name() == QStringLiteral("tpAmb"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                            }
+                            if(_xml.name() == QStringLiteral("verAplic"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_verAplic(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("chNFe"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_chNFe(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("dhRecbto"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                            }
+                            if(_xml.name() == QStringLiteral("nProt"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_nProt(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("digVal"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_digVal(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cStat"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_cStat(_valor.toInt());
+                            }
+                            if(_xml.name() == QStringLiteral("xMotivo"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_xMotivo(_valor);
+                            }
+                            //Sequência XML - PR13 - dentro de PR03
+                            if(_xml.name() == QStringLiteral("cMsg"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_cMsg(_valor.toInt());
+                            }
+                            if(_xml.name() == QStringLiteral("xMsg"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->protNFe->set_xMsg(_valor);
+                            }
+                            _xml.readNext();
+                            //while infProt
+                        }
+                    }
+                    _xml.readNext();
+                    //while protNFe
+                }
+            }
+
+            if(_xml.name() == QStringLiteral("retCancNFe"))
+            {
+                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retCancNFe")))
+                {
+                    if(attributes.hasAttribute("versao"))
+                    {
+                        _valor = attributes.value("versao").toString();
+                        if (!_valor.isEmpty())
+                            this->retorno->retCancNFe->set_versao(_valor);
+                    }
+                    if(_xml.name() == QStringLiteral("infCanc"))
+                    {
+                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infCanc")))
+                        {
+                            if(attributes.hasAttribute("Id"))
+                            {
+                                _valor = attributes.value("Id").toString();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_Id(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("tpAmb"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                            }
+                            if(_xml.name() == QStringLiteral("verAplic"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_verAplic(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cStat"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_cStat(_valor.toInt());
+                            }
+                            if(_xml.name() == QStringLiteral("xMotivo"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_xMotivo(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("cUF"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_cUF(_valor.toInt());
+                            }
+                            if(_xml.name() == QStringLiteral("chNFe"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_chNFe(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("dhRecbto"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                            }
+                            if(_xml.name() == QStringLiteral("nProt"))
+                            {
+                                _valor = _xml.readElementText();
+                                if (!_valor.isEmpty())
+                                    this->retorno->retCancNFe->infCanc->set_nProt(_valor);
+                            }
+                            _xml.readNext();
+                            //while infCanc
+                        }
+                    }
+                    _xml.readNext();
+                    //while retCancNFe
+                }
+            }
+            if(_xml.name() == QStringLiteral("procEventoNFe"))
+            {
+                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("procEventoNFe")))
+                {
+                    if(attributes.hasAttribute("versao"))
+                    {
+                        _valor = attributes.value("versao").toString();
+                        if (!_valor.isEmpty())
+                            this->retorno->procEventoNFe->obj->set_versao(_valor);
+                    }
+
+                    if(_xml.name() == QStringLiteral("evento"))
+                    {
+                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("evento")))
+                        {
+                            if(attributes.hasAttribute("versao"))
+                            {
+                                _valor = attributes.value("versao").toString();
+                                if (!_valor.isEmpty())
+                                    this->retorno->procEventoNFe->obj->evento->set_versao(_valor);
+                            }
+                            if(_xml.name() == QStringLiteral("infEvento"))
+                            {
+                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infEvento")))
+                                {
+                                    if(attributes.hasAttribute("Id"))
+                                    {
+                                        _valor = attributes.value("Id").toString();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_Id(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("cOrgao"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_cOrgao(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("tpAmb"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                                    }
+                                    if(_xml.name() == QStringLiteral("CNPJ"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_CNPJ(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("CPF"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_CPF(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("chNFe"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_chNFe(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("dhEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_dhEvento(QDateTime::fromString(_valor, Qt::ISODate));
+                                    }
+                                    if(_xml.name() == QStringLiteral("tpEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_tpEvento(ConvNF::strToTpEvento(_valor));
+                                    }
+                                    if(_xml.name() == QStringLiteral("nSeqEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_nSeqEvento(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("verEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->set_verEvento(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("detEvento"))
+                                    {
+                                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("detEvento")))
+                                        {
+                                            if(_xml.name() == QStringLiteral("descEvento"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_descEvento(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("cOrgaoAutor"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_cOrgaoAutor(_valor.toInt());
+                                            }
+                                            if(_xml.name() == QStringLiteral("tpAutor"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_tpAutor(ConvNF::strToTpAutor(_valor));
+                                            }
+                                            if(_xml.name() == QStringLiteral("verAplic"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_verAplic(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("nProt"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_nProt(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("xJust"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xJust(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("chNFeRef"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_chNFeRef(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("xCorrecao"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xCorrecao(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("xCondUso"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xCondUso(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("xCondUso"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xCondUso(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("dhEmi"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhEmi(QDateTime::fromString(_valor, Qt::ISODate));
+                                            }
+                                            if(_xml.name() == QStringLiteral("tpNF"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_tpNF(ConvNF::strToTpNF(_valor));
+                                            }
+                                            if(_xml.name() == QStringLiteral("IE"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_IE(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("vNF"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_vNF(_valor.toDouble());
+                                            }
+                                            if(_xml.name() == QStringLiteral("vICMS"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_vICMS(_valor.toDouble());
+                                            }
+                                            if(_xml.name() == QStringLiteral("vST"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_vST(_valor.toDouble());
+                                            }
+                                            if(_xml.name() == QStringLiteral("tpAutorizacao"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_tpAutorizacao(ConvNF::strToTpAutorizacao(_valor));
+                                            }
+                                            if(_xml.name() == QStringLiteral("nDoc"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_nDoc(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("xNome"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xNome(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("latGPS"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_latGPS(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("longGPS"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_longGPS(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("hashComprovante"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_hashComprovante(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("dhHashComprovante"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhHashComprovante(QDateTime::fromString(_valor, Qt::ISODate));
+                                            }
+                                            if(_xml.name() == QStringLiteral("dest"))
+                                            {
+                                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("dest")))
+                                                {
+                                                    if(_xml.name() == QStringLiteral("UF"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->dest->set_UF(_valor.toInt());
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("CNPJ"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->dest->set_CNPJ(_valor);
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("CPF"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->dest->set_CPF(_valor);
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("idEstrangeiro"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->dest->set_idEstrangeiro(_valor);
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("IE"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->dest->set_IE(_valor);
+                                                    }
+                                                    _xml.readNext();
+                                                    //while dest
+                                                }
+                                            }
+
+                                            if(_xml.name() == QStringLiteral("itemPedido"))
+                                            {
+                                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("itemPedido")))
+                                                {
+                                                    if(_xml.name() == QStringLiteral("numItem"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->obj->set_numItem(_valor.toInt());
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("qtdeItem"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->obj->set_qtdeItem(_valor.toInt());
+                                                    }
+
+                                                    _xml.readNext();
+                                                    //while itemPedido
+                                                }
+                                                this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->add();
+                                            }
+
+                                            if(_xml.name() == QStringLiteral("autXML"))
+                                            {
+                                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("autXML")))
+                                                {
+                                                    if(_xml.name() == QStringLiteral("CNPJ"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->autXML->set_CNPJ(_valor);
+                                                    }
+                                                    if(_xml.name() == QStringLiteral("CPF"))
+                                                    {
+                                                        _valor = _xml.readElementText();
+                                                        if (!_valor.isEmpty())
+                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->autXML->set_CPF(_valor);
+                                                    }
+                                                    _xml.readNext();
+                                                    //while autXML
+                                                }
+                                            }
+                                            _xml.readNext();
+                                            //while detEvento
+                                        }
+                                    }
+                                    _xml.readNext();
+                                    //while infEvento
+                                }
+                            }
+                            _xml.readNext();
+                            //while evento
+                        }
+                    }
+                    if(_xml.name() == QStringLiteral("retEvento"))
+                    {
+                        while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEvento")))
+                        {
+                            if(attributes.hasAttribute("versao"))
+                            {
+                                _valor = attributes.value("versao").toString();
+                                if (!_valor.isEmpty())
+                                    this->retorno->procEventoNFe->obj->retEvento->set_versao(_valor);
+                            }
+
+                            if(_xml.name() == QStringLiteral("infEvento"))
+                            {
+                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infEvento")))
+                                {
+                                    if(_xml.name() == QStringLiteral("Id"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_Id(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("tpAmb"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_tpAmb(ConvNF::strToTpAmb(_valor));
+                                    }
+                                    if(_xml.name() == QStringLiteral("verAplic"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_verAplic(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("verAplic"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_verAplic(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("cOrgao"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_cOrgao(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("cStat"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_cStat(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("xMotivo"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_xMotivo(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("chNFe"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_chNFe(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("tpEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_tpEvento(ConvNF::strToTpEvento(_valor));
+                                    }
+                                    if(_xml.name() == QStringLiteral("xEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_xEvento(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("nSeqEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_nSeqEvento(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("cOrgaoAutor"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_cOrgaoAutor(_valor.toInt());
+                                    }
+                                    if(_xml.name() == QStringLiteral("CNPJDest"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_CNPJDest(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("CPFDest"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_CPFDest(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("emailDest"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_emailDest(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("dhRegEvento"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_dhRegEvento(QDateTime::fromString(_valor, Qt::ISODate));
+                                    }
+                                    if(_xml.name() == QStringLiteral("nProt"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_nProt(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("chNFePend"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_chNFePend(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("dhRecbto"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
+                                    }
+                                    if(_xml.name() == QStringLiteral("chNFePend"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_chNFePend(_valor);
+                                    }
+                                    if(_xml.name() == QStringLiteral("cUF"))
+                                    {
+                                        _valor = _xml.readElementText();
+                                        if (!_valor.isEmpty())
+                                            this->retorno->procEventoNFe->obj->retEvento->infEvento->set_cUF(_valor.toInt());
+                                    }
+                                    _xml.readNext();
+                                    //while infEvento
+                                }
+                            }
+                            _xml.readNext();
+                            //while retEvento
+                        }
+                    }
+                    _xml.readNext();
+                    //while procEventoNFe
+                }
+                this->retorno->procEventoNFe->add();
+            }
+            _xml.readNext();
+            //while retConsSitNFe
+        }
     }
     else
     {
@@ -1105,7 +1800,6 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
         //caso errado, salvar log do retorno em formato html
         salvarLogs(TipoArquivo::HTML,TipoMsgLog::MsgErro ,"",
                    WebServicesNF::NFeConsultaProtocolo, this->m_msgRetorno);
-
     }
 
     return _ret;

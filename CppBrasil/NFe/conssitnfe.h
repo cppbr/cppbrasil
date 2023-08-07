@@ -22,7 +22,7 @@ public:
     ConsSitNFe(ConfigNFe* confgNFe, NotaFiscal* notafiscal);
     ~ConsSitNFe();
     void clear();
-    bool consultar(const QString &chNFe, const bool &salvarNotaVinculada = false);
+    bool consultar(const QString &chNFe, const bool &salvarXMLNota = false, const bool &vincularEvento = false);
     QString get_versao() const;
     void set_versao(const QString &versao);
     QString get_error() const;
@@ -44,7 +44,7 @@ private:
     QString m_chNFe;
     bool gerarXML(const QString &chNFe);
     bool validarEvento();
-    void tratarRetorno(const bool &salvarNotaVinculada = false);
+    void tratarRetorno(const bool &salvarXMLNota = false, const bool &vincularEvento = false);
 
 };
 

@@ -9,14 +9,44 @@
 #include <CppBrasil/NFe/convnf.h>
 #include <CppBrasil/NFe/retornonfe.h>
 #include <CppBrasil/NFe/retenvevento.h>
-#include <CppBrasil/NFe/enveventoevento.h>
+#include <CppBrasil/NFe/tevento.h>
 
-class CPPNFE_EXPORT RetConsSitBase
+class CPPNFE_EXPORT RetCancNFe
 {
 public:
-    RetConsSitBase();
-    ~RetConsSitBase();
-    virtual void clear();
+    RetCancNFe();
+    ~RetCancNFe();
+    void clear();
+    QString get_versao() const;
+    void set_versao(const QString &versao);
+    std::shared_ptr<InfEventoRet> infCanc;
+
+private:
+    QString m_versao;
+};
+
+
+class CPPNFE_EXPORT ProcEventoNFe
+{
+public:
+    ProcEventoNFe();
+    ~ProcEventoNFe();
+    void clear();
+    QString get_versao() const;
+    void set_versao(const QString &versao);
+    std::shared_ptr<TEvento> evento;
+    std::shared_ptr<RetEvento> retEvento;
+
+private:
+    QString m_versao;
+};
+
+class CPPNFE_EXPORT RetConsSitNFe
+{
+public:
+    RetConsSitNFe();
+    ~RetConsSitNFe();
+    void clear();
     QString get_versao() const;
     void set_versao(const QString &versao);
     TpAmb get_tpAmb() const;
@@ -33,9 +63,18 @@ public:
     void set_dhRecbto(const QDateTime &dhRecbto);
     QString get_chNFe() const;
     void set_chNFe(const QString &chNFe);
+    QString get_xml() const;
+    void set_xml(const QString &xml);
+    void salvarXML(const QString &caminho, const QString &nomeArquivo);
+
+
+    std::shared_ptr<ProtNFe> protNFe;
+    std::shared_ptr<RetCancNFe> retCancNFe ;
+    std::shared_ptr<Container<ProcEventoNFe>> procEventoNFe;
 
 private:
     QString m_versao;
+    QString m_Id;
     TpAmb m_tpAmb;
     QString m_verAplic;
     int m_cStat;
@@ -43,45 +82,7 @@ private:
     int m_cUF;
     QDateTime m_dhRecbto;
     QString m_chNFe;
-};
-
-
-class CPPNFE_EXPORT RetCancNFe: public RetConsSitBase
-{
-public:
-    RetCancNFe();
-    ~RetCancNFe();
-    void clear() override;
-    QString get_nProt() const;
-    void set_nProt(const QString &nProt);
-
-private:
-    QString m_nProt;
-};
-
-class CPPNFE_EXPORT ProcEventoNFe
-{
-public:
-    ProcEventoNFe();
-    ~ProcEventoNFe();
-    void clear();
-    std::shared_ptr<EnvEventoEvento> evento;
-    std::shared_ptr<RetEvento> retEvento;
-private:
-    QString m_versao;
-};
-
-
-class CPPNFE_EXPORT RetConsSitNFe : public RetConsSitBase
-{
-public:
-    RetConsSitNFe();
-    ~RetConsSitNFe();
-    void clear() override;
-    std::shared_ptr<ProtNFe> protNFe;
-    std::shared_ptr<RetCancNFe> retCancNFe ;
-    std::shared_ptr<ProcEventoNFe> procEventoNFe;
-
+    QString m_xml;
 };
 
 #endif // RETCONSSITNFE_H

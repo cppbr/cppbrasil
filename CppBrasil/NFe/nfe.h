@@ -56,7 +56,8 @@ public:
     std::shared_ptr<InfNFe> infNFe;
     std::shared_ptr<ProtNFe> protNFe;
     std::shared_ptr<InfNFeSupl> infNFeSupl;
-
+protected:
+    void set_XMLOriginal(const QString &xmlOriginal);
 private:
     QString m_chaveacesso;
     QString m_xml_original;

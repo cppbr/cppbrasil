@@ -224,6 +224,11 @@ void Nfe::set_XMLAutorizado(const QString &xmlAutorizado)
     this->m_xml_autorizado = xmlAutorizado;
 }
 
+void Nfe::set_XMLOriginal(const QString &xmlOriginal)
+{
+    this->m_xml_original = xmlOriginal;
+}
+
 void Nfe::gerarChaveAcesso()
 {
     QString cUF = QString::number(this->infNFe->ide->get_cUF());  //Código da UF do emitente do Documento Fiscal

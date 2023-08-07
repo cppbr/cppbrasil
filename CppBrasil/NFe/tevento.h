@@ -1,5 +1,5 @@
-#ifndef ENVEVENTOEVENTO_H
-#define ENVEVENTOEVENTO_H
+#ifndef TEVENTO_H
+#define TEVENTO_H
 
 
 #include <memory>
@@ -185,6 +185,8 @@ public:
     void set_tpEvento(const TpEvento &tpEvento);
     int get_nSeqEvento() const;
     void set_nSeqEvento(const int &nSeqEvento);
+    QString get_verEvento() const;
+    void set_verEvento(const QString &verEvento);
 
     std::shared_ptr<DetEvento> detEvento;
 
@@ -198,16 +200,16 @@ private:
     QDateTime m_dhEvento;
     TpEvento m_tpEvento;
     int m_nSeqEvento;
-
+    QString m_verEvento;
 };
 
 //-----------------------------------------------------
 
-class CPPNFE_EXPORT EnvEventoEvento
+class CPPNFE_EXPORT TEvento
 {
 public:
-    EnvEventoEvento();
-    ~EnvEventoEvento();
+    TEvento();
+    ~TEvento();
     void clear();
     QString get_versao() const;
     void set_versao(const QString &versao);
@@ -229,4 +231,4 @@ private:
     QString m_error;
 };
 
-#endif // ENVEVENTOEVENTO_H
+#endif // TEVENTO_H
