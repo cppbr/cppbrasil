@@ -54,10 +54,7 @@ bool EnvEvento::enviarEvento(const int &idLote)
                                       this->retorno.get());
 
             connect(_ws, &WSEvento::wsChange, this, &EnvEvento::wsChange);
-            connect(_ws, &WSEvento::errorOccurred, this,
-                    [=] (const QString &error)  {
-                this->m_error = error;
-            });
+            connect(_ws, &WSEvento::errorOccurred, this, &EnvEvento::onError);
 
 
             bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
@@ -96,6 +93,12 @@ void EnvEvento::set_versao(const QString &versao)
 QString EnvEvento::get_error() const
 {
     return this->m_error;
+}
+
+void EnvEvento::onError(const QString &error)
+{
+    this->m_error = error;
+    emit errorOccurred(error);
 }
 
 bool EnvEvento::assinarEvento(const QString &evento, const QString &uri, QString &output)

@@ -59,8 +59,8 @@ public:
 
 
 private:
-    const InfNFe *m_infNFe;
-    const ConfigNFe *m_confgNFe;
+    const InfNFe *m_infNFe; //ponteiro de fora
+    const ConfigNFe *m_confgNFe; //ponteiro de fora
     QXmlStreamWriter *m_xmlw;
     QByteArray m_strXML;
 

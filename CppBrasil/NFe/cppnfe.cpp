@@ -37,5 +37,6 @@ CppNFe::~CppNFe()
 void CppNFe::clear()
 {
     this->notafiscal->clear();
+    this->eventos->clear();
 }
 

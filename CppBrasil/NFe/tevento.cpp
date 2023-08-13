@@ -187,7 +187,7 @@ void DetEvento::clear()
     this->m_xCorrecao.clear();
     this->m_xCondUso.clear();
     //EPEC
-    CppUtil::clearDateTime(m_dhEmi);
+    CppUtil::clearDateTime(this->m_dhEmi);
     this->m_tpNF = TpNF::None;
     this->m_IE.clear();
     this->m_vNF = 0.0;
@@ -195,6 +195,13 @@ void DetEvento::clear()
     this->m_vST = 0.0;
     //Ator Interessado na NF-e
     this->m_tpAutorizacao = TpAutorizacao::None;
+    //EntregaNFe
+    this->m_nDoc.clear();
+    this->m_xNome.clear();
+    this->m_latGPS.clear();
+    this->m_longGPS.clear();
+    this->m_hashComprovante.clear();
+    CppUtil::clearDateTime(this->m_dhHashComprovante);
 
 }
 
@@ -434,6 +441,7 @@ InfEvento::~InfEvento()
 
 void InfEvento::clear()
 {
+    this->detEvento->clear();
     this->m_Id.clear();
     this->m_cOrgao = 0;
     this->m_tpAmb = TpAmb::None;
@@ -443,6 +451,7 @@ void InfEvento::clear()
     CppUtil::clearDateTime(this->m_dhEvento);
     this->m_tpEvento = TpEvento::None;
     this->m_nSeqEvento = 0;
+    this->m_verEvento.clear();
 }
 
 QString InfEvento::get_Id() const

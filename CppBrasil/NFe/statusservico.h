@@ -27,7 +27,7 @@ signals:
     void wsChange(const WebServicesNF &webServicesNF);
 
 private:
-    ConfigNFe* config;
+    ConfigNFe* config; //ponteiro de fora
     QString m_error;
 };
 

@@ -38,6 +38,8 @@ class CPPNFE_EXPORT EventoNotaFiscal : public QObject
 public:
     EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal);
     ~EventoNotaFiscal();
+    void clear();
+
     std::shared_ptr<StatusServico> statusServico;
     std::shared_ptr<EnvEvento> envEvento;
     std::shared_ptr<ConsSitNFe> consSitNFe;

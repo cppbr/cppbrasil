@@ -56,6 +56,9 @@ signals:
     void errorOccurred(const QString &error);
     void wsChange(const WebServicesNF &webServicesNF);
 
+private slots:
+    void onError(const QString &error);
+
 private:
     ConfigNFe* config; //ponteiro de fora
     NotaFiscal* notafiscal; //ponteiro de fora

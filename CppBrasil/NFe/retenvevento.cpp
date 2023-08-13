@@ -295,6 +295,7 @@ RetEnvEvento::~RetEnvEvento()
 
 void RetEnvEvento::clear()
 {
+    this->retEvento->clear();
     this->m_versao.clear();
     this->m_idLote = 0;
     this->m_tpAmb = TpAmb::None;

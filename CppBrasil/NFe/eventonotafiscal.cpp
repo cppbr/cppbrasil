@@ -39,3 +39,10 @@ EventoNotaFiscal::EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal) 
 EventoNotaFiscal::~EventoNotaFiscal()
 {
 }
+
+void EventoNotaFiscal::clear()
+{
+    this->statusServico->clear();
+    this->envEvento->clear();
+    this->consSitNFe->clear();
+}

@@ -14,6 +14,7 @@ StatusServico::~StatusServico()
 void StatusServico::clear()
 {
     this->retorno->clear();
+    this->m_error.clear();
 }
 
 bool StatusServico::status()
