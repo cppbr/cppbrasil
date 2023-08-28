@@ -114,6 +114,8 @@ public:
     void set_vST(const double &vST);
     TpAutorizacao get_tpAutorizacao() const;
     void set_tpAutorizacao(const TpAutorizacao &tpAutorizacao);
+    QDateTime get_dhEntrega() const;
+    void set_dhEntrega(const QDateTime &dhEntrega);
     QString get_nDoc() const;
     void set_nDoc(const QString &nDoc);
     QString get_xNome() const;
@@ -126,6 +128,8 @@ public:
     void set_hashComprovante(const QString &hashComprovante);
     QDateTime get_dhHashComprovante() const;
     void set_dhHashComprovante(const QDateTime &dhHashComprovante);
+    QString get_nProtEvento() const;
+    void set_nProtEvento(const QString &nProtEvento);
 
     std::shared_ptr<DestEPEC> dest;
     std::shared_ptr<Container<ItemPedProrrog>> itemPedido;
@@ -151,12 +155,14 @@ private:
     //Ator Interessado na NF-e
     TpAutorizacao m_tpAutorizacao;
     //EntregaNFe
+    QDateTime m_dhEntrega;
     QString m_nDoc;
     QString m_xNome;
     QString m_latGPS;
     QString m_longGPS;
     QString m_hashComprovante;
     QDateTime m_dhHashComprovante;
+    QString m_nProtEvento;
 };
 
 //-----------------------------------------------------

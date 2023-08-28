@@ -365,6 +365,16 @@ void DetEvento::set_tpAutorizacao(const TpAutorizacao &tpAutorizacao)
     this->m_tpAutorizacao = tpAutorizacao;
 }
 
+QDateTime DetEvento::get_dhEntrega() const
+{
+    return this->m_dhEntrega;
+}
+
+void DetEvento::set_dhEntrega(const QDateTime &dhEntrega)
+{
+    this->m_dhEntrega = dhEntrega;
+}
+
 QString DetEvento::get_nDoc() const
 {
     return this->m_nDoc;
@@ -423,6 +433,16 @@ QDateTime DetEvento::get_dhHashComprovante() const
 void DetEvento::set_dhHashComprovante(const QDateTime &dhHashComprovante)
 {
     this->m_dhHashComprovante = dhHashComprovante;
+}
+
+QString DetEvento::get_nProtEvento() const
+{
+    return this->m_nProtEvento;
+}
+
+void DetEvento::set_nProtEvento(const QString &nProtEvento)
+{
+    this->m_nProtEvento = nProtEvento;
 }
 
 //------------------------------------------------------------------------
@@ -667,7 +687,7 @@ void TEvento::gerarXML()
 
     //grupo detalhe do evento
     _xmlw.writeStartElement("detEvento"); //abertura do grupo detEvento
-    _xmlw.writeAttribute("versao", this->m_versao);
+    _xmlw.writeAttribute("versao", this->infEvento->get_verEvento());
 
     //descrição obrigatório para todos
     _xmlw.writeTextElement("descEvento", this->infEvento->detEvento->get_descEvento());
@@ -747,6 +767,8 @@ void TEvento::gerarXML()
     if (this->infEvento->get_tpEvento() == TpEvento::ComprovanteEntregaNFe ||
         this->infEvento->get_tpEvento() == TpEvento::CancelComprovanteEntregaNFe)
     {
+        if (!this->infEvento->detEvento->get_dhEntrega().isNull())
+            _xmlw.writeTextElement("dhEntrega", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhEntrega(), DtH::DateTimeUTC));
         if (!this->infEvento->detEvento->get_nDoc().isEmpty())
             _xmlw.writeTextElement("nDoc", this->infEvento->detEvento->get_nDoc());
         if (!this->infEvento->detEvento->get_xNome().isEmpty())
@@ -759,6 +781,9 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("hashComprovante", this->infEvento->detEvento->get_hashComprovante());
         if (!this->infEvento->detEvento->get_dhHashComprovante().isNull())
             _xmlw.writeTextElement("dhHashComprovante", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhHashComprovante(), DtH::DateTimeUTC));
+        if (!this->infEvento->detEvento->get_nProtEvento().isEmpty())
+            _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
+
     }
 
     _xmlw.writeEndElement(); //fechamento detEvento

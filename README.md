@@ -3,12 +3,12 @@
 
 # Sobre o projeto
 
-Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multiplataforma que ajudam no desenvolvimento de softwares ERP, CRM e outros.
+Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multiplataforma que ajudam no desenvolvimento de software ERP.
 
 
 ## Bibliotecas desenvolvidas
-- libCppNFe - lib para emissão de documentos fiscais NFe e NFCe.
-- libDanfeQtRpt - lib para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). Utiliza o QtRpt(Gerenciador de Relatórios open source).
+- libCppNFe - Biblioteca para emissão de documentos fiscais NFe e NFCe.
+- libDanfeQtRpt - Biblioteca para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). Utiliza o QtRpt(Gerenciador de Relatórios open source).
 
 
 # Tecnologias utilizadas
