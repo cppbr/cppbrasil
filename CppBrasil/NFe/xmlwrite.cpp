@@ -1412,10 +1412,18 @@ void XmlWrite::get_IPI(const int &i)
         {
             this->m_xmlw->writeStartElement("IPITrib"); //abertura grupo IPITrib
             this->m_xmlw->writeTextElement("CST", ConvNF::cstIPIToStr(this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST()));
-            this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_vBC(), 2));
-            this->m_xmlw->writeTextElement("pIPI", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_pIPI(), 4));
-            this->m_xmlw->writeTextElement("qUnid", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_qUnid(), 4));
-            this->m_xmlw->writeTextElement("vUnid", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_vUnid(), 4));
+            //Informar os campos O10 e O13 se o cálculo do IPI for por alíquota.
+            if (this->m_infNFe->det->items->value(i)->imposto->IPI->get_pIPI() > 0)
+            {
+                this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_vBC(), 2));
+                this->m_xmlw->writeTextElement("pIPI", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_pIPI(), 4));
+            }
+            //Informar os campos O11 e O12 se o cálculo do IPI for de valor por unidade.
+            if (this->m_infNFe->det->items->value(i)->imposto->IPI->get_qUnid() > 0)
+            {
+                this->m_xmlw->writeTextElement("qUnid", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_qUnid(), 4));
+                this->m_xmlw->writeTextElement("vUnid", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_vUnid(), 4));
+            }
             this->m_xmlw->writeTextElement("vIPI", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->IPI->get_vIPI(), 2));
             this->m_xmlw->writeEndElement();//fechamento grupo IPITrib
         }
@@ -1425,7 +1433,10 @@ void XmlWrite::get_IPI(const int &i)
             this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI03 ||
             this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI04 ||
             this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI51 ||
-            this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI52)
+            this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI52 ||
+            this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI53 ||
+            this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI54 ||
+            this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST() == CstIPI::IPI55)
         {
             this->m_xmlw->writeStartElement("IPINT"); //abertura grupo IPINT
             this->m_xmlw->writeTextElement("CST", ConvNF::cstIPIToStr(this->m_infNFe->det->items->value(i)->imposto->IPI->get_CST()));
@@ -1752,7 +1763,8 @@ void XmlWrite::get_total()
     this->m_xmlw->writeTextElement("vDesc", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vDesc(), 2));
     this->m_xmlw->writeTextElement("vII", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vII(), 2));
     this->m_xmlw->writeTextElement("vIPI", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPI(), 2));
-    this->m_xmlw->writeTextElement("vIPIDevol", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPIDevol(), 2));
+    if (this->m_infNFe->total->ICMSTot->get_vIPIDevol() > 0)
+        this->m_xmlw->writeTextElement("vIPIDevol", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPIDevol(), 2));
     this->m_xmlw->writeTextElement("vPIS", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vPIS(), 2));
     this->m_xmlw->writeTextElement("vCOFINS", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vCOFINS(), 2));
     this->m_xmlw->writeTextElement("vOutro", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vOutro(), 2));
