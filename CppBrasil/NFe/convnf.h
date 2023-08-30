@@ -176,8 +176,8 @@ enum class IndPag {None = -1, aVista = 1, aPrazo = 2};
 enum class TPag {None = -1, Dinheiro = 1, Cheque = 2, CartaoCredito = 3,
                 CartaoDebito = 4, CreditoLoja = 5, ValeAlimentacao = 10,
                 ValeRefeicao = 11, ValePresente = 12, ValeCombustivel = 13,
-                BoletoBancario = 15, DepositoBancario = 16, Pix = 17,
-                TranferenciaBancaria = 18, ProgramaFidelidade = 19,
+                DuplicataMercanti = 14, BoletoBancario = 15, DepositoBancario = 16,
+                Pix = 17, TranferenciaBancaria = 18, ProgramaFidelidade = 19,
                 SemPagamento = 90, Outros = 99};
 
 //tpIntegra - Tipo de Integração para pagamento
