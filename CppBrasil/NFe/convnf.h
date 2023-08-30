@@ -48,7 +48,7 @@ enum class TpImp {None = -1, SemGeracao = 0, Retrato = 1, Paisagem = 2,
                              Simplificado = 3, NFCe = 4, MsgEletronica = 5};
 //tpEmis - Tipo de Emissão da NF-e
 enum class TpEmis {None = -1, Normal = 1, Contingencia_FSIA = 2,
-                   Contingencia_SCAN_DESATIVADO = 3, //desativado na NT 2015/002
+                   RegimeEspecialNFF_NaoUsarEste = 3, //Antes Contingência SCAN desativado na NT 2015/002. Agora Regime Especial NFF (NT 2021.002)
                    Contingencia_EPEC = 4, Contingencia_FSDA = 5, Contingencia_SVCAN = 6,
                    Contingencia_SVCRS = 7, Contingencia_SVCSP = 8, Contingencia_NFCe = 9};
 //finNFe - Finalidade de emissão da NF-e
