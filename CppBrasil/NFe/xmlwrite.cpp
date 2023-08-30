@@ -1041,6 +1041,16 @@ void XmlWrite::get_ICMS(const int &i)
                 this->m_xmlw->writeTextElement("vBCST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vBCST(), 2));
                 this->m_xmlw->writeTextElement("pICMSST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pICMSST(), 4));
                 this->m_xmlw->writeTextElement("vICMSST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSST(), 2));
+
+                if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vBCFCPST() > 0 ||
+                    this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pFCPST() > 0   ||
+                    this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vFCPST() > 0)
+                {
+                    this->m_xmlw->writeTextElement("vBCFCPST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vBCFCPST(), 2));
+                    this->m_xmlw->writeTextElement("pFCPST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pFCPST(), 4));
+                    this->m_xmlw->writeTextElement("vFCPST", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vFCPST(), 2));
+                }
+
                 this->m_xmlw->writeTextElement("pBCOp", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pBCOp(), 4));
                 this->m_xmlw->writeTextElement("UFST", this->m_infNFe->det->items->value(i)->imposto->ICMS->get_UFST());
             }
