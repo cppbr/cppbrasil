@@ -783,13 +783,13 @@ void XmlWrite::get_imposto(const int &i)
     this->m_xmlw->writeStartElement("imposto");//abertura grupo imposto
     this->m_xmlw->writeTextElement("vTotTrib", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->get_vTotTrib(), 2));
     get_ICMS(i);
-    get_ICMSUFDest(i);
     get_IPI(i);
     get_II(i);
     get_PIS(i);
     get_PISST(i);
     get_COFINS(i);
     get_COFINSST(i);
+    get_ICMSUFDest(i);
     get_ISSQN(i);
     this->m_xmlw->writeEndElement();//fechamento grupo imposto
 }
@@ -1542,15 +1542,14 @@ void XmlWrite::get_PIS(const int &i)
             this->m_xmlw->writeStartElement("PISOutr");//abertura grupo PISOutr
             this->m_xmlw->writeTextElement("CST", ConvNF::cstPISToStr(this->m_infNFe->det->items->value(i)->imposto->PIS->get_CST()));
             //Informar os campos Q07 e Q08 se o cálculo do PIS em percentual.
-            if (this->m_infNFe->det->items->value(i)->imposto->PIS->get_vBC() > 0 ||
-                this->m_infNFe->det->items->value(i)->imposto->PIS->get_pPIS() > 0)
+            //caso não seja por valor o padrão será percentual
+            if (this->m_infNFe->det->items->value(i)->imposto->PIS->get_qBCProd() == 0 ||
+                this->m_infNFe->det->items->value(i)->imposto->PIS->get_vAliqProd() == 0)
             {
                 this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PIS->get_vBC(), 2));
                 this->m_xmlw->writeTextElement("pPIS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PIS->get_pPIS(), 4));
             }
-            //Informar os campos Q10 e Q11 se o cálculo do PIS for em valor.
-            if (this->m_infNFe->det->items->value(i)->imposto->PIS->get_qBCProd() > 0 ||
-                this->m_infNFe->det->items->value(i)->imposto->PIS->get_vAliqProd() > 0)
+            else //Informar os campos Q10 e Q11 se o cálculo do PIS for em valor.
             {
                 this->m_xmlw->writeTextElement("qBCProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PIS->get_qBCProd(), 4));
                 this->m_xmlw->writeTextElement("vAliqProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PIS->get_vAliqProd(), 4));
@@ -1572,15 +1571,14 @@ void XmlWrite::get_PISST(const int &i)
     {
         this->m_xmlw->writeStartElement("PISST");//abertura grupo PISST
         //Informar os campos R02 e R03 para cálculo do PIS em percentual.
-        if (this->m_infNFe->det->items->value(i)->imposto->PISST->get_vBC() > 0 ||
-            this->m_infNFe->det->items->value(i)->imposto->PISST->get_pPIS() > 0)
+        //caso não seja por valor o padrão será percentual
+        if (this->m_infNFe->det->items->value(i)->imposto->PISST->get_qBCProd() == 0 ||
+            this->m_infNFe->det->items->value(i)->imposto->PISST->get_vAliqProd() == 0)
         {
             this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PISST->get_vBC(), 2));
             this->m_xmlw->writeTextElement("pPIS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PISST->get_pPIS(), 4));
         }
-        //Informar os campos R04 e R05 para cálculo do PIS em valor.
-        if (this->m_infNFe->det->items->value(i)->imposto->PISST->get_qBCProd() > 0 ||
-            this->m_infNFe->det->items->value(i)->imposto->PISST->get_vAliqProd() > 0)
+        else //Informar os campos R04 e R05 para cálculo do PIS em valor.
         {
             this->m_xmlw->writeTextElement("qBCProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PISST->get_qBCProd(), 4));
             this->m_xmlw->writeTextElement("vAliqProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->PISST->get_vAliqProd(), 4));
@@ -1659,15 +1657,14 @@ void XmlWrite::get_COFINS(const int &i)
             this->m_xmlw->writeStartElement("COFINSOutr");//abertura grupo COFINSOutr
             this->m_xmlw->writeTextElement("CST", ConvNF::cstCOFINSToStr(this->m_infNFe->det->items->value(i)->imposto->COFINS->get_CST()));
             //Informar os campos S07 e S08 para cálculo da COFINS em percentual.
-            if (this->m_infNFe->det->items->value(i)->imposto->COFINS->get_vBC() > 0 ||
-                this->m_infNFe->det->items->value(i)->imposto->COFINS->get_pCOFINS() > 0)
+            //caso não seja por valor o padrão será percentual
+            if (this->m_infNFe->det->items->value(i)->imposto->COFINS->get_qBCProd() == 0 ||
+                this->m_infNFe->det->items->value(i)->imposto->COFINS->get_vAliqProd() == 0)
             {
                 this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINS->get_vBC(), 2));
                 this->m_xmlw->writeTextElement("pCOFINS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINS->get_pCOFINS(), 4));
             }
-            //Informar os campos S09 e S10 para cálculo da COFINS em valor.
-            if (this->m_infNFe->det->items->value(i)->imposto->COFINS->get_qBCProd() > 0 ||
-                this->m_infNFe->det->items->value(i)->imposto->COFINS->get_vAliqProd() > 0)
+            else//Informar os campos S09 e S10 para cálculo da COFINS em valor.
             {
                 this->m_xmlw->writeTextElement("qBCProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINS->get_qBCProd(), 4));
                 this->m_xmlw->writeTextElement("vAliqProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINS->get_vAliqProd(), 4));
@@ -1689,15 +1686,14 @@ void XmlWrite::get_COFINSST(const int &i)
     {
         this->m_xmlw->writeStartElement("COFINSST");//abertura grupo COFINSST
         //Informar os campos T02 e T03 para cálculo da COFINS Substituição Tributária em percentual.
-        if (this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_vBC() > 0 ||
-            this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_pCOFINS() > 0)
+        //caso não seja por valor o padrão será percentual
+        if (this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_qBCProd() == 0 ||
+            this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_vAliqProd() == 0)
         {
             this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_vBC(), 2));
             this->m_xmlw->writeTextElement("pCOFINS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_pCOFINS(), 4));
         }
-        //Informar os campos T04 e T05 para cálculo da COFINS Substituição Tributária em valor.
-        if (this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_qBCProd() > 0 ||
-            this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_vAliqProd() > 0)
+        else//Informar os campos T04 e T05 para cálculo da COFINS Substituição Tributária em valor.
         {
             this->m_xmlw->writeTextElement("qBCProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_qBCProd(), 4));
             this->m_xmlw->writeTextElement("vAliqProd", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->COFINSST->get_vAliqProd(), 4));
@@ -1811,8 +1807,7 @@ void XmlWrite::get_total()
     this->m_xmlw->writeTextElement("vDesc", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vDesc(), 2));
     this->m_xmlw->writeTextElement("vII", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vII(), 2));
     this->m_xmlw->writeTextElement("vIPI", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPI(), 2));
-    if (this->m_infNFe->total->ICMSTot->get_vIPIDevol() > 0)
-        this->m_xmlw->writeTextElement("vIPIDevol", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPIDevol(), 2));
+    this->m_xmlw->writeTextElement("vIPIDevol", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vIPIDevol(), 2));
     this->m_xmlw->writeTextElement("vPIS", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vPIS(), 2));
     this->m_xmlw->writeTextElement("vCOFINS", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vCOFINS(), 2));
     this->m_xmlw->writeTextElement("vOutro", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vOutro(), 2));
