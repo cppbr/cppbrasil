@@ -781,7 +781,8 @@ void XmlWrite::get_prod(const int &i)
 void XmlWrite::get_imposto(const int &i)
 {   //imposto - M01
     this->m_xmlw->writeStartElement("imposto");//abertura grupo imposto
-    this->m_xmlw->writeTextElement("vTotTrib", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->get_vTotTrib(), 2));
+    if (this->m_infNFe->det->items->value(i)->imposto->get_vTotTrib() > 0)
+        this->m_xmlw->writeTextElement("vTotTrib", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->get_vTotTrib(), 2));
     get_ICMS(i);
     get_IPI(i);
     get_II(i);
