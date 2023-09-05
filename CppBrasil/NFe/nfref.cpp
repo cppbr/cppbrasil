@@ -31,6 +31,7 @@ NFRef::~NFRef()
 void NFRef::clear()
 {
     this->m_refNFe.clear();
+    this->m_refNFeSig.clear();
     this->m_refCTe.clear();
 
     this->refNF->clear();
@@ -48,6 +49,16 @@ void NFRef::set_refNFe(const QString &refNFe)
   this->m_refNFe = refNFe;
 }
 
+QString NFRef::get_refNFeSig() const
+{
+    return this->m_refNFeSig;
+}
+
+void NFRef::set_refNFeSig(const QString &refNFeSig)
+{
+    this->m_refNFeSig = refNFeSig;
+}
+
 QString NFRef::get_refCTe() const
 {
   return this->m_refCTe;
@@ -55,5 +66,5 @@ QString NFRef::get_refCTe() const
 
 void NFRef::set_refCTe(const QString &refCTe)
 {
-  this->m_refCTe = refCTe;
+    this->m_refCTe = refCTe;
 }

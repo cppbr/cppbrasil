@@ -36,6 +36,8 @@ public:
     void clear();
     QString get_refNFe() const;
     void set_refNFe(const QString &refNFe);
+    QString get_refNFeSig() const;
+    void set_refNFeSig(const QString &refNFeSig);
     QString get_refCTe() const;
     void set_refCTe(const QString &refCTe);
 
@@ -45,6 +47,7 @@ public:
 
 private:
     QString m_refNFe;
+    QString m_refNFeSig;
     QString m_refCTe;
 };
 

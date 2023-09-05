@@ -215,6 +215,9 @@ void XmlWrite::get_NFref()
             this->m_xmlw->writeStartElement("NFref");//abertura grupo NFref
             if (!this->m_infNFe->ide->NFref->items->value(i)->get_refNFe().isEmpty())
                 this->m_xmlw->writeTextElement("refNFe", this->m_infNFe->ide->NFref->items->value(i)->get_refNFe());
+            if (!this->m_infNFe->ide->NFref->items->value(i)->get_refNFeSig().isEmpty())
+                this->m_xmlw->writeTextElement("refNFeSig", this->m_infNFe->ide->NFref->items->value(i)->get_refNFeSig());
+
             //grupo refNF - nota 1/1A
             //se exitir uma numeração
             if (this->m_infNFe->ide->NFref->items->value(i)->refNF->get_nNF() > 0)
