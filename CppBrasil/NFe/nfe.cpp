@@ -234,7 +234,9 @@ void Nfe::gerarChaveAcesso()
     QString cUF = QString::number(this->infNFe->ide->get_cUF());  //Código da UF do emitente do Documento Fiscal
     cUF = CppUtility::insZeroLeft(cUF, 2);
     QString dhEmi = this->infNFe->ide->get_dhEmi().toString("yyMM"); //AAMM - Ano e Mês de emissão da NF-e
-    QString cnpj = this->infNFe->emite->get_CNPJ(); //CNPJ do emitente
+    QString cnpj_cpf = (!this->infNFe->emite->get_CNPJ().isEmpty() ?
+                        this->infNFe->emite->get_CNPJ() :
+                        CppUtility::insZeroLeft(this->infNFe->emite->get_CPF(), 14)) ; //CNPJ ou CPF do emitente
     QString mod = ConvNF::modeloDFToStr(this->infNFe->ide->get_mod());//Modelo do Documento Fiscal
     QString serie = QString::number(this->infNFe->ide->get_serie());//Serie do Documento Fiscal
     serie = CppUtility::insZeroLeft(serie, 3);
@@ -243,7 +245,7 @@ void Nfe::gerarChaveAcesso()
     QString tpemis = ConvNF::tpEmisToStr((this->infNFe->ide->get_tpEmis()));//forma de emissao da NF-e
     QString cNF =  QString::number(this->infNFe->ide->get_cNF());//Código Numérico que compõe a Chave de Acesso
     cNF = CppUtility::insZeroLeft(cNF, 8);
-    QString chaveNF = QString("%1%2%3%4%5%6%7%8").arg(cUF, dhEmi, cnpj, mod, serie, nf,
+    QString chaveNF = QString("%1%2%3%4%5%6%7%8").arg(cUF, dhEmi, cnpj_cpf, mod, serie, nf,
                                                       tpemis, cNF);
     QString cdv = QString::number(CppUtility::dvModulo11(chaveNF)); //Digito Verificador da Chave de Acesso
     //inserindo cDV na chave de acesso
