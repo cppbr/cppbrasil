@@ -768,7 +768,7 @@ QString ConvNF::tPagToStr(const TPag &value)
 TPag ConvNF::strToTPag(const QString &value)
 {
     QList<QString> _r = {"-1","01","02","03","04","05","10","11","12",
-                             "13","15","16","17","18","19","90","99"};
+                         "13","14","15","16","17","18","19","90","99"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TPag::None;
