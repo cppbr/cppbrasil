@@ -1506,6 +1506,12 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                                                 if (!_valor.isEmpty())
                                                     this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_tpAutorizacao(ConvNF::strToTpAutorizacao(_valor));
                                             }
+                                            if(_xml.name() == QStringLiteral("dhEntrega"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhEntrega(QDateTime::fromString(_valor, Qt::ISODate));
+                                            }
                                             if(_xml.name() == QStringLiteral("nDoc"))
                                             {
                                                 _valor = _xml.readElementText();
@@ -1541,6 +1547,12 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                                                 _valor = _xml.readElementText();
                                                 if (!_valor.isEmpty())
                                                     this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhHashComprovante(QDateTime::fromString(_valor, Qt::ISODate));
+                                            }
+                                            if(_xml.name() == QStringLiteral("nProtEvento"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_nProtEvento(_valor);
                                             }
                                             if(_xml.name() == QStringLiteral("dest"))
                                             {
