@@ -24,8 +24,10 @@ limitations under the License.
 #include <memory>
 #include <QString>
 #include <CppBrasil/cppbrasil_global.h>
+#include <CppBrasil/container.h>
 #include <CppBrasil/NFe/cide.h>
 #include <CppBrasil/NFe/encerrante.h>
+#include <CppBrasil/NFe/origcomb.h>
 
 class CPPNFE_EXPORT Comb
 {
@@ -54,7 +56,7 @@ public:
 
     std::shared_ptr<Cide> CIDE;
     std::shared_ptr<Encerrante> encerrante;
-
+    std::shared_ptr<Container<OrigComb>> origComb;
 private:
     int m_cProdANP;
     QString m_descANP;

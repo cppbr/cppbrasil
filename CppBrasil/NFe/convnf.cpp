@@ -502,7 +502,7 @@ QString ConvNF::cstICMSToStr(const CstICMS &value)
 {
     /*
      * Obs: Como alguns CST são alfanumérico, a conversão de CST para STR do ICMS
-     * será diferente. Não tem como converter para inteiro como nos demais. Nesse caso,
+     * será diferente. Não tem como converter para inteiro assim como nos demais. Nesse caso,
      * pegará o número da posição para fazer o cast. Caso seja None já retorna
      * string vazio, caso não, fará o cast pegando a posição a partir do zero sem a preseça
      * do -1 na QList, se não, ficaria errado.
@@ -513,16 +513,16 @@ QString ConvNF::cstICMSToStr(const CstICMS &value)
         return QString();
     else
     {
-        QList<QString>_r = {"00","10","20","30","40","41","50","51","60",
-                           "70","90","Part10", "Part90", "ST41", "ST60"};
+        QList<QString>_r = {"00","02","10","15","20","30","40","41","50","51","53",
+                           "60","61","70","90","Part10", "Part90", "ST41", "ST60"};
         return _r[static_cast<int>(value)];
     }
 }
 
 CstICMS ConvNF::strToCstICMS(const QString &value)
 {
-    QList<QString>_r = {"-1","00","10","20","30","40","41","50","51","60",
-                            "70","90","Part10", "Part90", "ST41", "ST60"};
+    QList<QString>_r = {"-1","00","02","10","15","20","30","40","41","50","51","53",
+                             "60","61","70","90","Part10", "Part90", "ST41", "ST60"};
 
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
@@ -908,5 +908,44 @@ TpAutorizacao ConvNF::strToTpAutorizacao(const QString &value)
         return TpAutorizacao::None;
     else
         return static_cast<TpAutorizacao>(_r[_i].toInt());
+
+}
+
+QString ConvNF::indImportToStr(const IndImport &value)
+{
+    if(value == IndImport::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+
+}
+
+IndImport ConvNF::strToIndImport(const QString &value)
+{
+    QList<QString> _r = {"-1", "0", "1"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return IndImport::None;
+    else
+        return static_cast<IndImport>(_r[_i].toInt());
+
+}
+
+QString ConvNF::motRedAdRemToStr(const MotRedAdRem &value)
+{
+    if(value == MotRedAdRem::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+MotRedAdRem ConvNF::strToMotRedAdRem(const QString &value)
+{
+    QList<QString> _r = {"-1", "1", "9"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return MotRedAdRem::None;
+    else
+        return static_cast<MotRedAdRem>(_r[_i].toInt());
 
 }

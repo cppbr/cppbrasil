@@ -21,7 +21,7 @@ limitations under the License.
 #include "comb.h"
 
 Comb::Comb() :
-    CIDE(new Cide), encerrante(new Encerrante),
+    CIDE(new Cide), encerrante(new Encerrante), origComb(new Container<OrigComb>),
     m_cProdANP(0), m_pGLP(0.0), m_pGNn(0.0), m_pGNi(0.0), m_vPart(0.0), m_qTemp(0.0)
 {
 
@@ -45,6 +45,7 @@ void Comb::clear()
 
     this->CIDE->clear();
     this->encerrante->clear();
+    this->origComb->clear();
 }
 
 int Comb::get_cProdANP() const

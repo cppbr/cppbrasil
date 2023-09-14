@@ -168,6 +168,8 @@ set(cppnfe_SRC
     obsfisco.cpp
     obsitem.h
     obsitem.cpp
+    origcomb.h
+    origcomb.cpp
     pag.h
     pag.cpp
     pis.h
@@ -302,6 +304,7 @@ set(HEADER_NFE
     obscont.h
     obsfisco.h
     obsitem.h
+    origcomb.h
     pag.h
     pis.h
     pisst.h

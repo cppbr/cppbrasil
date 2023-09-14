@@ -125,7 +125,32 @@ public:
     void set_vFCPDif(const double &vFCPDif);
     double get_vFCPEfet() const;
     void set_vFCPEfet(const double &vFCPEfet);
-
+    double get_qBCMono() const;
+    void set_qBCMono(const double &qBCMono);
+    double get_adRemICMS() const;
+    void set_adRemICMS(const double &adRemICMS);
+    double get_vICMSMono() const;
+    void set_vICMSMono(const double &vICMSMono);
+    double get_qBCMonoReten() const;
+    void set_qBCMonoReten(const double &qBCMonoReten);
+    double get_adRemICMSReten() const;
+    void set_adRemICMSReten(const double &adRemICMSReten);
+    double get_vICMSMonoReten() const;
+    void set_vICMSMonoReten(const double &vICMSMonoReten);
+    double get_pRedAdRem() const;
+    void set_pRedAdRem(const double &pRedAdRem);
+    MotRedAdRem get_motRedAdRem() const;
+    void set_motRedAdRem(const MotRedAdRem &motRedAdRem);
+    double get_vICMSMonoOp() const;
+    void set_vICMSMonoOp(const double &vICMSMonoOp);
+    double get_vICMSMonoDif() const;
+    void set_vICMSMonoDif(const double &vICMSMonoDif);
+    double get_qBCMonoRet() const;
+    void set_qBCMonoRet(const double &qBCMonoRet);
+    double get_adRemICMSRet() const;
+    void set_adRemICMSRet(const double &adRemICMSRet);
+    double get_vICMSMonoRet() const;
+    void set_vICMSMonoRet(const double &vICMSMonoRet);
 private:
     Orig m_orig;
     CstICMS m_CST;
@@ -174,6 +199,19 @@ private:
     double m_pFCPDif;
     double m_vFCPDif;
     double m_vFCPEfet;
+    double m_qBCMono;
+    double m_adRemICMS;
+    double m_vICMSMono;
+    double m_qBCMonoReten;
+    double m_adRemICMSReten;
+    double m_vICMSMonoReten;
+    double m_pRedAdRem;
+    MotRedAdRem m_motRedAdRem;
+    double m_vICMSMonoOp;
+    double m_vICMSMonoDif;
+    double m_qBCMonoRet;
+    double m_adRemICMSRet;
+    double m_vICMSMonoRet;
 };
 
 #endif // ICMS_H

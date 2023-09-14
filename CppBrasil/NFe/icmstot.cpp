@@ -22,6 +22,7 @@ limitations under the License.
 
 IcmsTot::IcmsTot(): m_vBC(0.0), m_vICMS(0.0), m_vICMSDeson(0.0), m_vFCPUFDest(0.0), m_vICMSUFDest(0.0),
     m_vICMSUFRemet(0.0), m_vFCP(0.0), m_vBCST(0.0), m_vST(0.0), m_vFCPST(0.0), m_vFCPSTRet(0.0),
+    m_qBCMono(0.0), m_vICMSMono(0.0), m_qBCMonoReten(0.0), m_vICMSMonoReten(0.0), m_qBCMonoRet(0.0), m_vICMSMonoRet(0.0),
     m_vProd(0.0), m_vFrete(0.0), m_vSeg(0.0), m_vDesc(0.0), m_vII(0.0), m_vIPI(0.0), m_vIPIDevol(0.0),
     m_vPIS(0.0), m_vCOFINS(0.0), m_vOutro(0.0), m_vNF(0.0), m_vTotTrib(0.0)
 {
@@ -44,6 +45,12 @@ void IcmsTot::clear()
     this->m_vST = 0.0;
     this->m_vFCPST = 0.0;
     this->m_vFCPSTRet = 0.0;
+    this->m_qBCMono = 0.0;
+    this->m_vICMSMono = 0.0;
+    this->m_qBCMonoReten = 0.0;
+    this->m_vICMSMonoReten = 0.0;
+    this->m_qBCMonoRet = 0.0;
+    this->m_vICMSMonoRet = 0.0;
     this->m_vProd = 0.0;
     this->m_vFrete = 0.0;
     this->m_vSeg = 0.0;
@@ -166,6 +173,66 @@ double IcmsTot::get_vFCPSTRet() const
 void IcmsTot::set_vFCPSTRet(const double &vFCPSTRet)
 {
     this->m_vFCPSTRet = vFCPSTRet;
+}
+
+double IcmsTot::get_qBCMono() const
+{
+    return this->m_qBCMono;
+}
+
+void IcmsTot::set_qBCMono(const double &qBCMono)
+{
+    this->m_qBCMono = qBCMono;
+}
+
+double IcmsTot::get_vICMSMono() const
+{
+    return this->m_vICMSMono;
+}
+
+void IcmsTot::set_vICMSMono(const double &vICMSMono)
+{
+    this->m_vICMSMono = vICMSMono;
+}
+
+double IcmsTot::get_qBCMonoReten() const
+{
+    return this->m_qBCMonoReten;
+}
+
+void IcmsTot::set_qBCMonoReten(const double &qBCMonoReten)
+{
+    this->m_qBCMonoReten = qBCMonoReten;
+}
+
+double IcmsTot::get_vICMSMonoReten() const
+{
+    return this->m_vICMSMonoReten;
+}
+
+void IcmsTot::set_vICMSMonoReten(const double &vICMSMonoReten)
+{
+    this->m_vICMSMonoReten = vICMSMonoReten;
+}
+
+double IcmsTot::get_qBCMonoRet() const
+{
+    return this->m_qBCMonoRet;
+}
+
+void IcmsTot::set_qBCMonoRet(const double &qBCMonoRet)
+{
+    this->m_qBCMonoRet = qBCMonoRet;
+}
+
+double IcmsTot::get_vICMSMonoRet() const
+{
+    return this->m_vICMSMonoRet;
+}
+
+void IcmsTot::set_vICMSMonoRet(const double &vICMSMonoRet)
+{
+    this->m_vICMSMonoRet = vICMSMonoRet;
 }
 
 double IcmsTot::get_vProd() const

@@ -108,8 +108,8 @@ enum class Orig {None = -1, Nacional = 0, EstrangeiraImportacaoDireta = 1,
   EstrangeiraAdquiridaMercadoInternoSemSimilarNacional = 7, NacionalImportacaoSuperior70 = 8};
 
 //cst Tributação do ICMS
-enum class CstICMS{None = -1, ICMS00, ICMS10, ICMS20, ICMS30, ICMS40, ICMS41, ICMS50, ICMS51,
-                   ICMS60, ICMS70, ICMS90, ICMSPart10, ICMSPart90, ICMSST41, ICMSST60};
+enum class CstICMS{None = -1, ICMS00, ICMS02, ICMS10, ICMS15, ICMS20, ICMS30, ICMS40, ICMS41, ICMS50, ICMS51,
+                   ICMS53, ICMS60, ICMS61, ICMS70, ICMS90, ICMSPart10, ICMSPart90, ICMSST41, ICMSST60};
 
 //csosn CRT=1 – Simples Nacional
 enum class CsosnICMS{None = -1, ICMSSN101 = 101, ICMSSN102 = 102, ICMSSN103 = 103, ICMSSN201 = 201,
@@ -215,7 +215,10 @@ enum class TpAutor {None = -1, EmpresaEmitente = 1, EmpresaDestinataria = 2, Emp
 
 //tpAutorizacao - tipo de autorização para o transportador
 enum class TpAutorizacao {None = -1, NaoPermite = 0, PermiteTranspAutTransp = 1};
-
+//indImport - Indicador de importação
+enum class IndImport {None = -1, Nacional = 0, Importado = 1};
+//motRedAdRem - Motivo da redução do adrem
+enum class MotRedAdRem {None = -1, TransporteColetivoPassageiros = 1, Outros = 9};
 
 class CPPNFE_EXPORT ConvNF : public ConvDF
 {
@@ -313,6 +316,10 @@ public:
     static TpAutor strToTpAutor(const QString &value);
     static QString tpAutorizacaoToStr(const TpAutorizacao &value);
     static TpAutorizacao strToTpAutorizacao(const QString &value);
+    static QString indImportToStr(const IndImport &value);
+    static IndImport strToIndImport(const QString &value);
+    static QString motRedAdRemToStr(const MotRedAdRem &value);
+    static MotRedAdRem strToMotRedAdRem(const QString &value);
 };
 
 #endif // CONVNF_H

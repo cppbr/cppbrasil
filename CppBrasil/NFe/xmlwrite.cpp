@@ -819,14 +819,14 @@ void XmlWrite::get_ICMS(const int &i)
             }
             else
             {
-                if (cst.length() > 4)
-                    cab = "ICMSPart";
-                else
-                    cab = "ICMSST";
                 cst = cst.right(2);
+                if (cst.length() > 4)   //Part10 ou Part90
+                    cab = "ICMSPart";
+                else                    //ST41 ou ST60
+                    cab = "ICMSST";
             }
 
-            this->m_xmlw->writeStartElement(cab); //abertura grupo ICMS00, ICMS10, etc->->->
+            this->m_xmlw->writeStartElement(cab); //abertura grupo ICMS00, ICMS10, etc
             this->m_xmlw->writeTextElement("orig", orig);
             this->m_xmlw->writeTextElement("CST", cst);
             //ICMS00 - N02
@@ -842,6 +842,14 @@ void XmlWrite::get_ICMS(const int &i)
                     this->m_xmlw->writeTextElement("pFCP", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pFCP(), 4));
                     this->m_xmlw->writeTextElement("vFCP", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vFCP(), 2));
                 }
+            }
+
+            //ICMS02 - N02a
+            if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST() == CstICMS::ICMS02)
+            {
+                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_qBCMono(), 4));
+                this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_adRemICMS(), 4));
+                this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMono(), 2));
             }
 
             //ICMS10 - N03
@@ -883,6 +891,23 @@ void XmlWrite::get_ICMS(const int &i)
                     this->m_xmlw->writeTextElement("vICMSSTDeson", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSSTDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMSST", ConvNF::motDesICMSToStr(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_motDesICMSST()));
                 }
+            }
+
+            //ICMS15 - N03a
+            if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST() == CstICMS::ICMS15)
+            {
+                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_qBCMono(), 4));
+                this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_adRemICMS(), 4));
+                this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMono(), 2));
+                this->m_xmlw->writeTextElement("qBCMonoReten", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_qBCMonoReten(), 4));
+                this->m_xmlw->writeTextElement("adRemICMSReten", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_adRemICMSReten(), 4));
+                this->m_xmlw->writeTextElement("vICMSMonoReten", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMonoReten(), 2));
+
+                if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pRedAdRem() > 0)
+                    this->m_xmlw->writeTextElement("pRedAdRem", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pRedAdRem(), 2));
+
+                if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_motRedAdRem() != MotRedAdRem::None)
+                    this->m_xmlw->writeTextElement("motRedAdRem", ConvNF::motRedAdRemToStr(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_motRedAdRem()));
             }
 
             //ICMS20 - N04
@@ -991,6 +1016,18 @@ void XmlWrite::get_ICMS(const int &i)
                    this->m_xmlw->writeTextElement("vFCPEfet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vFCPEfet(), 2));
             }
 
+            //ICMS53 - N07a
+            if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST() == CstICMS::ICMS53)
+            {
+                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_qBCMono(), 4));
+                this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_adRemICMS(), 4));
+                this->m_xmlw->writeTextElement("vICMSMonoOp", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMonoOp(), 2));
+                if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pDif() > 0)
+                    this->m_xmlw->writeTextElement("pDif", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pDif(), 4));
+                this->m_xmlw->writeTextElement("vICMSMonoDif", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMonoDif(), 2));
+                this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMono(), 2));
+            }
+
             //ICMS60 - N08
             if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST() == CstICMS::ICMS60)
             {
@@ -1025,6 +1062,14 @@ void XmlWrite::get_ICMS(const int &i)
                     this->m_xmlw->writeTextElement("pICMSEfet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_pICMSEfet(), 4));
                     this->m_xmlw->writeTextElement("vICMSEfet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSEfet(), 2));
                 }
+            }
+
+            //ICMS61 - N08a
+            if (this->m_infNFe->det->items->value(i)->imposto->ICMS->get_CST() == CstICMS::ICMS61)
+            {
+                this->m_xmlw->writeTextElement("qBCMonoRet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_qBCMonoRet(), 4));
+                this->m_xmlw->writeTextElement("adRemICMSRet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_adRemICMSRet(), 4));
+                this->m_xmlw->writeTextElement("vICMSMonoRet", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->imposto->ICMS->get_vICMSMonoRet(), 2));
             }
 
             //ICMSPart - N10a
@@ -1805,6 +1850,12 @@ void XmlWrite::get_total()
     this->m_xmlw->writeTextElement("vST", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vST(), 2));
     this->m_xmlw->writeTextElement("vFCPST", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vFCPST(), 2));
     this->m_xmlw->writeTextElement("vFCPSTRet", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vFCPSTRet(), 2));
+    this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_qBCMono(), 2));
+    this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vICMSMono(), 2));
+    this->m_xmlw->writeTextElement("qBCMonoReten", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_qBCMonoReten(), 2));
+    this->m_xmlw->writeTextElement("vICMSMonoReten", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vICMSMonoReten(), 2));
+    this->m_xmlw->writeTextElement("qBCMonoRet", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_qBCMonoRet(), 2));
+    this->m_xmlw->writeTextElement("vICMSMonoRet", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vICMSMonoRet(), 2));
     this->m_xmlw->writeTextElement("vProd", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vProd(), 2));
     this->m_xmlw->writeTextElement("vFrete", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vFrete(), 2));
     this->m_xmlw->writeTextElement("vSeg", CppUtility::doubleToStrDecimal(this->m_infNFe->total->ICMSTot->get_vSeg(), 2));

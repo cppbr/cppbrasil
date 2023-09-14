@@ -147,6 +147,7 @@ SOURCES += \
     obscont.cpp \
     obsfisco.cpp \
     obsitem.cpp \
+    origcomb.cpp \
     pag.cpp \
     pis.cpp \
     pisst.cpp \
@@ -249,6 +250,7 @@ HEADERS += \
     obscont.h \
     obsfisco.h \
     obsitem.h \
+    origcomb.h \
     pag.h \
     pis.h \
     pisst.h \

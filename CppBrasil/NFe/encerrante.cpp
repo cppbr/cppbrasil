@@ -86,3 +86,13 @@ void Encerrante::set_vEncFin(const double &vEncFin)
 {
     this->m_vEncFin = vEncFin;
 }
+
+double Encerrante::get_pBio() const
+{
+    return this->m_pBio;
+}
+
+void Encerrante::set_pBio(const double &pBio)
+{
+    this->m_pBio = pBio;
+}

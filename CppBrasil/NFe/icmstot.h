@@ -50,6 +50,18 @@ public:
     void set_vFCPST(const double &vFCPST);
     double get_vFCPSTRet() const;
     void set_vFCPSTRet(const double &vFCPSTRet);
+    double get_qBCMono() const;
+    void set_qBCMono(const double &qBCMono);
+    double get_vICMSMono() const;
+    void set_vICMSMono(const double &vICMSMono);
+    double get_qBCMonoReten() const;
+    void set_qBCMonoReten(const double &qBCMonoReten);
+    double get_vICMSMonoReten() const;
+    void set_vICMSMonoReten(const double &vICMSMonoReten);
+    double get_qBCMonoRet() const;
+    void set_qBCMonoRet(const double &qBCMonoRet);
+    double get_vICMSMonoRet() const;
+    void set_vICMSMonoRet(const double &vICMSMonoRet);
     double get_vProd() const;
     void set_vProd(const double &vProd);
     double get_vFrete() const;
@@ -74,7 +86,6 @@ public:
     void set_vNF(const double &vNF);
     double get_vTotTrib() const;
     void set_vTotTrib(const double &vTotTrib);
-
 private:
     double m_vBC;
     double m_vICMS;
@@ -87,6 +98,12 @@ private:
     double m_vST;
     double m_vFCPST;
     double m_vFCPSTRet;
+    double m_qBCMono;
+    double m_vICMSMono;
+    double m_qBCMonoReten;
+    double m_vICMSMonoReten;
+    double m_qBCMonoRet;
+    double m_vICMSMonoRet;
     double m_vProd;
     double m_vFrete;
     double m_vSeg;

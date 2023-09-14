@@ -17,38 +17,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-#ifndef ENCERRANTE_H
-#define ENCERRANTE_H
+#ifndef ORIGCOMB_H
+#define ORIGCOMB_H
 
 #include <CppBrasil/cppbrasil_global.h>
+#include <CppBrasil/NFe/convnf.h>
 
-class CPPNFE_EXPORT Encerrante
+class OrigComb
 {
 public:
-    Encerrante();
-    ~Encerrante();
+    OrigComb();
+    ~OrigComb();
     void clear();
-    int get_nBico() const;
-    void set_nBico(const int &nBico);
-    int get_nBomba() const;
-    void set_nBomba(const int &nBomba);
-    int get_nTanque() const;
-    void set_nTanque(const int &nTanque);
-    double get_vEncIni() const;
-    void set_vEncIni(const double &vEncIni);
-    double get_vEncFin() const;
-    void set_vEncFin(const double &vEncFin);
-    double get_pBio() const;
-    void set_pBio(const double &pBio);
-
+    IndImport get_indImport() const;
+    void set_indImport(const IndImport &indImport);
+    int get_cUFOrig() const;
+    void set_cUFOrig(const int &cUFOrig);
+    double get_cpOrig() const;
+    void set_pOrig(const double &pOrig);
 private:
-    int m_nBico;
-    int m_nBomba;
-    int m_nTanque;
-    double m_vEncIni;
-    double m_vEncFin;
-    double m_pBio;
+    IndImport m_indImport;
+    int m_cUFOrig;
+    double m_pOrig;
 };
 
-#endif // ENCERRANTE_H
+#endif // ORIGCOMB_H

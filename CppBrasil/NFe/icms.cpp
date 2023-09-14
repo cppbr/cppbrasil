@@ -29,7 +29,10 @@ Icms::Icms(): m_orig(Orig::None), m_CST(CstICMS::None), m_CSOSN(CsosnICMS::None)
     m_vICMSSTRet(0.0), m_vBCFCPSTRet(0.0), m_pFCPSTRet(0.0), m_vFCPSTRet(0.0), m_vBCSTDest(0.0),
     m_vICMSSTDest(0.0), m_pRedBCEfet(0.0), m_vBCEfet(0.0), m_pICMSEfet(0.0), m_vICMSEfet(0.0),
     m_pBCOp(0.0), m_pRedBC(0.0), m_pCredSN(0.0), m_vCredICMSSN(0.0), m_vICMSSTDeson(0.0),
-    m_motDesICMSST(MotDesICMS::None), m_pFCPDif(0.0), m_vFCPDif(0.0), m_vFCPEfet(0.0)
+    m_motDesICMSST(MotDesICMS::None), m_pFCPDif(0.0), m_vFCPDif(0.0), m_vFCPEfet(0.0),
+    m_qBCMono(0.0), m_adRemICMS(0.0), m_vICMSMono(0.0), m_qBCMonoReten(0.0), m_adRemICMSReten(0.0),
+    m_vICMSMonoReten(0.0), m_pRedAdRem(0.0), m_motRedAdRem(MotRedAdRem::None), m_vICMSMonoOp(0.0),
+    m_vICMSMonoDif(0.0), m_qBCMonoRet(0.0), m_adRemICMSRet(0.0), m_vICMSMonoRet(0.0)
 {
 }
 
@@ -86,6 +89,19 @@ void Icms::clear()
     this->m_pFCPDif = 0.0;
     this->m_vFCPDif = 0.0;
     this->m_vFCPEfet = 0.0;
+    this->m_qBCMono = 0.0;
+    this->m_adRemICMS = 0.0;
+    this->m_vICMSMono = 0.0;
+    this->m_qBCMonoReten = 0.0;
+    this->m_adRemICMSReten = 0.0;
+    this->m_vICMSMonoReten = 0.0;
+    this->m_pRedAdRem = 0.0;
+    this->m_motRedAdRem = MotRedAdRem::None;
+    this->m_vICMSMonoOp = 0.0;
+    this->m_vICMSMonoDif = 0.0;
+    this->m_qBCMonoRet = 0.0;
+    this->m_adRemICMSRet = 0.0;
+    this->m_vICMSMonoRet = 0.0;
 
 }
 
@@ -557,4 +573,134 @@ double Icms::get_vFCPEfet() const
 void Icms::set_vFCPEfet(const double &vFCPEfet)
 {
     this->m_vFCPEfet = vFCPEfet;
+}
+
+double Icms::get_qBCMono() const
+{
+    return this->m_qBCMono;
+}
+
+void Icms::set_qBCMono(const double &qBCMono)
+{
+    this->m_qBCMono = qBCMono;
+}
+
+double Icms::get_adRemICMS() const
+{
+    return this->m_adRemICMS;
+}
+
+void Icms::set_adRemICMS(const double &adRemICMS)
+{
+    this->m_adRemICMS = adRemICMS;
+}
+
+double Icms::get_vICMSMono() const
+{
+    return this->m_vICMSMono;
+}
+
+void Icms::set_vICMSMono(const double &vICMSMono)
+{
+    this->m_vICMSMono = vICMSMono;
+}
+
+double Icms::get_qBCMonoReten() const
+{
+    return this->m_qBCMonoReten;
+}
+
+void Icms::set_qBCMonoReten(const double &qBCMonoReten)
+{
+    this->m_qBCMonoReten = qBCMonoReten;
+}
+
+double Icms::get_adRemICMSReten() const
+{
+    return this->m_adRemICMSReten;
+}
+
+void Icms::set_adRemICMSReten(const double &adRemICMSReten)
+{
+    this->m_adRemICMSReten = adRemICMSReten;
+}
+
+double Icms::get_vICMSMonoReten() const
+{
+    return this->m_vICMSMonoReten;
+}
+
+void Icms::set_vICMSMonoReten(const double &vICMSMonoReten)
+{
+    this->m_vICMSMonoReten = vICMSMonoReten;
+}
+
+double Icms::get_pRedAdRem() const
+{
+    return this->m_pRedAdRem;
+}
+
+void Icms::set_pRedAdRem(const double &pRedAdRem)
+{
+    this->m_pRedAdRem = pRedAdRem;
+}
+
+MotRedAdRem Icms::get_motRedAdRem() const
+{
+    return this->m_motRedAdRem;
+}
+
+void Icms::set_motRedAdRem(const MotRedAdRem &motRedAdRem)
+{
+    this->m_motRedAdRem = motRedAdRem;
+}
+
+double Icms::get_vICMSMonoOp() const
+{
+    return this->m_vICMSMonoOp;
+}
+
+void Icms::set_vICMSMonoOp(const double &vICMSMonoOp)
+{
+    this->m_vICMSMonoOp = vICMSMonoOp;
+}
+
+double Icms::get_vICMSMonoDif() const
+{
+    return this->m_vICMSMonoDif;
+}
+
+void Icms::set_vICMSMonoDif(const double &vICMSMonoDif)
+{
+    this->m_vICMSMonoDif = vICMSMonoDif;
+}
+
+double Icms::get_qBCMonoRet() const
+{
+    return this->m_qBCMonoRet;
+}
+
+void Icms::set_qBCMonoRet(const double &qBCMonoRet)
+{
+    this->m_qBCMonoRet = qBCMonoRet;
+}
+
+double Icms::get_adRemICMSRet() const
+{
+    return this->m_adRemICMSRet;
+}
+
+void Icms::set_adRemICMSRet(const double &adRemICMSRet)
+{
+    this->m_adRemICMSRet = adRemICMSRet;
+}
+
+double Icms::get_vICMSMonoRet() const
+{
+    return this->m_vICMSMonoRet;
+}
+
+void Icms::set_vICMSMonoRet(const double &vICMSMonoRet)
+{
+    this->m_vICMSMonoRet = vICMSMonoRet;
 }
