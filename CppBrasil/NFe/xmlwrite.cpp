@@ -717,7 +717,7 @@ void XmlWrite::get_prod(const int &i)
     //arma - L01 - container 1-500
     if (this->m_infNFe->det->items->value(i)->prod->arma->items->count() > 0)
     {
-        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->arma->items->count() ; ++j)
+        for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->arma->items->count(); ++j)
         {
             this->m_xmlw->writeStartElement("arma");//abertura grupo arma
             this->m_xmlw->writeTextElement("tpArma", ConvNF::tpArmaToStr(this->m_infNFe->det->items->value(i)->prod->arma->items->value(j)->get_tpArma()));
@@ -769,6 +769,19 @@ void XmlWrite::get_prod(const int &i)
             this->m_xmlw->writeTextElement("vEncFin", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->prod->comb->encerrante->get_vEncFin(), 3));
             this->m_xmlw->writeEndElement();//fechamento grupo encerrante
         }
+        //origComb - LA18
+        if (this->m_infNFe->det->items->value(i)->prod->comb->origComb->items->count() > 0)
+        {
+            for(int j = 0; j < this->m_infNFe->det->items->value(i)->prod->comb->origComb->items->count(); ++j)
+            {
+                this->m_xmlw->writeStartElement("origComb");//abertura grupo arma
+                this->m_xmlw->writeTextElement("indImport", ConvNF::indImportToStr(this->m_infNFe->det->items->value(i)->prod->comb->origComb->items->value(j)->get_indImport()));
+                this->m_xmlw->writeTextElement("cUFOrig", QString::number(this->m_infNFe->det->items->value(i)->prod->comb->origComb->items->value(j)->get_cUFOrig()));
+                this->m_xmlw->writeTextElement("pOrig", CppUtility::doubleToStrDecimal(this->m_infNFe->det->items->value(i)->prod->comb->origComb->items->value(j)->get_pOrig(), 4));
+                this->m_xmlw->writeEndElement();//fechamento grupo arma
+            }
+        }
+
 
         this->m_xmlw->writeEndElement();//fechamento grupo comb
     }

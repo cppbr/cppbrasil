@@ -33,7 +33,7 @@ public:
     void set_indImport(const IndImport &indImport);
     int get_cUFOrig() const;
     void set_cUFOrig(const int &cUFOrig);
-    double get_cpOrig() const;
+    double get_pOrig() const;
     void set_pOrig(const double &pOrig);
 private:
     IndImport m_indImport;

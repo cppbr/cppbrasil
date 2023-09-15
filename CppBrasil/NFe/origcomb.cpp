@@ -29,9 +29,9 @@ OrigComb::~OrigComb()
 
 void OrigComb::clear()
 {
-   m_indImport = IndImport::None;
-   m_cUFOrig = 0;
-   m_pOrig = 0.0;
+   this->m_indImport = IndImport::None;
+   this->m_cUFOrig = 0;
+   this->m_pOrig = 0.0;
 }
 
 IndImport OrigComb::get_indImport() const
@@ -54,7 +54,7 @@ void OrigComb::set_cUFOrig(const int &cUFOrig)
     this->m_cUFOrig = cUFOrig;
 }
 
-double OrigComb::get_cpOrig() const
+double OrigComb::get_pOrig() const
 {
     return this->m_pOrig;
 }
