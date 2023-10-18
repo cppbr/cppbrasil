@@ -276,6 +276,7 @@ set(HEADER_NFE
     enderemit.h
     entrega.h
     envevento.h
+    tevento.h
     eventonotafiscal.h
     exporta.h
     exportind.h
@@ -315,6 +316,7 @@ set(HEADER_NFE
     refecf.h
     refnf.h
     refnfp.h
+    retconssitnfe.h
     retconsstatserv.h
     retenvevento.h
     retirada.h
