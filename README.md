@@ -27,11 +27,12 @@ Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multipl
 - libIconv(caso opte por compilar a libxml2 com suporte a libIconv. No Linux vem instalado por padrão. Para Windows [link.](https://github.com/pffang/libiconv-for-Windows))
 
 ## Compilação
-Linux 
-[Video](https://www.youtube.com/watch?v=UBzTjaNRnmI)
+### Linux
+A compilação no Linux pode ser feita via cmake ou utilizando o script MakeLinux.sh. O script utiliza o cmake e o ninja e será instalado dentro do diretório /usr.
 
-Windows
-[Video](https://www.youtube.com/watch?v=PiyHN9Ju4UA)
+### Windows
+A compilação no Windows pode ser feita via cmake ou utilizando o script MakeMSVC.bat. A compilação é feita através do compilador MSVC que pode ser obtido através da instalação do visual studio. Vocẽ também precisa indicar, em Variáveis de Ambiente, o caminho do cmake e ninja que se encontram na instalação do Qt. Para windows foi disponibilizado os requisitos no diretório third-party. Caso você queira utilizar versões mais atualizadas, basta substituir os arquivos em third-party/windows. Caso seja alterado o nome da pasta, será necessário alterar em MakeMSVC.bat.
+
 
 # Autor
 João Elson.
