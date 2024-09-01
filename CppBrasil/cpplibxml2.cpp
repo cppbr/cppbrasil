@@ -110,7 +110,7 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     xmlSchemaParserCtxt *_parser_ctxt = NULL;
     xmlSchema *_schema = NULL;
     xmlSchemaValidCtxt *_valid_ctxt = NULL;
-    xmlError *_schemError = NULL;
+    const xmlError *_schemError = NULL;
     _xml = NULL;
     _xsd = NULL;
     bool _ret = true;
