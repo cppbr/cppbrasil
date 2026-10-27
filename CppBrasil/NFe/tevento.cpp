@@ -161,7 +161,8 @@ void DestEPEC::set_IE(const QString &IE)
 
 DetEvento::DetEvento(): dest(new DestEPEC()), itemPedido(new Container<ItemPedProrrog>),
     autXML(new AutXMLAtor()), m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
-    m_tpNF(TpNF::None), m_vNF(0.0), m_vICMS(0.0), m_vST(0.0), m_tpAutorizacao(TpAutorizacao::None)
+    m_tpNF(TpNF::None), m_vNF(0.0), m_vICMS(0.0), m_vST(0.0), m_tpAutorizacao(TpAutorizacao::None),
+    m_nTentativa(0), m_tpMotivo(TpMotivo::None)
 {
 
 }
@@ -202,6 +203,13 @@ void DetEvento::clear()
     this->m_longGPS.clear();
     this->m_hashComprovante.clear();
     CppUtil::clearDateTime(this->m_dhHashComprovante);
+    //Insucesso na Entrega da NF-e
+    CppUtil::clearDateTime(this->m_dhTentativaEntrega);
+    this->m_nTentativa = 0;
+    this->m_tpMotivo = TpMotivo::None;
+    this->m_xJustMotivo.clear();
+    this->m_hashTentativaEntrega.clear();
+    CppUtil::clearDateTime(this->m_dhHashTentativaEntrega);
 
 }
 
@@ -443,6 +451,66 @@ QString DetEvento::get_nProtEvento() const
 void DetEvento::set_nProtEvento(const QString &nProtEvento)
 {
     this->m_nProtEvento = nProtEvento;
+}
+
+QDateTime DetEvento::get_dhTentativaEntrega() const
+{
+    return this->m_dhTentativaEntrega;
+}
+
+void DetEvento::set_dhTentativaEntrega(const QDateTime &dhTentativaEntrega)
+{
+    this->m_dhTentativaEntrega = dhTentativaEntrega;
+}
+
+int DetEvento::get_nTentativa() const
+{
+    return this->m_nTentativa;
+}
+
+void DetEvento::set_nTentativa(const int &nTentativa)
+{
+    this->m_nTentativa = nTentativa;
+}
+
+TpMotivo DetEvento::get_tpMotivo() const
+{
+    return this->m_tpMotivo;
+}
+
+void DetEvento::set_tpMotivo(const TpMotivo &tpMotivo)
+{
+    this->m_tpMotivo = tpMotivo;
+}
+
+QString DetEvento::get_xJustMotivo() const
+{
+    return this->m_xJustMotivo;
+}
+
+void DetEvento::set_xJustMotivo(const QString &xJustMotivo)
+{
+    this->m_xJustMotivo = xJustMotivo;
+}
+
+QString DetEvento::get_hashTentativaEntrega() const
+{
+    return this->m_hashTentativaEntrega;
+}
+
+void DetEvento::set_hashTentativaEntrega(const QString &hashTentativaEntrega)
+{
+    this->m_hashTentativaEntrega = hashTentativaEntrega;
+}
+
+QDateTime DetEvento::get_dhHashTentativaEntrega() const
+{
+    return this->m_dhHashTentativaEntrega;
+}
+
+void DetEvento::set_dhHashTentativaEntrega(const QDateTime &dhHashTentativaEntrega)
+{
+    this->m_dhHashTentativaEntrega = dhHashTentativaEntrega;
 }
 
 //------------------------------------------------------------------------
@@ -784,6 +852,29 @@ void TEvento::gerarXML()
         if (!this->infEvento->detEvento->get_nProtEvento().isEmpty())
             _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
 
+    }
+    //Insucesso na Entrega da NF-e
+    if (this->infEvento->get_tpEvento() == TpEvento::InsucessoEntregaNFe)
+    {
+        _xmlw.writeTextElement("dhTentativaEntrega", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhTentativaEntrega(), DtH::DateTimeUTC));
+        if (this->infEvento->detEvento->get_nTentativa() > 0)
+            _xmlw.writeTextElement("nTentativa", QString::number(this->infEvento->detEvento->get_nTentativa()));
+        _xmlw.writeTextElement("tpMotivo", ConvNF::tpMotivoToStr(this->infEvento->detEvento->get_tpMotivo()));
+        //xJustMotivo - informar apenas para tpMotivo=4
+        if (this->infEvento->detEvento->get_tpMotivo() == TpMotivo::Outros)
+            _xmlw.writeTextElement("xJustMotivo", this->infEvento->detEvento->get_xJustMotivo());
+        if (!this->infEvento->detEvento->get_latGPS().isEmpty())
+            _xmlw.writeTextElement("latGPS", this->infEvento->detEvento->get_latGPS());
+        if (!this->infEvento->detEvento->get_longGPS().isEmpty())
+            _xmlw.writeTextElement("longGPS", this->infEvento->detEvento->get_longGPS());
+        _xmlw.writeTextElement("hashTentativaEntrega", this->infEvento->detEvento->get_hashTentativaEntrega());
+        if (!this->infEvento->detEvento->get_dhHashTentativaEntrega().isNull())
+            _xmlw.writeTextElement("dhHashTentativaEntrega", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhHashTentativaEntrega(), DtH::DateTimeUTC));
+    }
+    //Cancelamento Insucesso na Entrega da NF-e
+    if (this->infEvento->get_tpEvento() == TpEvento::CancelInsucessoEntregaNFe)
+    {
+        _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
     }
 
     _xmlw.writeEndElement(); //fechamento detEvento

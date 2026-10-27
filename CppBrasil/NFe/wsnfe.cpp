@@ -72,14 +72,15 @@ QString WSNFeBase::get_urlNamespaceWS(const WebServicesNF &webServicesNF) const
     return _res;
 }
 
-QString WSNFeBase::get_urlServidorWS(const WebServicesNF &webServicesNF) const
+QString WSNFeBase::get_urlServidorWS(const WebServicesNF &webServicesNF, const QString &servidor) const
 {
     QString _url = UrlNFe::get_urlServidor(confgNFe->webservices->get_uf(),
                                            confgNFe->webservices->get_tpAmb(),
                                            confgNFe->get_TipoEmissao(),
                                            confgNFe->get_ModeloDF(),
                                            confgNFe->get_VersaoNF(),
-                                           webServicesNF);
+                                           webServicesNF,
+                                           servidor);
     return _url;
 
 }
@@ -732,11 +733,11 @@ WSEvento::~WSEvento()
 
 }
 
-bool WSEvento::send(const QByteArray &xml, const QString &verLayout)
+bool WSEvento::send(const QByteArray &xml, const QString &verLayout, const QString &servidor)
 {
     set_verLayout(verLayout);
     StatusRetorno _ret = StatusRetorno::EmProcessamento;
-    QString _url = get_urlServidorWS(WebServicesNF::NFeRecepcaoEvento);
+    QString _url = get_urlServidorWS(WebServicesNF::NFeRecepcaoEvento, servidor);
     //gera xml do lote na var m_msgEnvio
     if (gerarXML(xml))
     {
@@ -1553,6 +1554,42 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                                                 _valor = _xml.readElementText();
                                                 if (!_valor.isEmpty())
                                                     this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_nProtEvento(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("dhTentativaEntrega"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhTentativaEntrega(QDateTime::fromString(_valor, Qt::ISODate));
+                                            }
+                                            if(_xml.name() == QStringLiteral("nTentativa"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_nTentativa(_valor.toInt());
+                                            }
+                                            if(_xml.name() == QStringLiteral("tpMotivo"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_tpMotivo(ConvNF::strToTpMotivo(_valor));
+                                            }
+                                            if(_xml.name() == QStringLiteral("xJustMotivo"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_xJustMotivo(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("hashTentativaEntrega"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_hashTentativaEntrega(_valor);
+                                            }
+                                            if(_xml.name() == QStringLiteral("dhHashTentativaEntrega"))
+                                            {
+                                                _valor = _xml.readElementText();
+                                                if (!_valor.isEmpty())
+                                                    this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->set_dhHashTentativaEntrega(QDateTime::fromString(_valor, Qt::ISODate));
                                             }
                                             if(_xml.name() == QStringLiteral("dest"))
                                             {

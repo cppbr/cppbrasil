@@ -40,7 +40,8 @@ public:
                                 const VersaoQrCodeNF &versaoQrCodeNF);
     static QString get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &tipoEmissao,
                                    const ModeloDF &modelodf, const VersaoNF &versaoNF,
-                                   const WebServicesNF &webServicesNF);
+                                   const WebServicesNF &webServicesNF,
+                                   const QString &servidor = QString());
 private:
     static QString get_infNFesupl(const TipoInfNFeSupl &tipo , const UF &uf,
                                   const TpAmb &tpAmb, const VersaoQrCodeNF &versaoQrCodeNF);

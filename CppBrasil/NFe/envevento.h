@@ -70,6 +70,7 @@ private:
     void updateEvento(int &index);
     bool validarEvento();
     void tratarRetorno();
+    bool get_servidorEvento(QString &servidor);
 };
 
 

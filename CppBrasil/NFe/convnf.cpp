@@ -861,8 +861,8 @@ QString ConvNF::tpEventoToStr(const TpEvento &value)
 
 TpEvento ConvNF::strToTpEvento(const QString &value)
 {
-    QList<QString> _r = {"-1", "110110", "110111", "110112", "110130", "110131", "110140", "111500",
-                         "111501", "111502", "111503", "110150", "210200", "210210", "210220", "210240"};
+    QList<QString> _r = {"-1", "110110", "110111", "110112", "110130", "110131", "110140", "110192",
+                         "110193", "111500", "111501", "111502", "111503", "110150", "210200", "210210", "210220", "210240"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpEvento::None;
@@ -947,5 +947,24 @@ MotRedAdRem ConvNF::strToMotRedAdRem(const QString &value)
         return MotRedAdRem::None;
     else
         return static_cast<MotRedAdRem>(_r[_i].toInt());
+
+}
+
+QString ConvNF::tpMotivoToStr(const TpMotivo &value)
+{
+    if(value == TpMotivo::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpMotivo ConvNF::strToTpMotivo(const QString &value)
+{
+    QList<QString> _r = {"-1", "1", "2", "3", "4"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpMotivo::None;
+    else
+        return static_cast<TpMotivo>(_r[_i].toInt());
 
 }

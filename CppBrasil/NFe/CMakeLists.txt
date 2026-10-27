@@ -13,6 +13,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
+find_package(LibXml2 REQUIRED)
 
 #Caso necessário, informe os diretório dos Header Files openssl, libxml2, zlib e libIconv(caso esteja no windows)
 #include_directories(
@@ -21,8 +22,8 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 #/usr/include/zlib
 #/usr/include/libIconv
 #)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..
+                   ${LIBXML2_INCLUDE_DIR})
 
 set(cppnfe_SRC
     ../cppbrasil_global.h

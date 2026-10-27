@@ -39,7 +39,7 @@ QString UrlNFe::get_urlChave(const UF &uf, const TpAmb &tpAmb,
 
 QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &tipoEmissao,
                              const ModeloDF &modelodf, const VersaoNF &versaoNF,
-                             const WebServicesNF &webServicesNF)
+                             const WebServicesNF &webServicesNF, const QString &servidor)
 {
     QString _uf, _ambiente, _modelo, _versao, _server;
 
@@ -71,10 +71,18 @@ QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &
     _joDf = _docJs.object();
     _jvDf = _joDf.value(_modelo);
 
+    //caso seja informado o servidor, ele será usado independente da UF. Ex: SVRS, AN.
+    //Isso acontece em eventos que possuem um único ambiente autorizador, como o
+    //Insucesso na Entrega da NF-e (NT 2023.005), autorizado somente pela SVRS.
+    if (!servidor.isEmpty())
+    {
+        _server =  (tpAmb == TpAmb::Homologacao) ? "WH_" : "WP_";
+        _server += servidor;
+    }
     //caso seja contingência NFe, só existem dois servidores: SVC-AN e SVC-RS
-    if ((tipoEmissao == TpEmis::Contingencia_SVCAN ||
-         tipoEmissao == TpEmis::Contingencia_SVCRS) &&
-        (modelodf == ModeloDF::NFe) )
+    else if ((tipoEmissao == TpEmis::Contingencia_SVCAN ||
+              tipoEmissao == TpEmis::Contingencia_SVCRS) &&
+             (modelodf == ModeloDF::NFe) )
     {
         _server =  (tpAmb == TpAmb::Homologacao) ? "WH_" : "WP_";
         _server += (tipoEmissao == TpEmis::Contingencia_SVCAN) ? "SVC-AN" : "SVC-RS";

@@ -130,6 +130,18 @@ public:
     void set_dhHashComprovante(const QDateTime &dhHashComprovante);
     QString get_nProtEvento() const;
     void set_nProtEvento(const QString &nProtEvento);
+    QDateTime get_dhTentativaEntrega() const;
+    void set_dhTentativaEntrega(const QDateTime &dhTentativaEntrega);
+    int get_nTentativa() const;
+    void set_nTentativa(const int &nTentativa);
+    TpMotivo get_tpMotivo() const;
+    void set_tpMotivo(const TpMotivo &tpMotivo);
+    QString get_xJustMotivo() const;
+    void set_xJustMotivo(const QString &xJustMotivo);
+    QString get_hashTentativaEntrega() const;
+    void set_hashTentativaEntrega(const QString &hashTentativaEntrega);
+    QDateTime get_dhHashTentativaEntrega() const;
+    void set_dhHashTentativaEntrega(const QDateTime &dhHashTentativaEntrega);
 
     std::shared_ptr<DestEPEC> dest;
     std::shared_ptr<Container<ItemPedProrrog>> itemPedido;
@@ -163,6 +175,14 @@ private:
     QString m_hashComprovante;
     QDateTime m_dhHashComprovante;
     QString m_nProtEvento;
+    //Insucesso na Entrega da NF-e
+    QDateTime m_dhTentativaEntrega;
+    int m_nTentativa;
+    TpMotivo m_tpMotivo;
+    QString m_xJustMotivo;
+    QString m_hashTentativaEntrega;
+    QDateTime m_dhHashTentativaEntrega;
+
 };
 
 //-----------------------------------------------------

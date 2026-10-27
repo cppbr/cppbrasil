@@ -59,7 +59,7 @@ protected:
     QString get_namespaceBase() const;
     QString get_urlNamespaceBase() const;
     QString get_urlNamespaceWS(const WebServicesNF &webServicesNF) const;
-    QString get_urlServidorWS(const WebServicesNF &webServicesNF) const;
+    QString get_urlServidorWS(const WebServicesNF &webServicesNF, const QString &servidor = QString()) const;
     bool validarXML(const QString &schemaName, const QString &nomeGrupo, const QByteArray &xml);
     void salvarLogs(const TipoArquivo &tipolog, const TipoMsgLog &msglog,
                     const QString &nomeGrupo, const WebServicesNF &webServicesNF,
@@ -123,7 +123,7 @@ class CPPNFE_EXPORT WSEvento : public WSNFeBase
 public:
     WSEvento(ConfigNFe* confgNFe, CppCrypto* crypto, RetEnvEvento* retorno);
     ~WSEvento();
-    bool send(const QByteArray &xml, const QString &verLayout);
+    bool send(const QByteArray &xml, const QString &verLayout, const QString &servidor = QString());
 
 private:
     RetEnvEvento* retorno;

@@ -202,11 +202,12 @@ enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspeci
 enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
                      CancelamentoSubstituicao = 110112, ComprovanteEntregaNFe = 110130,
                      CancelComprovanteEntregaNFe = 110131, EPEC = 110140,
-                     PedidoProrrogacao1 = 111500, PedidoProrrogacao2 = 111501,
-                     CancelPedidoProrrogacao1 = 111502, CancelPedidoProrrogacao2 = 111503,
-                     AtorInteressadoNFeTransp = 110150, ConfirmacaoOperacaoDest = 210200,
-                     CienciaOperacaoDest = 210210,  DesconhecimentoOperacaoDest = 210220,
-                     OperacaoNaoRealizadaDest = 210240};
+                     InsucessoEntregaNFe = 110192, CancelInsucessoEntregaNFe = 110193,
+                     PedidoProrrogacao1 = 111500,
+                     PedidoProrrogacao2 = 111501, CancelPedidoProrrogacao1 = 111502,
+                     CancelPedidoProrrogacao2 = 111503, AtorInteressadoNFeTransp = 110150,
+                     ConfirmacaoOperacaoDest = 210200, CienciaOperacaoDest = 210210,
+                     DesconhecimentoOperacaoDest = 210220, OperacaoNaoRealizadaDest = 210240};
 
 //tpAutor - Tipo de autor do evento
 //obs: 3-EmpresaTerceiros, serve para terceiros como no caso de evento Ator Interessado. 3=Empresa Transportadora.
@@ -219,6 +220,10 @@ enum class TpAutorizacao {None = -1, NaoPermite = 0, PermiteTranspAutTransp = 1}
 enum class IndImport {None = -1, Nacional = 0, Importado = 1};
 //motRedAdRem - Motivo da redução do adrem
 enum class MotRedAdRem {None = -1, TransporteColetivoPassageiros = 1, Outros = 9};
+
+//tpMotivo - Motivo Insucesso na Entrega da NF-e
+enum class TpMotivo {None = -1, RecebedorNaoEncontrado = 1, RecusaRecebedor = 2,
+                     EnderecoInexistente = 3, Outros = 4};
 
 class CPPNFE_EXPORT ConvNF : public ConvDF
 {
@@ -320,6 +325,8 @@ public:
     static IndImport strToIndImport(const QString &value);
     static QString motRedAdRemToStr(const MotRedAdRem &value);
     static MotRedAdRem strToMotRedAdRem(const QString &value);
+    static QString tpMotivoToStr(const TpMotivo &value);
+    static TpMotivo strToTpMotivo(const QString &value);
 };
 
 #endif // CONVNF_H

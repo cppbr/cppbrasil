@@ -43,6 +43,13 @@ bool EnvEvento::enviarEvento(const int &idLote)
 //salvarNotaVinculada serve para salvar notas onde a nota em questão foi emitida pelo próprio
 //transmissor do evento.
     bool _ret = true;
+    QString _servidor;
+    if (!get_servidorEvento(_servidor))
+    {
+        emit errorOccurred(this->m_error);
+        return false;
+    }
+
     if (gerarXML(idLote))
     {
         //validar xml
@@ -58,7 +65,8 @@ bool EnvEvento::enviarEvento(const int &idLote)
 
 
             bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
-                                  ConvNF::versaoLayout(WebServicesNF::NFeRecepcaoEvento));
+                                  ConvNF::versaoLayout(WebServicesNF::NFeRecepcaoEvento),
+                                  _servidor);
 
             if (_ret)
               tratarRetorno();
@@ -205,6 +213,34 @@ void EnvEvento::updateEvento(int &index)
         evento->items->value(index)->infEvento->set_tpAmb(config->webservices->get_tpAmb());
 }
 
+
+bool EnvEvento::get_servidorEvento(QString &servidor)
+{
+    //Insucesso na Entrega da NF-e (NT 2023.005) é autorizado somente pela SVRS, independente
+    //da UF do emitente. Por isso, não pode ser enviado no mesmo lote com outros tipos de evento.
+    int _qtdInsucesso = 0;
+    for (int i = 0; i < evento->items->count(); ++i)
+    {
+        TpEvento _tpEvento = evento->items->value(i)->infEvento->get_tpEvento();
+        if (_tpEvento == TpEvento::InsucessoEntregaNFe ||
+            _tpEvento == TpEvento::CancelInsucessoEntregaNFe)
+            ++_qtdInsucesso;
+    }
+
+    servidor.clear();
+    if (_qtdInsucesso == 0)
+        return true;
+
+    if (_qtdInsucesso != evento->items->count())
+    {
+        this->m_error = "Eventos de Insucesso na Entrega da NF-e devem ser enviados em lote "
+                        "separado, pois são autorizados somente pela SVRS.";
+        return false;
+    }
+
+    servidor = "SVRS";
+    return true;
+}
 
 bool EnvEvento::validarEvento()
 {
