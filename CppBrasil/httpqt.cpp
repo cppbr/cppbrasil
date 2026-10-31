@@ -39,7 +39,7 @@ QByteArray HttpQt::send(const QByteArray &host, const QByteArray &data)
     std::unique_ptr<QNetworkRequest> _request(new QNetworkRequest(QUrl(host)));
     configSSL(_request.get());
     _request->setTransferTimeout(_timeout);
-    _request->setHeader(QNetworkRequest::ContentTypeHeader, "text/xml;charst=utf-8");
+    _request->setHeader(QNetworkRequest::ContentTypeHeader, "text/xml; charset=utf-8");
 
     std::unique_ptr<QNetworkAccessManager> _manager(new QNetworkAccessManager(this));
     configProxy(_manager.get());
