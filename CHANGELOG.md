@@ -69,6 +69,13 @@ e a **carregar o arquivo de configuração do OpenSSL** (`openssl.cnf` do sistem
 Antes, a configuração era ignorada. Com isso, a política de criptografia do sistema passa a valer: no Fedora/RHEL
 e derivados, é preciso liberar a assinatura SHA1 (ver README).
 
+#### libxml2: recomendado 2.13 ou superior, e recompilar ao passar para a 2.14 ou superior
+A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas e mesmo resultado nas validações por XSD).
+- Na **2.13 ou superior**, erros em XSDs incluídos pelo schema principal (ex.: `leiauteNFe_v4.00.xsd` corrompido) vão para a
+  mensagem de erro da validação. Na 2.12 ou anterior, também são impressos no stderr da aplicação.
+- Na **2.14 ou superior**, a libxml2 mudou o nome do arquivo da biblioteca (`libxml2.so.2` → `libxml2.so.16`). Quem atualizar
+  a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
+
 ### Adicionado
 - `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
   que permitem escrever `for (auto *x : *container)`.

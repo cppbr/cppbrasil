@@ -25,7 +25,7 @@ Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as
 ## Requisitos
 - Qt >= 5.15.2
 - OpenSSL >= 1.1.1 (recomendado 3.x)
-- LibXML2
+- LibXML2 (testada com 2.12 e 2.15; recomendado **2.13 ou superior**, ver abaixo)
 - ZLib
 - libIconv(caso opte por compilar a libxml2 com suporte a libIconv. No Linux vem instalado por padrão. Para Windows [link.](https://github.com/pffang/libiconv-for-Windows))
 
@@ -48,6 +48,15 @@ rh-allow-sha1-signatures = yes
 ```
 
 Windows, Debian e Ubuntu não têm esse bloqueio.
+
+### LibXML2: versão e recompilação
+- **2.13 ou superior (recomendado):** erros de leitura dos XSDs incluídos pelo schema principal (por exemplo, um
+  `leiauteNFe_v4.00.xsd` corrompido) aparecem na mensagem de erro da validação. Na 2.12 ou anterior, esse erro também é
+  impresso no stderr da aplicação.
+- **2.14 ou superior: o arquivo da biblioteca mudou** de `libxml2.so.2` para `libxml2.so.16` (no Windows, a DLL também
+  pode mudar de nome). Ao atualizar a libxml2 a partir da 2.13 ou anterior, **recompile a CppBrasil e a sua aplicação**
+  contra a versão nova; os binários compilados com a antiga não carregam a nova.
+- A lib funciona com a libxml2 compilada sem a interface antiga SAX1 (`--without-sax1`).
 
 ## Compilação
 ### Linux
