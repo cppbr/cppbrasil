@@ -750,6 +750,9 @@ bool CppLibXml2::nodeSetContent(const xmlDoc *xml_doc, const char *node_name,
        return false;
     }
 
-    xmlNodeSetContent(_node, (unsigned char*)value);
+    //xmlNodeSetContent interpreta o valor como XML já escapado ('&' e '<' viram erro ou se perdem, conforme
+    //a versão da libxml2). Limpa o conteúdo e adiciona como texto puro, escapado na gravação.
+    xmlNodeSetContent(_node, NULL);
+    xmlNodeAddContent(_node, (const xmlChar*)value);
     return true;
 }
