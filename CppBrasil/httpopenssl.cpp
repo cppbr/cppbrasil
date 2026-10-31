@@ -20,8 +20,10 @@ limitations under the License.
 
 #include "httpopenssl.h"
 
-HttpOpenSSL::HttpOpenSSL(const CppCrypto* crypto) : HttpClient(crypto)
+HttpOpenSSL::HttpOpenSSL(const CppCrypto* crypto, const int &timeout) : HttpClient(crypto)
 {
+    this->m_timeout = timeout;
+
     //pkey
     QByteArray _pkeyDER = crypto->get_pkeyDER();
     BIO *_bpkey = BIO_new_mem_buf(_pkeyDER.data(), _pkeyDER.length());
@@ -49,6 +51,7 @@ HttpOpenSSL::HttpOpenSSL(const CppCrypto* crypto) : HttpClient(crypto)
         if (!(_cert = d2i_X509_bio(_biocert, NULL)))
         {
             emit errorOccurred("Erro ao obter certificado AC de streaming.");
+            BIO_free(_biocert);
             break;
         }
         sk_X509_push(m_ca, X509_dup(_cert));
@@ -79,6 +82,8 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data)
        WSAStartup(wVersionRequested, &wsaData);
     #endif
 
+    this->m_data.clear();
+
     //se o gethostbyname não funcionar, deve retornar daqui.
     QByteArray _h = getHostName(host, THost::host);
     if(!(_hp=gethostbyname(_h.data())))
@@ -97,6 +102,26 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data)
         emit errorOccurred("Erro ao criar socket.");
         return "";
     }
+    //fecha o socket em qualquer retorno
+    std::unique_ptr<int, void(*)(int*)> _sockGuard(&_sock, [](int *s) {
+#ifdef _WIN32
+        closesocket(*s);
+#else
+        close(*s);
+#endif
+    });
+
+    //timeout de envio e leitura (mesmo padrão do HttpQt)
+    int _timeout = (this->m_timeout > 0) ? this->m_timeout : 15000;
+#ifdef _WIN32
+    DWORD _tv = _timeout;
+#else
+    struct timeval _tv;
+    _tv.tv_sec = _timeout / 1000;
+    _tv.tv_usec = (_timeout % 1000) * 1000;
+#endif
+    setsockopt(_sock, SOL_SOCKET, SO_RCVTIMEO, (const char *)&_tv, sizeof(_tv));
+    setsockopt(_sock, SOL_SOCKET, SO_SNDTIMEO, (const char *)&_tv, sizeof(_tv));
 
     if(::connect(_sock,(struct sockaddr *)&_addr, sizeof(_addr))<0)
     {
@@ -107,92 +132,169 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data)
     OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG |
                      OPENSSL_INIT_LOAD_SSL_STRINGS |
                      OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
-    const SSL_METHOD *_meth = TLS_client_method();
-    SSL_CTX *_ctx = SSL_CTX_new (_meth);
-    SSL_CTX_use_cert_and_key(_ctx, m_cert, m_pkey, m_ca, 0);
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> _ctx(SSL_CTX_new(TLS_client_method()), SSL_CTX_free);
+    if (!_ctx)
+    {
+        emit errorOccurred("Erro ao criar contexto SSL.");
+        return "";
+    }
+#ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
+    //servidores que fecham a conexão sem close_notify
+    SSL_CTX_set_options(_ctx.get(), SSL_OP_IGNORE_UNEXPECTED_EOF);
+#endif
+    if (SSL_CTX_use_cert_and_key(_ctx.get(), m_cert, m_pkey, m_ca, 0) != 1)
+    {
+        emit errorOccurred("Erro ao carregar certificado na conexão SSL.");
+        return "";
+    }
 
-    SSL *_ssl = SSL_new(_ctx);
+    std::unique_ptr<SSL, decltype(&SSL_free)> _ssl(SSL_new(_ctx.get()), SSL_free);
     if (!_ssl)
     {
-        emit errorOccurred("Erro ao criar SSL.\n");
+        emit errorOccurred("Erro ao criar SSL.");
         return "";
     }
 
-    BIO *_sbio = BIO_new_socket(_sock, BIO_NOCLOSE);
-    SSL_set_bio(_ssl, _sbio, _sbio);
-    SSL_set_connect_state(_ssl);
-    SSL_accept(_ssl);
+    SSL_set_fd(_ssl.get(), _sock);
+    SSL_set_tlsext_host_name(_ssl.get(), _h.data()); //SNI
 
-    int _err = SSL_connect(_ssl);
-    if (_err <= 0)
+    int _ret = SSL_connect(_ssl.get());
+    if (_ret <= 0)
     {
-        emit errorOccurred("Erro ao criar conexão SSL :" + QString::number(_err));
+        int _err = SSL_get_error(_ssl.get(), _ret);
+        emit errorOccurred("Erro ao criar conexão SSL :" + QString::number(_err) + " - " + getErrorName(_err));
         return "";
     }
 
-    QByteArray _pack = getCommand(host, data);
-    sendPacket(_ssl, _pack.data());
-    receivePacket(_ssl);
-#ifdef __linux__
-    close(_sock);
-#elif _WIN32
-    closesocket(_sock);
-#endif
+    if (sendPacket(_ssl.get(), getCommand(host, data)))
+        receivePacket(_ssl.get());
 
-    SSL_free(_ssl);
-    SSL_CTX_free(_ctx);
+    SSL_shutdown(_ssl.get());
 
     return this->m_data;
 }
 
-void HttpOpenSSL::sendPacket(SSL *ssl, const char *buf)
+bool HttpOpenSSL::sendPacket(SSL *ssl, const QByteArray &buf)
 {
-    int _len = SSL_write(ssl, buf, strlen(buf));
-    if (_len < 0)
+    int _len = SSL_write(ssl, buf.constData(), buf.size());
+    if (_len <= 0)
     {
         int _err = SSL_get_error(ssl, _len);
         emit errorOccurred("Erro ao enviar dados :" + QString::number(_err) + " - " + getErrorName(_err));
+        return false;
     }
+    return true;
 }
 
 void HttpOpenSSL::receivePacket(SSL *ssl)
 {
-    int _len, _err;
+    int _len;
+    int _err = SSL_ERROR_NONE;
     QByteArray _data;
     QByteArray _buf;
     _buf.resize(1024 * 8);
-    while ((_len = SSL_read(ssl, _buf.data(), _buf.size())) > 0) {
-        _data.append(_buf);
-        _err = SSL_get_error(ssl, _len);
-        if ((_len < _buf.size()) || (_err != SSL_ERROR_NONE))
+    //lê até o fim da resposta: Content-Length completo, último chunk ou conexão fechada
+    while (!responseComplete(_data))
+    {
+        _len = SSL_read(ssl, _buf.data(), _buf.size());
+        if (_len <= 0)
+        {
+            _err = SSL_get_error(ssl, _len);
             break;
+        }
+        _data.append(_buf.constData(), _len);
     }
 
-    if (_err != SSL_ERROR_NONE)
+    if ((_err == SSL_ERROR_WANT_READ) || (_err == SSL_ERROR_WANT_WRITE))
+    {
+        //socket bloqueante: só acontece quando o SO_RCVTIMEO expira
+        emit errorOccurred("Erro ao ler dados retornados: tempo de resposta esgotado (timeout).");
+        return;
+    }
+    if ((_err != SSL_ERROR_NONE) && (_err != SSL_ERROR_ZERO_RETURN))
     {
         emit errorOccurred("Erro ao ler dados retornados :" + QString::number(_err) + " - " + getErrorName(_err));
+        return;
     }
-    else
+
+    int _end = _data.indexOf("\r\n\r\n");
+    if (_end < 0)
     {
-        this->m_data.clear();
-        this->m_data.append(CppUtility::extractStr(_data, "\r\n\r\n", "").trimmed());
+        emit errorOccurred("Erro ao ler dados retornados: resposta HTTP incompleta.");
+        return;
     }
+
+    QByteArray _body = _data.mid(_end + 4);
+    if (headerValue(_data.left(_end), "Transfer-Encoding").toLower().contains("chunked"))
+        _body = decodeChunked(_body);
+
+    this->m_data.append(_body.trimmed());
+}
+
+bool HttpOpenSSL::responseComplete(const QByteArray &data)
+{
+    int _end = data.indexOf("\r\n\r\n");
+    if (_end < 0)
+        return false;
+
+    QByteArray _header = data.left(_end);
+    int _sizeBody = data.size() - (_end + 4);
+
+    if (headerValue(_header, "Transfer-Encoding").toLower().contains("chunked"))
+        return data.endsWith("\r\n0\r\n\r\n") || (_sizeBody >= 5 && data.mid(_end + 4).startsWith("0\r\n\r\n"));
+
+    bool _ok = false;
+    int _length = headerValue(_header, "Content-Length").toInt(&_ok);
+    if (_ok)
+        return _sizeBody >= _length;
+
+    return false; //sem tamanho: lê até o servidor fechar a conexão
+}
+
+QByteArray HttpOpenSSL::headerValue(const QByteArray &header, const QByteArray &name)
+{
+    const QList<QByteArray> _lines = header.split('\n');
+    for (const QByteArray &_line : _lines)
+    {
+        int _i = _line.indexOf(':');
+        if ((_i > 0) && (_line.left(_i).trimmed().toLower() == name.toLower()))
+            return _line.mid(_i + 1).trimmed();
+    }
+    return QByteArray();
+}
+
+QByteArray HttpOpenSSL::decodeChunked(const QByteArray &body)
+{
+    QByteArray _res;
+    int _pos = 0;
+    while (_pos < body.size())
+    {
+        int _eol = body.indexOf("\r\n", _pos);
+        if (_eol < 0)
+            break;
+        bool _ok = false;
+        //tamanho em hexa, podendo ter extensões depois de ';'
+        int _size = body.mid(_pos, _eol - _pos).split(';').first().trimmed().toInt(&_ok, 16);
+        if (!_ok || _size <= 0)
+            break;
+        _res.append(body.mid(_eol + 2, _size));
+        _pos = _eol + 2 + _size + 2;
+    }
+    return _res;
 }
 
 QByteArray HttpOpenSSL::getCommand(const QByteArray &host, const QByteArray &data)
 {
-    QString _http, _host, _server;
+    QByteArray _http;
 
-    _host = getHostName(host, THost::host);
-    _server = getHostName(host, THost::server);
-
-    _http.append("POST "+ _server +" HTTP/1.1 \r\n");
-    _http.append("Host: "+ _host +" \r\n");
+    _http.append("POST " + getHostName(host, THost::server) + " HTTP/1.1\r\n");
+    _http.append("Host: " + getHostName(host, THost::host) + "\r\n");
     _http.append("Content-Type: text/xml; charset=utf-8\r\n");
-    _http.append("Content-Length: " + QString::number(data.length()) +"\r\n\r\n");
+    _http.append("Content-Length: " + QByteArray::number(data.size()) + "\r\n");
+    _http.append("Connection: close\r\n\r\n");
     _http.append(data);
 
-    return _http.toLocal8Bit();
+    return _http;
 }
 
 QByteArray HttpOpenSSL::getHostName(const QByteArray &host, const THost &tipo)
@@ -221,7 +323,7 @@ QString HttpOpenSSL::getErrorName(const int &err)
             _erroName = "SSL_ERROR_SSL";
             break;
         case SSL_ERROR_WANT_READ:
-            _erroName = "SSL_ERROR_WANT_WRITE";
+            _erroName = "SSL_ERROR_WANT_READ";
             break;
         case SSL_ERROR_WANT_WRITE:
             _erroName = "SSL_ERROR_WANT_WRITE";
