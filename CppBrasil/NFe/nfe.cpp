@@ -181,7 +181,10 @@ void Nfe::assinarXML(const ConfigNFe *config)
 void Nfe::gerarXML(const ConfigNFe *config)
 {
     QByteArray _output;
-    //limpando dados caso o xml seja importado
+    //limpando dados caso o xml seja importado ou gerado novamente
+    this->m_error.clear();
+    this->m_xml_original.clear();
+    this->m_xml_assinado.clear();
     this->m_xml_autorizado.clear();
     this->protNFe->clear();
 
@@ -190,6 +193,10 @@ void Nfe::gerarXML(const ConfigNFe *config)
     if (xml->gerarXML(&_output))
     {
         this->m_xml_original.append(_output.data());
+    }
+    else
+    {
+        this->m_error = "Erro ao gerar o XML da nota.";
     }
 }
 

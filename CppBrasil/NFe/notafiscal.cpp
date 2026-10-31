@@ -55,7 +55,7 @@ bool NotaFiscal::assinar()
     }
 
     if(_err > 0)
-      set_error("Erro ao assinar " + QString::number(this->m_tError) + " nota(s).", _err);
+      set_error("Erro ao assinar " + QString::number(_err) + " nota(s).", _err);
 
     return (_err == 0);
 }
@@ -71,7 +71,7 @@ bool NotaFiscal::gerar()
     }
 
     if(_err > 0)
-      set_error("Erro ao gerar " + QString::number(this->m_tError) + " nota(s).", _err);
+      set_error("Erro ao gerar " + QString::number(_err) + " nota(s).", _err);
 
     return (_err == 0);
 }
@@ -87,7 +87,7 @@ bool NotaFiscal::validar()
     }
 
     if(_err > 0)
-      set_error("Erro ao validar " + QString::number(this->m_tError) + " nota(s).", _err);
+      set_error("Erro ao validar " + QString::number(_err) + " nota(s).", _err);
 
     return (_err == 0);
 }
