@@ -128,7 +128,7 @@ void CppDanfe::genBarcode()
                       + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_CNPJ();
 
         //vNF
-        QString _vNF = CppUtility::insZeroLeft(QString::number((this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF() * 100)), 14);
+        QString _vNF = CppUtility::insZeroLeft(QString::number(qRound64(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF() * 100)), 14); //qRound64: inteiro em centavos, sem notacao cientifica
         _barCt += _vNF;
 
         //ICMSp
