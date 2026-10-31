@@ -51,8 +51,13 @@ struct RetEnt{
 QList<RetEnt> RetEntList;
 
 CppDanfeQtRPT::CppDanfeQtRPT(const CppNFe *cppnfe, const int &recNo): CppDanfe(cppnfe, recNo),
-    m_report(new QtRPT(this))
+    m_report(new QtRPT)
 {
+    //conecta uma unica vez, se ficasse no print() cada chamada duplicaria as conexoes.
+    QObject::connect(m_report.get(), &QtRPT::setValue, this, &CppDanfeQtRPT::setValue);
+    QObject::connect(m_report.get(), &QtRPT::setField, this, &CppDanfeQtRPT::setField);
+    QObject::connect(m_report.get(), &QtRPT::setValueImage, this, &CppDanfeQtRPT::setValueImage);
+    QObject::connect(m_report.get(), &QtRPT::setDSInfo, this, &CppDanfeQtRPT::setDSInfo);
 }
 
 CppDanfeQtRPT::~CppDanfeQtRPT()
@@ -79,11 +84,6 @@ void CppDanfeQtRPT::print()
 
     if (!m_report->loadReport(_file))
         qDebug() << "Report file not found";
-
-    QObject::connect(&*m_report, &QtRPT::setValue, this, &CppDanfeQtRPT::setValue);
-    QObject::connect(&*m_report, &QtRPT::setField, this, &CppDanfeQtRPT::setField);
-    QObject::connect(&*m_report, &QtRPT::setValueImage, this, &CppDanfeQtRPT::setValueImage);
-    QObject::connect(&*m_report, &QtRPT::setDSInfo, this, &CppDanfeQtRPT::setDSInfo);
 
     m_report->printExec(false);
 }

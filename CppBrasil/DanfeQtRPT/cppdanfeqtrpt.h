@@ -41,7 +41,7 @@ public:
     virtual void print();
 
 private:
-    std::shared_ptr<QtRPT> m_report;
+    std::unique_ptr<QtRPT> m_report; //sem parent, o unique_ptr e o unico dono.
     void loadRetEnt();
 private slots:
     void setDSInfo(DataSetInfo &dsInfo);
