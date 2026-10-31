@@ -124,6 +124,9 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - **Assinatura com DOCTYPE** (`signXML`): um XML com `<!DOCTYPE>` e entidade externa fazia o conteúdo de arquivos locais
   entrar no XML assinado (XXE), e podia acessar a rede. Agora XML com DOCTYPE é recusado na assinatura (o XML da NF-e
   não tem DOCTYPE; a assinatura das notas não muda).
+- `CppXML::setNode` (`CppLibXml2`): valor com `&` ou `<` era tratado como XML já escapado. Na libxml2 2.12 a tag ficava
+  vazia (e o erro saía no stderr); na 2.15 o `&` era descartado. Agora o valor é gravado como texto, escapado corretamente,
+  igual nas duas versões. A assinatura não é afetada.
 - `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
