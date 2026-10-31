@@ -267,7 +267,7 @@ void ConfArquivos::set_salvarPorModelo(const bool &porModelo)
 
 //-------------------------------------------------------------
 
-ConfWebServices::ConfWebServices() : m_tpAmb(TpAmb::None),  m_connTimeout(0),
+ConfWebServices::ConfWebServices() : m_uf(UF::None), m_tpAmb(TpAmb::None),  m_connTimeout(0),
     m_asynchronousTimeout(0), m_tentativas(0), m_httpType(HttpType::None), m_compactar(false),
     m_compactarAcimaDe(0), m_verificarSocket(true)
 {
