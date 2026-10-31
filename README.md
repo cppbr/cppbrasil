@@ -10,6 +10,9 @@ Projeto desenvolvido em C++ e Qt framework para criação de bibliotecas multipl
 - libCppNFe - Biblioteca para emissão de documentos fiscais NFe e NFCe.
 - libDanfeQtRpt - Biblioteca para impressão de DANFE(Documento auxiliar de Nota Fiscal Eletrônica). Utiliza o QtRpt(Gerenciador de Relatórios open source).
 
+## Mudanças
+Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as que quebram compatibilidade.
+
 
 # Tecnologias utilizadas
 - C/C++
