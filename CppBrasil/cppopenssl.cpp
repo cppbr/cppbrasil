@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "cppopenssl.h"
+#include <QTimeZone>
 CppOpenSSL::CppOpenSSL(const QByteArray &p12path, const QByteArray &pass): m_p12path(p12path), m_pass(pass)
 {
 }
@@ -127,7 +128,11 @@ QDateTime CppOpenSSL::asn1_to_QDateTime(const ASN1_TIME *aTime)
     QString _sTime = QString("%1%2%3%4%5").arg(_t.mid(8, 2), ":", _t.mid(10, 2),
                                              ":", _t.mid(12, 2));
     QTime _resTime(QTime::fromString(_sTime,"hh:mm:ss"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QDateTime _result(_resDate, _resTime, QTimeZone::UTC);
+#else
     QDateTime _result(_resDate, _resTime, Qt::UTC);
+#endif
     ASN1_GENERALIZEDTIME_free(_gt);
     return _result;
 }
