@@ -122,6 +122,10 @@ e derivados, é preciso liberar a assinatura SHA1 (ver README).
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 
 ### Alterado
+- **Validação por XSD mais rápida** (`CppLibXml2::parseXML`): o schema era lido e interpretado a cada validação. Agora fica
+  em cache no processo, compartilhado entre as threads (cerca de 11 vezes mais rápido: 1.600 validações de NF-e caíram de
+  12 s para 1 s). Se algum `.xsd` da pasta for alterado, incluído ou removido, o schema é interpretado de novo
+  automaticamente, sem reiniciar a aplicação. Os schemas usados ficam em memória até o fim do processo.
 - `CppLibXml2`: troca as funções antigas `xmlParseMemory`/`xmlParseFile` (interface SAX1, que pode estar desligada na
   compilação da libxml2) por `xmlReadMemory`/`xmlReadFile`. A lib compila com libxml2 sem SAX1 e não acessa a rede ao ler XML.
   Os erros de leitura não vão mais para o stderr, e a mensagem de XML malformado informa o motivo

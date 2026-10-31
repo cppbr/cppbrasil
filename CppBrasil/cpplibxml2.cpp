@@ -19,6 +19,11 @@ limitations under the License.
 
 
 #include "cpplibxml2.h"
+#include <QDir>
+#include <QFileInfo>
+#include <QHash>
+#include <QMutex>
+#include <memory>
 
 namespace {
 //guarda o primeiro erro reportado pela libxml2 em userData (QString*), em vez de imprimir no stderr
@@ -45,6 +50,95 @@ QString lastParseError()
     if (_error != NULL)
         captureError(&_msg, const_cast<xmlError*>(_error));
     return _msg;
+}
+
+//cache dos schemas já interpretados, compartilhado por todo o processo (o CppLibXml2 é criado a cada operação).
+//Um xmlSchema é só leitura depois de interpretado e pode ser usado por várias threads, cada uma com o seu
+//xmlSchemaValidCtxt. O shared_ptr mantém o schema vivo durante a validação, mesmo que seja trocado no cache.
+//schema interpretado e o documento do XSD de onde veio (o schema aponta para nós do documento)
+struct CompiledSchema
+{
+    xmlDoc *doc = NULL;
+    xmlSchema *schema = NULL;
+    CompiledSchema() = default;
+    CompiledSchema(const CompiledSchema&) = delete;
+    CompiledSchema& operator=(const CompiledSchema&) = delete;
+    ~CompiledSchema()
+    {
+        if (schema != NULL)
+            xmlSchemaFree(schema);
+        if (doc != NULL)
+            xmlFreeDoc(doc);
+    }
+};
+
+struct SchemaCacheItem
+{
+    QByteArray stamp;
+    std::shared_ptr<CompiledSchema> schema;
+};
+
+struct SchemaCache
+{
+    QMutex mutex;
+    QHash<QString, SchemaCacheItem> items;
+};
+
+SchemaCache &schemaCache()
+{
+    //criado uma vez e nunca destruído: evita liberar schemas depois que a libxml2 já foi finalizada na saída do programa
+    static SchemaCache *_cache = new SchemaCache;
+    return *_cache;
+}
+
+//"assinatura" dos .xsd da pasta (quantidade, data e tamanho): muda quando um schema é trocado, incluído ou removido,
+//inclusive os incluídos pelo schema principal (leiaute, tipos básicos...)
+QByteArray schemaDirStamp(const QString &dir)
+{
+    qint64 _maxTime = 0, _sumSize = 0;
+    const QFileInfoList _files = QDir(dir).entryInfoList(QStringList() << "*.xsd", QDir::Files);
+    for (const QFileInfo &_f : _files)
+    {
+        _maxTime = qMax(_maxTime, _f.lastModified().toMSecsSinceEpoch());
+        _sumSize += _f.size();
+    }
+    return QByteArray::number(_files.size()) + ':' + QByteArray::number(_maxTime) + ':' + QByteArray::number(_sumSize);
+}
+
+//retorna o schema do cache ou o interpreta (e guarda). Em caso de erro, retorna nulo e preenche error.
+std::shared_ptr<CompiledSchema> loadSchema(const QString &dir, const QString &schemaFile, QString &error)
+{
+    const QByteArray _stamp = schemaDirStamp(dir);
+    SchemaCache &_cache = schemaCache();
+    QMutexLocker _locker(&_cache.mutex);
+
+    auto _it = _cache.items.constFind(schemaFile);
+    if ((_it != _cache.items.constEnd()) && (_it->stamp == _stamp))
+        return _it->schema;
+
+    std::shared_ptr<CompiledSchema> _schema(new CompiledSchema);
+    xmlResetLastError();
+    _schema->doc = xmlReadFile(schemaFile.toLocal8Bit().constData(), NULL, READ_OPTIONS);
+    if (_schema->doc == NULL)
+        error = lastParseError();
+    else
+    {
+        xmlSchemaParserCtxt *_parser_ctxt = xmlSchemaNewDocParserCtxt(_schema->doc);
+        if (_parser_ctxt != NULL)
+        {
+            xmlSchemaSetParserStructuredErrors(_parser_ctxt, captureError, &error);
+            _schema->schema = xmlSchemaParse(_parser_ctxt);
+            xmlSchemaFreeParserCtxt(_parser_ctxt);
+        }
+    }
+    if (_schema->schema == NULL)
+        _schema.reset();
+
+    if (_schema)
+        _cache.items.insert(schemaFile, SchemaCacheItem{_stamp, _schema});
+    else
+        _cache.items.remove(schemaFile);
+    return _schema;
 }
 }
 
@@ -134,14 +228,10 @@ bool CppLibXml2::parseSign(const QByteArray &xml_doc)
 bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_name)
 {
     QString _path;
-    QByteArray _schemafile;
-    xmlDoc *_xml, *_xsd;
-    xmlSchemaParserCtxt *_parser_ctxt = NULL;
-    xmlSchema *_schema = NULL;
+    xmlDoc *_xml = NULL;
+    std::shared_ptr<CompiledSchema> _schema;
     xmlSchemaValidCtxt *_valid_ctxt = NULL;
     QString _schemaError, _validError;
-    _xml = NULL;
-    _xsd = NULL;
     bool _ret = true;
 
 
@@ -150,37 +240,21 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
        set_error(QStringLiteral("Diretório do schema inválido ou sem permissão para leitura"));
        return false;
     }
-    _schemafile.append(_path.toLocal8Bit());
-    _schemafile.append(schema_name.data());
 
     xmlResetLastError();
     _xml = xmlReadMemory(xml_doc.constData(), xml_doc.size(), NULL, NULL, READ_OPTIONS);
-    QString _parseError = lastParseError();
-    _xsd = xmlReadFile(_schemafile.constData(), NULL, READ_OPTIONS);
-    if (_xsd == NULL)
-        _schemaError = lastParseError();
-    _parser_ctxt = xmlSchemaNewDocParserCtxt(_xsd);
-    if (_parser_ctxt != NULL)
+    if ((_xml == NULL) || (xmlDocGetRootElement(_xml) == NULL))
     {
-        xmlSchemaSetParserStructuredErrors(_parser_ctxt, captureError, &_schemaError);
-        _schema = xmlSchemaParse(_parser_ctxt);
+        QString _parseError = lastParseError();
+        set_error(QStringLiteral("Erro: Falha ao interpretar o XML") +
+                  (_parseError.isEmpty() ? QString() : QStringLiteral(": ") + _parseError));
+        _ret = false;
     }
-    if (_schema != NULL)
-        _valid_ctxt = xmlSchemaNewValidCtxt(_schema);
-
 
     if (_ret)
     {
-        if ((_xml == NULL) || (xmlDocGetRootElement(_xml) == NULL))
-        {
-            set_error(QStringLiteral("Erro: Falha ao interpretar o XML") +
-                      (_parseError.isEmpty() ? QString() : QStringLiteral(": ") + _parseError));
-            _ret = false;
-        }
-    }
-    if (_ret)
-    {
-        if (_schema == NULL)
+        _schema = loadSchema(_path, _path + QString::fromLocal8Bit(schema_name), _schemaError);
+        if (!_schema)
         {
             set_error(QStringLiteral("Erro: Schema inválido") +
                       (_schemaError.isEmpty() ? QString() : QStringLiteral(": ") + _schemaError));
@@ -189,7 +263,7 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     }
     if (_ret)
     {
-        if (_valid_ctxt == NULL)
+        if ((_valid_ctxt = xmlSchemaNewValidCtxt(_schema->schema)) == NULL)
         {
             set_error(QStringLiteral("Erro: Não foi possivel criar um contexto para o Schema"));
             _ret = false;
@@ -215,12 +289,6 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
 
     if (_valid_ctxt != NULL)
       xmlSchemaFreeValidCtxt(_valid_ctxt);
-    if (_schema != NULL)
-      xmlSchemaFree(_schema);
-    if (_parser_ctxt != NULL)
-      xmlSchemaFreeParserCtxt(_parser_ctxt);
-    if (_xsd != NULL)
-      xmlFreeDoc(_xsd);
     if (_xml != NULL)
       xmlFreeDoc(_xml);
     return _ret;
