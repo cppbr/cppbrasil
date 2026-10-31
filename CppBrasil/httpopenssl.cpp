@@ -104,9 +104,9 @@ QByteArray HttpOpenSSL::send(const QByteArray &host, const QByteArray &data)
         return "";
     }
 
-    SSL_library_init();
-    SSLeay_add_ssl_algorithms();
-    SSL_load_error_strings();
+    OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG |
+                     OPENSSL_INIT_LOAD_SSL_STRINGS |
+                     OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
     const SSL_METHOD *_meth = TLS_client_method();
     SSL_CTX *_ctx = SSL_CTX_new (_meth);
     SSL_CTX_use_cert_and_key(_ctx, m_cert, m_pkey, m_ca, 0);

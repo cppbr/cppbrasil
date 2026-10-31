@@ -325,7 +325,7 @@ bool CppOpenSSL::subjectName(X509 *cert)
 bool CppOpenSSL::dataEmissao(X509 *cert)
 {
     try{
-        ASN1_TIME* _certTime = X509_get_notBefore(cert);
+        const ASN1_TIME* _certTime = X509_get0_notBefore(cert);
         QDateTime _dt = asn1_to_QDateTime(_certTime);
         if (!_dt.isValid())
         {
@@ -345,7 +345,7 @@ bool CppOpenSSL::dataEmissao(X509 *cert)
 bool CppOpenSSL::dataVencimento(X509 *cert)
 {
     try{
-        ASN1_TIME* _certTime = X509_get_notAfter(cert);
+        const ASN1_TIME* _certTime = X509_get0_notAfter(cert);
         QDateTime _dt = asn1_to_QDateTime(_certTime);
         if (!_dt.isValid())
         {
@@ -433,7 +433,7 @@ bool CppOpenSSL::hash(const HashType &hashtype, const QByteArray &input, EVP_PKE
     try{
         QByteArray _sha(hashTypeToStr(hashtype).toLocal8Bit());
 
-        _ctx = EVP_MD_CTX_create();
+        _ctx = EVP_MD_CTX_new();
         if (_ctx == NULL)
         {
            _ret = false;
@@ -498,7 +498,7 @@ bool CppOpenSSL::hash(const HashType &hashtype, const QByteArray &input, EVP_PKE
         }
 
         if (_ctx != NULL)
-          EVP_MD_CTX_destroy(_ctx);
+          EVP_MD_CTX_free(_ctx);
         if (_hash != NULL)
           OPENSSL_clear_free((unsigned char*)_hash, _len);
 
@@ -507,7 +507,7 @@ bool CppOpenSSL::hash(const HashType &hashtype, const QByteArray &input, EVP_PKE
     } catch (std::exception const& e) {
         qWarning() << QStringLiteral( "Erro ao assinar documento: ") << e.what();
         if (_ctx != NULL)
-          EVP_MD_CTX_destroy(_ctx);
+          EVP_MD_CTX_free(_ctx);
         if (_hash != NULL)
           OPENSSL_clear_free((unsigned char*)_hash, _len);
 
