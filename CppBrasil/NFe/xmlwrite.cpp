@@ -588,7 +588,6 @@ void XmlWrite::get_prod(const int &i)
                                                                             DtH::Date));
             this->m_xmlw->writeTextElement("xLocDesemb", this->m_infNFe->det->value(i)->prod->DI->value(j)->get_xLocDesemb());
             this->m_xmlw->writeTextElement("UFDesemb", this->m_infNFe->det->value(i)->prod->DI->value(j)->get_UFDesemb());
-            this->m_xmlw->writeTextElement("UFDesemb", this->m_infNFe->det->value(i)->prod->DI->value(j)->get_UFDesemb());
             this->m_xmlw->writeTextElement("dDesemb", CppUtility::dateTimeToStr(this->m_infNFe->det->value(i)->prod->DI->value(j)->get_dDesemb(),
                                                                                 DtH::Date));
             this->m_xmlw->writeTextElement("tpViaTransp", ConvNF::tpViaTranspToStr(this->m_infNFe->det->value(i)->prod->DI->value(j)->get_tpViaTransp()));
