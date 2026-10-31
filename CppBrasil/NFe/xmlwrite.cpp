@@ -51,7 +51,7 @@ QByteArray XmlWrite::get_infNFeSupl_OFFLINE(const QString &chave, const VersaoQr
     QString _qrcode, _inputHash, _xml;
     QByteArray _resHash;
     _chave = chave;
-    _versaoQr = ConvNF::versaoQrCodeNFToStr(versaoQrcodeNF).at(0);//apenas o primeiro numero da versão
+    _versaoQr = ConvNF::versaoQrCodeNFToStr(versaoQrcodeNF).left(1);//apenas o primeiro numero da versão
     _ambiente = ConvNF::tpAmbToStr(tpAmb);
     _diaEmiss =  emissao.toString("dd");
     _valornf = CppUtility::doubleToStrDecimal(vNF, 2);
@@ -2325,7 +2325,7 @@ void XmlWrite::get_infNFeSupl_ONLINE()
          QString _chave, _versaoQr, _ambiente, _idcsc, _csc, _qrcode, _inputHash;
          QByteArray _resHash;
          _chave = QString(this->m_infNFe->get_Id()).right(this->m_infNFe->get_Id().length() - 3); //remove NFe da string
-         _versaoQr = ConvNF::versaoQrCodeNFToStr(this->m_confgNFe->get_VersaoQrCodeNF()).at(0);//apenas o primeiro numero da versão
+         _versaoQr = ConvNF::versaoQrCodeNFToStr(this->m_confgNFe->get_VersaoQrCodeNF()).left(1);//apenas o primeiro numero da versão
          _ambiente = ConvNF::tpAmbToStr(this->m_infNFe->ide->get_tpAmb());
          if (!this->m_confgNFe->get_IdCSC().isEmpty()) //não pode ser empty se não daria erro na conversao para inteiro
            _idcsc = QString::number(this->m_confgNFe->get_IdCSC().toInt());

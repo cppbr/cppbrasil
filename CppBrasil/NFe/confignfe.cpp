@@ -31,8 +31,8 @@ Certificado::~Certificado()
 
 //---------------------------------------------------------------
 
-ArquivosNF::ArquivosNF(Certificado *certificado):
-    certificado(certificado)
+ArquivosNF::ArquivosNF(Certificado *certificado): m_salvarEventosPorDatas(false),
+    certificado(certificado), m_ModeloDF(ModeloDF::NFe)
 {
 
 }
@@ -215,7 +215,8 @@ QString ArquivosNF::get_caminho(const QString &pastaBase, const bool &porCNPJ, c
 //---------------------------------------------------------------
 
 ConfigNFe::ConfigNFe(): certificado(new Certificado), arquivos(new ArquivosNF(certificado.get())),
-    webservices(new ConfWebServices)
+    webservices(new ConfWebServices), m_ModeloDF(ModeloDF::NFe), m_VersaoNF(VersaoNF::v400),
+    m_VersaoQRCodeNF(VersaoQrCodeNF::v200), m_indSinc(IndSinc::Nao), m_tipoEmissao(TpEmis::Normal)
 {
 
 }
