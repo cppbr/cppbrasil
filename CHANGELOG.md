@@ -76,12 +76,16 @@ A cópia causava double delete (crash). Agora gera erro de compilação.
 - Acesso fora dos limites da string ao montar a versão do QR Code (online e offline).
 - DANFE: o objeto do relatório tinha dois donos, e cada chamada de `print()` no mesmo objeto duplicava as conexões
   (os campos eram preenchidos várias vezes).
+- DANFE: a lista de locais de retirada e entrega era global e compartilhada entre todas as instâncias. Duas impressões
+  ao mesmo tempo podiam misturar os dados. Agora cada DANFE tem a sua lista, e campos numéricos sem valor saem zerados
+  em vez de lixo de memória.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 
 ### Alterado
 - Objetos temporários internos (`CppLibXml2`, web services, `XmlRead`, cliente HTTP, ...) passaram a usar
   `std::unique_ptr`, sem vazamento de memória em caso de exceção.
 - `Container::add()` ficou seguro contra exceção.
+- O layout interno de `CppDanfeQtRPT` mudou: as aplicações que usam a lib do DANFE precisam ser recompiladas.
 
 ### Removido
 - Dependências pré-compiladas antigas para Windows em `third-party/windows/` (OpenSSL 3.1.3, libxml2 2.11.5,
