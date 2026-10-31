@@ -40,9 +40,9 @@ public:
     ~EventoNotaFiscal();
     void clear();
 
-    std::shared_ptr<StatusServico> statusServico;
-    std::shared_ptr<EnvEvento> envEvento;
-    std::shared_ptr<ConsSitNFe> consSitNFe;
+    std::unique_ptr<StatusServico> statusServico;
+    std::unique_ptr<EnvEvento> envEvento;
+    std::unique_ptr<ConsSitNFe> consSitNFe;
 
 signals:
     void errorOccurred(const QString &error);

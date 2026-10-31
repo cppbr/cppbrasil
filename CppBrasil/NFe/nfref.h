@@ -41,9 +41,9 @@ public:
     QString get_refCTe() const;
     void set_refCTe(const QString &refCTe);
 
-    std::shared_ptr<RefNF> refNF;
-    std::shared_ptr<RefNFP> refNFP;
-    std::shared_ptr<RefECF> refECF;
+    std::unique_ptr<RefNF> refNF;
+    std::unique_ptr<RefNFP> refNFP;
+    std::unique_ptr<RefECF> refECF;
 
 private:
     QString m_refNFe;

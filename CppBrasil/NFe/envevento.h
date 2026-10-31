@@ -49,8 +49,8 @@ public:
     void set_versao(const QString &versao);
     QString get_error() const;
 
-    std::shared_ptr<Container<TEvento>> evento;
-    std::shared_ptr<RetEnvEvento> retorno;
+    std::unique_ptr<Container<TEvento>> evento;
+    std::unique_ptr<RetEnvEvento> retorno;
 
 signals:
     void errorOccurred(const QString &error);

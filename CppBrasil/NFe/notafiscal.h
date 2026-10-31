@@ -53,8 +53,8 @@ public:
     int get_totalErros() const;
     QString get_error() const;
 
-    std::shared_ptr<Container<Nfe>> NFe;
-    std::shared_ptr<RetConsReciNFe> retorno;
+    std::unique_ptr<Container<Nfe>> NFe;
+    std::unique_ptr<RetConsReciNFe> retorno;
 
 signals:
     void errorOccurred(const QString &error);

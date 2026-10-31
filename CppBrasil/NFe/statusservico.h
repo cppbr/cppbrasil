@@ -20,7 +20,7 @@ public:
     bool status();
     QString get_error() const;
 
-    std::shared_ptr<RetConsStatServ> retorno;
+    std::unique_ptr<RetConsStatServ> retorno;
 
 signals:
     void errorOccurred(const QString &error);

@@ -51,8 +51,8 @@ public:
     double get_vLiqFor() const;
     void set_vLiqFor(const double &vLiqFor);
 
-    std::shared_ptr<Container<ForDia>> forDia;
-    std::shared_ptr<Container<Deduc>> deduc;
+    std::unique_ptr<Container<ForDia>> forDia;
+    std::unique_ptr<Container<Deduc>> deduc;
 private:
     QString m_safra;
     QString m_ref;

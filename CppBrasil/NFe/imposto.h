@@ -42,15 +42,15 @@ public:
     double get_vTotTrib() const;
     void set_vTotTrib(const double &vTotTrib);
 
-    std::shared_ptr<Icms> ICMS;
-    std::shared_ptr<IcmsUFDest> ICMSUFDest;
-    std::shared_ptr<Ipi> IPI;
-    std::shared_ptr<Ii> II;
-    std::shared_ptr<Pis> PIS;
-    std::shared_ptr<PisST> PISST;
-    std::shared_ptr<Cofins> COFINS;
-    std::shared_ptr<CofinsST> COFINSST;
-    std::shared_ptr<IssQN> ISSQN;
+    std::unique_ptr<Icms> ICMS;
+    std::unique_ptr<IcmsUFDest> ICMSUFDest;
+    std::unique_ptr<Ipi> IPI;
+    std::unique_ptr<Ii> II;
+    std::unique_ptr<Pis> PIS;
+    std::unique_ptr<PisST> PISST;
+    std::unique_ptr<Cofins> COFINS;
+    std::unique_ptr<CofinsST> COFINSST;
+    std::unique_ptr<IssQN> ISSQN;
 private:
     double m_vTotTrib;
 };

@@ -34,8 +34,8 @@ public:
     ~ObsItem();
     void clear();
 
-    std::shared_ptr<ObsCont> obsCont;
-    std::shared_ptr<ObsFisco> obsFisco;
+    std::unique_ptr<ObsCont> obsCont;
+    std::unique_ptr<ObsFisco> obsFisco;
 
 };
 

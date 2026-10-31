@@ -19,7 +19,7 @@ public:
     void clear();
     QString get_versao() const;
     void set_versao(const QString &versao);
-    std::shared_ptr<InfEventoRet> infCanc;
+    std::unique_ptr<InfEventoRet> infCanc;
 
 private:
     QString m_versao;
@@ -34,8 +34,8 @@ public:
     void clear();
     QString get_versao() const;
     void set_versao(const QString &versao);
-    std::shared_ptr<TEvento> evento;
-    std::shared_ptr<RetEvento> retEvento;
+    std::unique_ptr<TEvento> evento;
+    std::unique_ptr<RetEvento> retEvento;
 
 private:
     QString m_versao;
@@ -68,9 +68,9 @@ public:
     void salvarXML(const QString &caminho, const QString &nomeArquivo);
 
 
-    std::shared_ptr<ProtNFe> protNFe;
-    std::shared_ptr<RetCancNFe> retCancNFe ;
-    std::shared_ptr<Container<ProcEventoNFe>> procEventoNFe;
+    std::unique_ptr<ProtNFe> protNFe;
+    std::unique_ptr<RetCancNFe> retCancNFe ;
+    std::unique_ptr<Container<ProcEventoNFe>> procEventoNFe;
 
 private:
     QString m_versao;

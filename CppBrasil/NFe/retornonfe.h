@@ -116,7 +116,7 @@ public:
     QString get_xMsg() const;
     void set_xMsg(const QString &xMsg);
 
-    std::shared_ptr<Container<ProtNFe>> protNFe;
+    std::unique_ptr<Container<ProtNFe>> protNFe;
 
 private:
     QString m_versao;

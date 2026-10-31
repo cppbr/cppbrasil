@@ -35,9 +35,9 @@ public:
     CppNFe();
     ~CppNFe();
     void clear();
-    std::shared_ptr<ConfigNFe> configuracoes;
-    std::shared_ptr<NotaFiscal> notafiscal;
-    std::shared_ptr<EventoNotaFiscal> eventos;
+    std::unique_ptr<ConfigNFe> configuracoes;
+    std::unique_ptr<NotaFiscal> notafiscal;
+    std::unique_ptr<EventoNotaFiscal> eventos;
 
 signals:
     void errorOccurred(const QString &error);

@@ -53,9 +53,9 @@ public:
     QString get_XMLAutorizado() const;
     void set_XMLAutorizado(const QString &xmlAutorizado);
 
-    std::shared_ptr<InfNFe> infNFe;
-    std::shared_ptr<ProtNFe> protNFe;
-    std::shared_ptr<InfNFeSupl> infNFeSupl;
+    std::unique_ptr<InfNFe> infNFe;
+    std::unique_ptr<ProtNFe> protNFe;
+    std::unique_ptr<InfNFeSupl> infNFeSupl;
 protected:
     void set_XMLOriginal(const QString &xmlOriginal);
 private:

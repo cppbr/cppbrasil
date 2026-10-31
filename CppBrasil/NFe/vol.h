@@ -46,7 +46,7 @@ public:
     double get_pesoB() const;
     void set_pesoB(const double &pesoB);
 
-    std::shared_ptr<Container<Lacres>> lacres;
+    std::unique_ptr<Container<Lacres>> lacres;
 
 private:
     double m_qVol;

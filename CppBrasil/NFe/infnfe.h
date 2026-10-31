@@ -55,24 +55,24 @@ public:
     QString get_Id() const;
     void set_Id(const QString &id);
 
-    std::shared_ptr<Ide> ide;
-    std::shared_ptr<Emit> emite; //obs. emit é uma palavra reservada QT
-    std::shared_ptr<Avulsa> avulsa;
-    std::shared_ptr<Dest> dest;
-    std::shared_ptr<Retirada> retirada;
-    std::shared_ptr<Entrega> entrega;
-    std::shared_ptr<Container<AutXML>> autXML;
-    std::shared_ptr<Container<Det>> det;
-    std::shared_ptr<Total> total;
-    std::shared_ptr<Transp> transp;
-    std::shared_ptr<Cobr> cobr;
-    std::shared_ptr<Pag> pag;
-    std::shared_ptr<InfIntermed> infIntermed;
-    std::shared_ptr<InfAdic> infAdic;
-    std::shared_ptr<Exporta> exporta;
-    std::shared_ptr<Compra> compra;
-    std::shared_ptr<Cana> cana;
-    std::shared_ptr<InfRespTec> infRespTec;
+    std::unique_ptr<Ide> ide;
+    std::unique_ptr<Emit> emite; //obs. emit é uma palavra reservada QT
+    std::unique_ptr<Avulsa> avulsa;
+    std::unique_ptr<Dest> dest;
+    std::unique_ptr<Retirada> retirada;
+    std::unique_ptr<Entrega> entrega;
+    std::unique_ptr<Container<AutXML>> autXML;
+    std::unique_ptr<Container<Det>> det;
+    std::unique_ptr<Total> total;
+    std::unique_ptr<Transp> transp;
+    std::unique_ptr<Cobr> cobr;
+    std::unique_ptr<Pag> pag;
+    std::unique_ptr<InfIntermed> infIntermed;
+    std::unique_ptr<InfAdic> infAdic;
+    std::unique_ptr<Exporta> exporta;
+    std::unique_ptr<Compra> compra;
+    std::unique_ptr<Cana> cana;
+    std::unique_ptr<InfRespTec> infRespTec;
 
 private:
     QString m_versao;

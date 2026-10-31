@@ -143,9 +143,9 @@ public:
     QDateTime get_dhHashTentativaEntrega() const;
     void set_dhHashTentativaEntrega(const QDateTime &dhHashTentativaEntrega);
 
-    std::shared_ptr<DestEPEC> dest;
-    std::shared_ptr<Container<ItemPedProrrog>> itemPedido;
-    std::shared_ptr<AutXMLAtor> autXML;
+    std::unique_ptr<DestEPEC> dest;
+    std::unique_ptr<Container<ItemPedProrrog>> itemPedido;
+    std::unique_ptr<AutXMLAtor> autXML;
 private:
     QString m_versao;
     QString m_descEvento;
@@ -214,7 +214,7 @@ public:
     QString get_verEvento() const;
     void set_verEvento(const QString &verEvento);
 
-    std::shared_ptr<DetEvento> detEvento;
+    std::unique_ptr<DetEvento> detEvento;
 
 private:
     QString m_Id;
@@ -248,7 +248,7 @@ public:
     void gerarXML();
     QString get_error() const;
 
-    std::shared_ptr<InfEvento> infEvento;
+    std::unique_ptr<InfEvento> infEvento;
 
 private:
     QString m_versao;

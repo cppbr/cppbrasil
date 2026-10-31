@@ -45,11 +45,11 @@ public:
     QString get_balsa() const;
     void set_balsa(const QString &balsa);
 
-    std::shared_ptr<Transporta> transporta;
-    std::shared_ptr<RetTransp> retTransp;
-    std::shared_ptr<VeicTransp> veicTransp;
-    std::shared_ptr<Container<Reboque>> reboque;
-    std::shared_ptr<Container<Vol>> vol;
+    std::unique_ptr<Transporta> transporta;
+    std::unique_ptr<RetTransp> retTransp;
+    std::unique_ptr<VeicTransp> veicTransp;
+    std::unique_ptr<Container<Reboque>> reboque;
+    std::unique_ptr<Container<Vol>> vol;
 
 private:
     ModFrete m_modFrete;

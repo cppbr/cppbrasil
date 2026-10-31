@@ -54,9 +54,9 @@ public:
     QString get_UFCons() const;
     void set_UFCons(const QString &UFCons);
 
-    std::shared_ptr<Cide> CIDE;
-    std::shared_ptr<Encerrante> encerrante;
-    std::shared_ptr<Container<OrigComb>> origComb;
+    std::unique_ptr<Cide> CIDE;
+    std::unique_ptr<Encerrante> encerrante;
+    std::unique_ptr<Container<OrigComb>> origComb;
 private:
     int m_cProdANP;
     QString m_descANP;

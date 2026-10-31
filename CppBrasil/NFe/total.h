@@ -34,9 +34,9 @@ public:
     ~Total();
     void clear();
 
-    std::shared_ptr<IcmsTot> ICMSTot;
-    std::shared_ptr<IssQNtot> ISSQNtot;
-    std::shared_ptr<RetTrib> retTrib;
+    std::unique_ptr<IcmsTot> ICMSTot;
+    std::unique_ptr<IssQNtot> ISSQNtot;
+    std::unique_ptr<RetTrib> retTrib;
 };
 
 #endif // TOTAL_H
