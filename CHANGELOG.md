@@ -114,11 +114,18 @@ e derivados, é preciso liberar a assinatura SHA1 (ver README).
 - Validação por XSD (`parseXML`): os erros da libxml2 eram impressos no stderr da aplicação e a mensagem de erro terminava com
   quebra de linha. Agora os erros são capturados pela lib, e a mensagem informa o **primeiro** erro do XML (antes era o último).
   Diretório de schemas inválido encerra a validação na hora.
+- **Assinatura com DOCTYPE** (`signXML`): um XML com `<!DOCTYPE>` e entidade externa fazia o conteúdo de arquivos locais
+  entrar no XML assinado (XXE), e podia acessar a rede. Agora XML com DOCTYPE é recusado na assinatura (o XML da NF-e
+  não tem DOCTYPE; a assinatura das notas não muda).
 - `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 
 ### Alterado
+- `CppLibXml2`: troca as funções antigas `xmlParseMemory`/`xmlParseFile` (interface SAX1, que pode estar desligada na
+  compilação da libxml2) por `xmlReadMemory`/`xmlReadFile`. A lib compila com libxml2 sem SAX1 e não acessa a rede ao ler XML.
+  Os erros de leitura não vão mais para o stderr, e a mensagem de XML malformado informa o motivo
+  (ex.: `Erro: Falha ao interpretar o XML: 77 - Premature end of data in tag vBC line 1`).
 - Objetos temporários internos (`CppLibXml2`, web services, `XmlRead`, cliente HTTP, ...) passaram a usar
   `std::unique_ptr`, sem vazamento de memória em caso de exceção.
 - `Container::add()` ficou seguro contra exceção.

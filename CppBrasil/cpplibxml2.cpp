@@ -33,6 +33,19 @@ void captureError(void *userData, xmlErrorPtr error)
         *_msg = QString("%1%2%3").arg(QString::number(error->code), " - ",
                                       QString::fromUtf8(error->message).trimmed());
 }
+
+//opções de leitura: sem acesso à rede e sem imprimir erros no stderr (a lib informa o erro pelo get_error)
+const int READ_OPTIONS = XML_PARSE_NONET | XML_PARSE_NOERROR | XML_PARSE_NOWARNING;
+
+//último erro de parse da libxml2 (por thread), no formato "código - mensagem"
+QString lastParseError()
+{
+    QString _msg;
+    const xmlError *_error = xmlGetLastError();
+    if (_error != NULL)
+        captureError(&_msg, const_cast<xmlError*>(_error));
+    return _msg;
+}
 }
 
 CppLibXml2::CppLibXml2(CppCrypto *cppcrypto, const QByteArray &schemapath)
@@ -140,8 +153,12 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     _schemafile.append(_path.toLocal8Bit());
     _schemafile.append(schema_name.data());
 
-    _xml = xmlParseMemory(xml_doc.data(),xml_doc.length());
-    _xsd = xmlParseFile(_schemafile.data());
+    xmlResetLastError();
+    _xml = xmlReadMemory(xml_doc.constData(), xml_doc.size(), NULL, NULL, READ_OPTIONS);
+    QString _parseError = lastParseError();
+    _xsd = xmlReadFile(_schemafile.constData(), NULL, READ_OPTIONS);
+    if (_xsd == NULL)
+        _schemaError = lastParseError();
     _parser_ctxt = xmlSchemaNewDocParserCtxt(_xsd);
     if (_parser_ctxt != NULL)
     {
@@ -156,7 +173,8 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     {
         if ((_xml == NULL) || (xmlDocGetRootElement(_xml) == NULL))
         {
-            set_error(QStringLiteral("Erro: Falha ao interpretar o XML xmlParseDoc"));
+            set_error(QStringLiteral("Erro: Falha ao interpretar o XML") +
+                      (_parseError.isEmpty() ? QString() : QStringLiteral(": ") + _parseError));
             _ret = false;
         }
     }
@@ -217,8 +235,7 @@ bool CppLibXml2::setNode(const QByteArray &xml_doc, const QByteArray &node_name,
     unsigned char *_res = NULL;
 
     //criando o main document de string xml_doc
-    _len = strlen(xml_doc);
-    if ((_xml = xmlParseMemory(xml_doc, _len)) == NULL)
+    if ((_xml = xmlReadMemory(xml_doc.constData(), xml_doc.size(), NULL, NULL, READ_OPTIONS)) == NULL)
       _ret = false;
 
     //insira no _xml_sigin os valores _x509 e _signature
@@ -267,14 +284,18 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
     _ret_xml_sigin = NULL;
     _ret_xml_complete = NULL;
 
-    //opcoes aplicadas so neste parse (antes eram globais da libxml2 e afetavam todos os parses seguintes):
-    //XML_PARSE_DTDLOAD|XML_PARSE_DTDATTR equivalem a XML_DETECT_IDS|XML_COMPLETE_ATTRS e
-    //XML_PARSE_NOENT equivale a xmlSubstituteEntitiesDefault(1).
-    const int _parseOptions = XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR;
+    //sem DTD nem entidades: o XML da NF-e não tem DOCTYPE, e carregar entidades externas permitiria
+    //incluir conteúdo de arquivos locais no XML assinado (XXE). Documentos com DOCTYPE são recusados abaixo.
+    const int _parseOptions = READ_OPTIONS;
 
     _len = xml_doc.length();
     if ((_xml = xmlReadMemory(xml_doc.data(), _len, NULL, NULL, _parseOptions)) == NULL)
       _ret = false;
+    else if ((_xml->intSubset != NULL) || (_xml->extSubset != NULL))
+    {
+        set_error(QStringLiteral("Erro: XML com DOCTYPE não é aceito na assinatura."));
+        _ret = false;
+    }
 
 
     _x509.append(this->cppcrypto->get_certBase64().toLocal8Bit());
@@ -577,14 +598,14 @@ bool CppLibXml2::addChildFromString(const char *xml_doc, const char *xml_child,
 
     //main document de string xml_doc
     _len = strlen(xml_doc);
-    if ((_xml = xmlParseMemory(xml_doc, _len)) == NULL)
+    if ((_xml = xmlReadMemory(xml_doc, _len, NULL, NULL, READ_OPTIONS)) == NULL)
       _ret = false;
 
     //cria xml child de string xml_child
     if (_ret)
     {
         _len = strlen(xml_child);
-        if ((_xml_child = xmlParseMemory(xml_child, _len)) == NULL)
+        if ((_xml_child = xmlReadMemory(xml_child, _len, NULL, NULL, READ_OPTIONS)) == NULL)
           _ret = false;
     }
 
