@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "nfe.h"
+#include <QRegularExpression>
 
 Nfe::Nfe(): infNFe(new InfNFe), protNFe(new ProtNFe), infNFeSupl(new InfNFeSupl)
 {
@@ -250,6 +251,11 @@ void Nfe::gerarChaveAcesso()
     cNF = CppUtility::insZeroLeft(cNF, 8);
     QString chaveNF = QString("%1%2%3%4%5%6%7%8").arg(cUF, dhEmi, cnpj_cpf, mod, serie, nf,
                                                       tpemis, cNF);
+    //a chave sem o DV deve ter 43 digitos numericos, caso contrario a SEFAZ rejeita a nota.
+    static const QRegularExpression _re43(QStringLiteral("^\\d{43}$"));
+    if (!_re43.match(chaveNF).hasMatch())
+        this->m_error = "Chave de acesso invalida (" + chaveNF + "): verifique cUF, dhEmi, CNPJ/CPF do emitente "
+                        "(somente numeros), mod, serie, nNF, tpEmis e cNF.";
     QString cdv = QString::number(CppUtility::dvModulo11(chaveNF)); //Digito Verificador da Chave de Acesso
     //inserindo cDV na chave de acesso
     chaveNF.append(cdv);

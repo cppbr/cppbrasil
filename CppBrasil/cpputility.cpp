@@ -32,16 +32,16 @@ void CppUtility::clearDateTime(QDateTime &datetime)
 
 int CppUtility::dvModulo11(const QString &str)
 {
-    int _peso[] = {4,3,2,9,8,7,6,5,4,3,2,9,8,7,6,5,4,3,2,9,8,
-                  7,6,5,4,3,2,9,8,7,6,5,4,3,2,9,8,7,6,5,4,3,2};
-
+    //pesos de 2 a 9, aplicados da direita para a esquerda sobre o tamanho real da string
+    //(chave de acesso com 43 posicoes, chave de contingencia FS/FS-DA com 35, ...).
+    //caracteres nao numericos valem 0.
     int _soma = 0;
-    int _n_peso = sizeof(_peso) / sizeof(int);
-    for (int i = 0; i < _n_peso; ++i)
+    int _peso = 2;
+    for (int i = str.length() - 1; i >= 0; --i)
     {
-        QString _schave = str.data()[i];
-        int _ichave = _schave.toInt();
-        _soma = _soma + (_ichave * _peso[i]);
+        int _ichave = str.at(i).isDigit() ? str.at(i).digitValue() : 0;
+        _soma = _soma + (_ichave * _peso);
+        _peso = (_peso == 9) ? 2 : _peso + 1;
     }
     int _resto = _soma % 11;
     int _dv = 11 - _resto;
