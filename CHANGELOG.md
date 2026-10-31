@@ -63,6 +63,12 @@ passa a devolver `false` com a mensagem `Chave de acesso invalida (...)`. Antes,
 com uma chave que a SEFAZ rejeitaria. A causa mais comum é o **CNPJ/CPF do emitente com máscara**
 (`12.345.678/0001-90`): informe somente os números.
 
+#### OpenSSL 1.1.1 ou superior e leitura do `openssl.cnf`
+A lib passa a exigir o **OpenSSL 1.1.1 ou superior** (com versões antigas, a compilação para com uma mensagem clara)
+e a **carregar o arquivo de configuração do OpenSSL** (`openssl.cnf` do sistema ou o indicado em `OPENSSL_CONF`).
+Antes, a configuração era ignorada. Com isso, a política de criptografia do sistema passa a valer: no Fedora/RHEL
+e derivados, é preciso liberar a assinatura SHA1 (ver README).
+
 ### Adicionado
 - `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
   que permitem escrever `for (auto *x : *container)`.
@@ -92,6 +98,8 @@ com uma chave que a SEFAZ rejeitaria. A causa mais comum é o **CNPJ/CPF do emit
   era formatado em notação científica (ex.: `1e+06`).
 - A assinatura alterava configurações globais da libxml2, afetando todos os parses seguintes (validação por XSD e
   retornos da SEFAZ). As opções agora valem só para a assinatura. A assinatura gerada não muda.
+- **Assinatura no Fedora/RHEL** (e derivados): falhava sempre com "Erro ao assinar documento", porque a lib ignorava
+  a configuração do OpenSSL e o SHA1 ficava bloqueado sem como liberar. Agora basta liberar o SHA1 (ver README).
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 

@@ -20,6 +20,11 @@ limitations under the License.
 
 #include "cppopenssl.h"
 #include <QTimeZone>
+
+#if OPENSSL_VERSION_NUMBER < 0x10101000L
+#error "CppBrasil requer OpenSSL 1.1.1 ou superior"
+#endif
+
 CppOpenSSL::CppOpenSSL(const QByteArray &p12path, const QByteArray &pass): m_p12path(p12path), m_pass(pass)
 {
 }
@@ -549,12 +554,14 @@ bool CppOpenSSL::certToDER()
 
 bool CppOpenSSL::loadOpenssl()
 {
-    OpenSSL_add_all_algorithms();
-    ERR_load_crypto_strings();
-    OPENSSL_no_config();
+    // Carrega o openssl.cnf do sistema/aplicação (ex.: no Fedora/RHEL, é ele que libera a assinatura SHA1)
+    OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG |
+                        OPENSSL_INIT_ADD_ALL_CIPHERS |
+                        OPENSSL_INIT_ADD_ALL_DIGESTS |
+                        OPENSSL_INIT_LOAD_CRYPTO_STRINGS, NULL);
+
     PKCS12 *_p12 = NULL;
     BIO *_bioP12 = NULL;
-
 
     try {
             if (!unloadOpenssl())//clear all

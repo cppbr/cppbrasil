@@ -24,10 +24,30 @@ Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as
 
 ## Requisitos
 - Qt >= 5.15.2
-- OpenSSL
+- OpenSSL >= 1.1.1 (recomendado 3.x)
 - LibXML2
 - ZLib
 - libIconv(caso opte por compilar a libxml2 com suporte a libIconv. No Linux vem instalado por padrão. Para Windows [link.](https://github.com/pffang/libiconv-for-Windows))
+
+### Fedora/RHEL e derivados: assinatura SHA1
+A NF-e é assinada com **RSA-SHA1**, e o OpenSSL do Fedora/RHEL (e derivados, como CentOS Stream, Rocky, Alma e Nobara)
+bloqueia assinaturas SHA1 por padrão. Sem liberar, `assinar()` falha com "Erro ao assinar documento"
+(`evp_pkey_ctx_set_md: invalid digest`). Libere de uma das formas:
+
+- No sistema todo: `sudo update-crypto-policies --set DEFAULT:SHA1` (para voltar: `--set DEFAULT`).
+- Só na aplicação: aponte a variável `OPENSSL_CONF` para um arquivo como este:
+
+```ini
+openssl_conf = openssl_init
+
+[openssl_init]
+alg_section = evp_properties
+
+[evp_properties]
+rh-allow-sha1-signatures = yes
+```
+
+Windows, Debian e Ubuntu não têm esse bloqueio.
 
 ## Compilação
 ### Linux
