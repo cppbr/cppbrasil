@@ -107,6 +107,7 @@ e derivados, é preciso liberar a assinatura SHA1 (ver README).
   - XML com acentos podia ser corrompido no Windows (conversão para a codificação local) e o `Content-Length` ficava errado;
   - linha do pedido HTTP inválida (espaço antes do fim de linha), SNI não enviado e `SSL_accept` indevido no cliente;
   - socket, `SSL_CTX` e `SSL` vazavam nos retornos de erro.
+- `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 
