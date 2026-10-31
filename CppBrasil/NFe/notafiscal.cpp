@@ -270,14 +270,12 @@ void NotaFiscal::tratarRetorno()
 
 bool NotaFiscal::importXML(const QByteArray &xml)
 {
-    Nfe *_nfe = new Nfe;
-    XmlRead *_xRead = new XmlRead(_nfe, xml);
+    std::unique_ptr<Nfe> _nfe = std::make_unique<Nfe>();
+    XmlRead *_xRead = new XmlRead(_nfe.get(), xml);
     bool _ret = _xRead->import();
 
     if (_ret)
-        NFe->add(_nfe);
-    else
-        delete _nfe; //caso a importação falhe, deve ser excluido o ponteiro _nfe já que não será inserido no container.
+        NFe->add(std::move(_nfe)); //caso a importação falhe, o unique_ptr exclui o _nfe automaticamente.
 
     delete _xRead;
     return _ret;
