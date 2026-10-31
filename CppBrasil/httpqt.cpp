@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "httpqt.h"
+#include <memory>
 
 HttpQt::HttpQt(const CppCrypto* crypto, const QNetworkProxy &proxy,
                const QSsl::SslProtocol &protocol, const int &timeout,
@@ -35,16 +36,16 @@ QByteArray HttpQt::send(const QByteArray &host, const QByteArray &data)
 {
     //default 15 segundos
     int _timeout = (this->m_timeout > 0) ? this->m_timeout : 15000;
-    QNetworkRequest *_request = new QNetworkRequest(QUrl(host));
-    configSSL(_request);
+    std::unique_ptr<QNetworkRequest> _request(new QNetworkRequest(QUrl(host)));
+    configSSL(_request.get());
     _request->setTransferTimeout(_timeout);
     _request->setHeader(QNetworkRequest::ContentTypeHeader, "text/xml;charst=utf-8");
 
-    QNetworkAccessManager *_manager = new QNetworkAccessManager(this);
-    configProxy(_manager);
+    std::unique_ptr<QNetworkAccessManager> _manager(new QNetworkAccessManager(this));
+    configProxy(_manager.get());
     _manager->setTransferTimeout(_timeout);
-    connect(_manager, &QNetworkAccessManager::sslErrors, this, &HttpQt::sslErrors);
-    connect(_manager, &QNetworkAccessManager::finished, this, &HttpQt::finished);
+    connect(_manager.get(), &QNetworkAccessManager::sslErrors, this, &HttpQt::sslErrors);
+    connect(_manager.get(), &QNetworkAccessManager::finished, this, &HttpQt::finished);
 
     QEventLoop _loop;
     QNetworkReply* _reply = _manager->post(*_request,data);
@@ -55,8 +56,6 @@ QByteArray HttpQt::send(const QByteArray &host, const QByteArray &data)
     _manager->clearAccessCache();
     _manager->clearConnectionCache();
 
-    delete _request;
-    delete _manager;
     return this->m_data;
 }
 

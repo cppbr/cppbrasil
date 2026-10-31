@@ -29,20 +29,18 @@ bool ConsSitNFe::consultar(const QString &chNFe, const bool &salvarXMLNota, cons
         if (validarEvento())
         {
             //envia
-            WSConsultaProtocolo* _ws = new WSConsultaProtocolo(this->config,
-                                                               this->config->certificado->get_cryptoLib(),
-                                                               this->retorno.get());
+            std::unique_ptr<WSConsultaProtocolo> _ws(new WSConsultaProtocolo(this->config,
+                                                                             this->config->certificado->get_cryptoLib(),
+                                                                             this->retorno.get()));
 
-            connect(_ws, &WSConsultaProtocolo::wsChange, this, &ConsSitNFe::wsChange);
-            connect(_ws, &WSConsultaProtocolo::errorOccurred, this, &ConsSitNFe::onError);
+            connect(_ws.get(), &WSConsultaProtocolo::wsChange, this, &ConsSitNFe::wsChange);
+            connect(_ws.get(), &WSConsultaProtocolo::errorOccurred, this, &ConsSitNFe::onError);
 
             bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
                                   ConvNF::versaoLayout(WebServicesNF::NFeConsultaProtocolo));
 
             if (_ret)
               tratarRetorno(salvarXMLNota, vincularEvento);
-
-            delete _ws;
         }
         else
         {
@@ -101,7 +99,7 @@ bool ConsSitNFe::validarEvento()
     _schemaName.append("consSitNFe_v");
     _schemaName.append(this->m_versao.toLocal8Bit());
     _schemaName.append(".xsd");
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath));
 
     this->m_error.clear(); //limpando erro
     if (!_libxml->parseXML(this->m_xml.toLocal8Bit(), _schemaName))
@@ -110,7 +108,6 @@ bool ConsSitNFe::validarEvento()
         _ret = false;
     }
 
-    delete _libxml;
     return _ret;
 }
 
@@ -124,7 +121,7 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
 
     //atualiza e salva o xml da nota
     QByteArray _schema = this->config->arquivos->get_caminhoSchema().toLocal8Bit();
-    CppXML * _libxml = new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema));
     QByteArray _nfeProc, _protNFe, _xml;
     int _cStat = this->retorno->get_cStat();
 
@@ -197,5 +194,4 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
             }
         }
     }
-    delete _libxml;
 }

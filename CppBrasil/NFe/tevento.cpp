@@ -707,7 +707,7 @@ void TEvento::assinarXML(const ConfigNFe *config)
     _nodesign.append("SignedInfo");
     _uri.append(infEvento->get_Id().toLocal8Bit());
 
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schema);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schema));
 
     //assina o xml
     if (_libxml->signXML(_xmldoc, _sha1, _nodedoc, _nodesign, _uri,
@@ -720,8 +720,6 @@ void TEvento::assinarXML(const ConfigNFe *config)
     {
         this->m_error.append(_libxml->get_error());
     }
-
-    delete _libxml;
 }
 
 void TEvento::gerarXML()
