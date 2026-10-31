@@ -50,7 +50,11 @@ QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &
     Q_INIT_RESOURCE(resourcenfe);
     QFile _file;
     _file.setFileName(":/resnfe/urlnfe.json");
-    _file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qWarning() << "Erro ao abrir" << _file.fileName() << ":" << _file.errorString();
+        return QString();
+    }
     QString _strJs;
     _strJs = _file.readAll();
     _file.close();
@@ -136,7 +140,11 @@ QString UrlNFe::get_infNFesupl(const TipoInfNFeSupl &tipo, const UF &uf, const T
     Q_INIT_RESOURCE(resourcenfe);
     QFile _file;
     _file.setFileName(":/resnfe/urlnfe.json");
-    _file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qWarning() << "Erro ao abrir" << _file.fileName() << ":" << _file.errorString();
+        return QString();
+    }
     QString _jstr;
     _jstr = _file.readAll();
     _file.close();
