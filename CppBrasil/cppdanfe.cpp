@@ -114,7 +114,7 @@ void CppDanfe::genBarcode()
     _barcode.setHighDPI(true);
     _barcode.setTextVisible(false);
     //barcode chave
-    _barcode.setText(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->get_chNFe());
+    _barcode.setText(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->get_chNFe());
     _barcode.update();
     QPainter painter(&m_imBarcode);
     m_imBarcode.fill( Qt::white );
@@ -123,24 +123,24 @@ void CppDanfe::genBarcode()
     if (this->m_tpEmis == TpEmis::Contingencia_FSIA || this->m_tpEmis == TpEmis::Contingencia_FSDA)
     {
         //cUF, tpEmis, CNPJ
-        QString _barCt = QString::number(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_cUF())
-                      + ConvNF::tpEmisToStr(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_tpEmis())
-                      + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_CNPJ();
+        QString _barCt = QString::number(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_cUF())
+                      + ConvNF::tpEmisToStr(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_tpEmis())
+                      + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_CNPJ();
 
         //vNF
-        QString _vNF = CppUtility::insZeroLeft(QString::number((this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF() * 100)), 14);
+        QString _vNF = CppUtility::insZeroLeft(QString::number((this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF() * 100)), 14);
         _barCt += _vNF;
 
         //ICMSp
-        double _vICMS = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vICMS();
+        double _vICMS = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vICMS();
         _barCt += (_vICMS > 0 ? "1" : "2");
 
         //ICMSs
-        double _vST = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vST();
+        double _vST = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vST();
         _barCt += (_vST > 0 ? "1" : "2");
 
         //DD
-        QString _dd = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd");
+        QString _dd = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd");
         _barCt += _dd;
 
         //DV
@@ -167,7 +167,7 @@ void CppDanfe::genBarcode()
 
 void CppDanfe::genQrCode()
 {
-    QString _http = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFeSupl->get_qrCode();
+    QString _http = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFeSupl->get_qrCode();
     QrCode _qr = QrCode::encodeText(_http.toLocal8Bit(), QrCode::Ecc::HIGH);
     QString _svg = toSvgString(_qr, 2);
     QSvgRenderer _renderer(_svg.toUtf8());
@@ -180,13 +180,13 @@ void CppDanfe::genQrCode()
 
 void CppDanfe::getParam()
 {
-    m_mod = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_mod();
-    m_tpEmis = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_tpEmis();
+    m_mod = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_mod();
+    m_tpEmis = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_tpEmis();
 
     //modelo frete
     if (this->m_mod == ModeloDF::NFe)
     {
-        int _val = ConvNF::modFreteToStr(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->get_modFrete()).toInt();
+        int _val = ConvNF::modFreteToStr(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->get_modFrete()).toInt();
 
         switch (_val)
         {
@@ -208,23 +208,23 @@ void CppDanfe::getParam()
     }
 
     //chave deve ser separada por espaço
-    if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->get_chNFe().isEmpty())
+    if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->get_chNFe().isEmpty())
     {
-        this->m_chave = formatChave(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->get_chNFe());
+        this->m_chave = formatChave(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->get_chNFe());
     }
 
     //protocolo
-    this->m_protocolo = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->protNFe->get_nProt() + " "
-                      + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->protNFe->get_dhRecbto().toString("dd/MM/yyyy hh:mm:ss");
+    this->m_protocolo = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->protNFe->get_nProt() + " "
+                      + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->protNFe->get_dhRecbto().toString("dd/MM/yyyy hh:mm:ss");
 
     //infCpl
-    if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->infAdic->get_infAdFisco().isEmpty())
-        this->m_infCpl = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->infAdic->get_infAdFisco();
-    if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->infAdic->get_infCpl().isEmpty())
+    if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->infAdic->get_infAdFisco().isEmpty())
+        this->m_infCpl = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->infAdic->get_infAdFisco();
+    if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->infAdic->get_infCpl().isEmpty())
     {
         if (!this->m_infCpl.isEmpty())
             this->m_infCpl += QString("\n");
-        this->m_infCpl += this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->infAdic->get_infCpl();
+        this->m_infCpl += this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->infAdic->get_infCpl();
     }
 
     //formato do número da nf
@@ -232,20 +232,20 @@ void CppDanfe::getParam()
     if (this->m_mod == ModeloDF::NFe)
     {
         //999.999.999
-        QString _n = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_nNF()), 9);
+        QString _n = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_nNF()), 9);
         this->m_nNF = _n.mid(0, 3) + QStringLiteral(".") + _n.mid(3, 3) + QStringLiteral(".") + _n.mid(6, 3);
     }
     else //se for NFCe
     {
         //999999
-        this->m_nNF = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_nNF()), 9);
+        this->m_nNF = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_nNF()), 9);
     }
 
     //formato do número da série da nf
-    this->m_serie = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_serie()), 3);
+    this->m_serie = CppUtility::insZeroLeft(QString::number(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_serie()), 3);
 
     //cStat
-    this->m_cStat = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->protNFe->get_cStat();
+    this->m_cStat = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->protNFe->get_cStat();
 
     //gerar codigo de barras
     genBarcode();

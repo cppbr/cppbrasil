@@ -808,10 +808,10 @@ void TEvento::gerarXML()
     if (this->infEvento->get_tpEvento() == TpEvento::CancelPedidoProrrogacao1 ||
         this->infEvento->get_tpEvento() == TpEvento::CancelPedidoProrrogacao2)
     {
-        for (int i = 0; i < this->infEvento->detEvento->itemPedido->items->count(); ++i) {
+        for (int i = 0; i < this->infEvento->detEvento->itemPedido->count(); ++i) {
             _xmlw.writeStartElement("itemPedido"); //abertura do grupo itemPedido - agrupamento dos ítens
-            _xmlw.writeAttribute("numItem", QString::number(this->infEvento->detEvento->itemPedido->items->value(i)->get_numItem()));
-            _xmlw.writeTextElement("qtdeItem", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->itemPedido->items->value(i)->get_qtdeItem(), 4));
+            _xmlw.writeAttribute("numItem", QString::number(this->infEvento->detEvento->itemPedido->value(i)->get_numItem()));
+            _xmlw.writeTextElement("qtdeItem", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->itemPedido->value(i)->get_qtdeItem(), 4));
             _xmlw.writeEndElement(); //fechamento itemPedido - agrupamento dos ítens
         }
     }

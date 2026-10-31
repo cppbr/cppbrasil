@@ -92,48 +92,48 @@ void CppDanfeQtRPT::loadRetEnt()
 {
     RetEntList.clear();
     //se existir local de retirada
-    if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xNome().isEmpty() ||
-        !this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xLgr().isEmpty())
+    if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xNome().isEmpty() ||
+        !this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xLgr().isEmpty())
     {
          RetEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE RETIRADA",
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_CNPJ(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_CPF(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xNome(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xLgr(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_nro(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xCpl(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xBairro(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_cMun(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xMun(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_UF(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_CEP(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_cPais(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_xPais(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_fone(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_email(),
-                                  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->retirada->get_IE()));
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_CNPJ(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_CPF(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xNome(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xLgr(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_nro(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xCpl(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xBairro(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_cMun(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xMun(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_UF(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_CEP(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_cPais(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xPais(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_fone(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_email(),
+                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_IE()));
     }
     //se existir local de entrega
-    if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xNome().isEmpty() ||
-        !this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xLgr().isEmpty())
+    if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xNome().isEmpty() ||
+        !this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xLgr().isEmpty())
     {
         RetEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE ENTREGA",
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_CNPJ(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_CPF(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xNome(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xLgr(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_nro(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xCpl(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xBairro(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_cMun(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xMun(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_UF(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_CEP(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_cPais(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_xPais(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_fone(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_email(),
-                                 this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->entrega->get_IE()));
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_CNPJ(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_CPF(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xNome(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xLgr(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_nro(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xCpl(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xBairro(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_cMun(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xMun(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_UF(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_CEP(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_cPais(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xPais(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_fone(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_email(),
+                                 this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_IE()));
     }
 }
 
@@ -146,8 +146,8 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
     //fatura
     if (dsInfo.dsName == "dsFatura")
     {
-        if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_nFat().isEmpty() ||
-           this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_vLiq() > 0)
+        if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_nFat().isEmpty() ||
+           this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_vLiq() > 0)
         {
            dsInfo.recordCount = 1;
 
@@ -159,11 +159,11 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
     //duplicata
     if (dsInfo.dsName == "dsDup")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->count() > 0)
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->count() > 0)
         {
             //obs: como não existe horizontalBand nesse relatório, deve ser feito um cálculo colocando 5 registros por linha.
             int _count, _tReg;
-            _count = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->count();
+            _count = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->count();
 
             if (_count <= 5)
             {
@@ -187,14 +187,14 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
     if (dsInfo.dsName == "dsVolume")
     {
         //deve ter no mínimo 1
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-           dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+           dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count();
         else
            dsInfo.recordCount = 1;
     }
     //produto
     if (dsInfo.dsName == "dsProd")
-       dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->count();
+       dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->count();
 
     //rodapé da nfce
     if (dsInfo.dsName == "dsFooterNFCe")
@@ -202,7 +202,7 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
 
     //pagamento
     if (dsInfo.dsName == "dsPagamento")
-       dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->pag->detPag->items->count();
+       dsInfo.recordCount = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->pag->detPag->count();
 
 }
 
@@ -213,7 +213,7 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
 
     //----------canhoto
     if (paramName == "canhoto.vNF")
-       paramValue =  CppUtility::formatMoney(this->m_cppnfe->notafiscal->NFe->items->
+       paramValue =  CppUtility::formatMoney(this->m_cppnfe->notafiscal->NFe->
                                              value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF(), 2);
 
     //----------info geral
@@ -235,7 +235,7 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
                 }
         } else
         {   //nfce pega somente o endereço para consulta por chave
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFeSupl->get_urlChave();
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFeSupl->get_urlChave();
         }
     }
 
@@ -243,7 +243,7 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
     {
         QString _msg;
         //homologação
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_tpAmb() == TpAmb::Homologacao)
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_tpAmb() == TpAmb::Homologacao)
         {
             _msg = QStringLiteral("SEM VALOR FISCAL") + QString("\n") + QStringLiteral("HOMOLOGAÇÃO");
         }
@@ -259,7 +259,7 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
            paramValue = _msg;
     }
     if (paramName == "tpnf")
-       paramValue =  ConvNF::tpNFToStr(this->m_cppnfe->notafiscal->NFe->items->
+       paramValue =  ConvNF::tpNFToStr(this->m_cppnfe->notafiscal->NFe->
                                        value(this->m_recNo)->infNFe->ide->get_tpNF());
     if (paramName == "nNF")
        paramValue = this->m_nNF;
@@ -307,64 +307,64 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
     }
 
     if (paramName == "natOp")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_natOp();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_natOp();
     if (paramName == "natOp")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_natOp();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_natOp();
 
     //----------emit
     if (paramName == "emit.xNome")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_xNome();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_xNome();
     if (paramName == "emit.ender")
     {
-        paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->enderEmit->get_xLgr() + ", "
-                    + QString::number(this->m_cppnfe->notafiscal->NFe->items->
+        paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->enderEmit->get_xLgr() + ", "
+                    + QString::number(this->m_cppnfe->notafiscal->NFe->
                                       value(this->m_recNo)->infNFe->emite->enderEmit->get_nro())
-                    + " - " + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->enderEmit->get_xBairro()
-                    + " - " + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->enderEmit->get_xMun()
-                    + " - " + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->enderEmit->get_UF()
-                    + " - CEP: " + QString::number(this->m_cppnfe->notafiscal->NFe->items->
+                    + " - " + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->enderEmit->get_xBairro()
+                    + " - " + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->enderEmit->get_xMun()
+                    + " - " + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->enderEmit->get_UF()
+                    + " - CEP: " + QString::number(this->m_cppnfe->notafiscal->NFe->
                                                    value(this->m_recNo)->infNFe->emite->enderEmit->get_CEP());
     }
     if (paramName == "emit.fone")
-       paramValue = "fone: " + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->enderEmit->get_fone();
+       paramValue = "fone: " + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->enderEmit->get_fone();
     if (paramName == "emit.ie")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_IE();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_IE();
     if (paramName == "emit.iest")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_IEST();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_IEST();
     if (paramName == "emit.cnpj")
     {
-        if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_CNPJ().isEmpty())
+        if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_CNPJ().isEmpty())
         {
-            paramValue = CppUtility::formatCNPJ(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_CNPJ());
+            paramValue = CppUtility::formatCNPJ(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_CNPJ());
         }
         else
         {
-            paramValue = CppUtility::formatCPF(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->emite->get_CPF());
+            paramValue = CppUtility::formatCPF(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->emite->get_CPF());
         }
     }
 
     //----------dest
     if (paramName == "dest.xNome")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_xNome();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_xNome();
     if (paramName == "dest.cnpj")
     {
         QString _cpfCnpj;
         //se vazio
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CNPJ().isEmpty() &&
-            this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CPF().isEmpty())
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_CNPJ().isEmpty() &&
+            this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_CPF().isEmpty())
         {
             _cpfCnpj = "CONSUMIDOR NAO IDENTIFICADO";
         } else
         {
             QString _numDoc, _nomeDoc;
-            if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CNPJ().isEmpty())
+            if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_CNPJ().isEmpty())
             {
-                _numDoc = CppUtility::formatCNPJ(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CNPJ());
+                _numDoc = CppUtility::formatCNPJ(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_CNPJ());
                 _nomeDoc = "CNPJ do Consumidor: ";
             }
             else
             {
-                _numDoc = CppUtility::formatCPF(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_CPF());
+                _numDoc = CppUtility::formatCPF(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_CPF());
                 _nomeDoc = "CPF do Consumidor: ";
             }
             //se NFCe, já deve ir formatado com o nome do documento. NFe somente número.
@@ -377,30 +377,30 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
         paramValue = _cpfCnpj;
     }
     if (paramName == "dest.ender")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_xLgr();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_xLgr();
     if (paramName == "dest.xBairro")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_xBairro();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_xBairro();
     if (paramName == "dest.cep")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_CEP();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_CEP();
     if (paramName == "dest.xMun")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_xMun();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_xMun();
     if (paramName == "dest.uf")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_UF();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_UF();
     if (paramName == "dest.telefone")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->enderDest->get_fone();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->enderDest->get_fone();
     if (paramName == "dest.ie")
-       paramValue =  this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->dest->get_IE();
+       paramValue =  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->dest->get_IE();
     if (paramName == "dhEmi")
     {
         if (this->m_mod == ModeloDF::NFe)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd/MM/yyyy");
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd/MM/yyyy");
         else //nfce
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd/MM/yyyy hh:mm:ss");
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_dhEmi().toString("dd/MM/yyyy hh:mm:ss");
     }
     if (paramName == "dhSaiEnt")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_dhSaiEnt().toString("dd/MM/yyyy");
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_dhSaiEnt().toString("dd/MM/yyyy");
     if (paramName == "hSaiEnt")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_dhSaiEnt().toString("hh:mm:ss");
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_dhSaiEnt().toString("hh:mm:ss");
 
     //retirada/entrega
     if ((paramName == "retent.descricao"))
@@ -435,16 +435,16 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
 
     //fatura
     if (paramName == "fatura.nFat")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_nFat();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_nFat();
     if (paramName == "fatura.vOrig")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_vOrig();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_vOrig();
     if (paramName == "fatura.vDesc")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_vDesc();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_vDesc();
     if (paramName == "fatura.vLiq")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->fat->get_vLiq();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->fat->get_vLiq();
 
     //duplicata
-    if ((paramName == "dup.descricao") && (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->count() > 0))
+    if ((paramName == "dup.descricao") && (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->count() > 0))
     {
         //só aparece a descrição no primeiro registro
         if (recNo == 0)
@@ -470,17 +470,17 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
         //obs: como são 5 registro por linha, o cálculo será: (registro atual * (total de colunas que é 5)) + numero da coluna.
         int _rec = (recNo * 5) + _iColumn;
         //verifica se há registros. Obs: Deve sempre ser maior, já que o recNo começa do zero.
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->count() > _rec)
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->count() > _rec)
         {
             QString _v =
               QStringLiteral("Parcela:           ")
-            + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->value(_rec)->get_nDup()
+            + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->value(_rec)->get_nDup()
             + QString("\n")
             + QStringLiteral("Vencimento:    ")
-            + this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->value(_rec)->get_dVenc().toString("dd/MM/yyyy")
+            + this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->value(_rec)->get_dVenc().toString("dd/MM/yyyy")
             + QString("\n")
             + QStringLiteral("Valor:             ")
-            + CppUtility::formatMoney(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->cobr->dup->items->value(_rec)->get_vDup(), 2);
+            + CppUtility::formatMoney(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->cobr->dup->value(_rec)->get_vDup(), 2);
 
             paramValue = _v;
         }
@@ -489,114 +489,114 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
 
     //----------total
     if (paramName == "imposto.vBC")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vBC();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vBC();
     if (paramName == "imposto.vICMS")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vICMS();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vICMS();
     if (paramName == "imposto.vBCST")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vBCST();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vBCST();
     if (paramName == "imposto.vST")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vST();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vST();
     if (paramName == "imposto.vTotTrib")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vTotTrib();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vTotTrib();
     if (paramName == "imposto.vProd")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vProd();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vProd();
     if (paramName == "imposto.vFrete")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vFrete();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vFrete();
     if (paramName == "imposto.vSeg")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vSeg();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vSeg();
     if (paramName == "imposto.vDesc")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vDesc();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vDesc();
     if (paramName == "imposto.vOutro")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vOutro();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vOutro();
     if (paramName == "imposto.vIPI")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vIPI();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vIPI();
     if (paramName == "imposto.vNF")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->total->ICMSTot->get_vNF();
     if (paramName == "imposto.qtdItens") //somente NFCe
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->count();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->count();
 
     //----------pagamentos - somente NFCe
     if (paramName == "pagamento.vTroco")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->pag->get_vTroco();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->pag->get_vTroco();
     if (paramName == "pagamento.tPag")
-       paramValue = tPagToNome(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->pag->detPag->items->value(recNo)->get_tPag());
+       paramValue = tPagToNome(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->pag->detPag->value(recNo)->get_tPag());
     if (paramName == "pagamento.vPag")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->pag->detPag->items->value(recNo)->get_vPag();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->pag->detPag->value(recNo)->get_vPag();
 
     //----------transportador
     if (paramName == "transporte.xNome")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_xNome();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_xNome();
     if (paramName == "transporte.modFrete")
        paramValue = this->m_modFrete;
     if (paramName == "transporte.RNTC")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->veicTransp->get_RNTC();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->veicTransp->get_RNTC();
     if (paramName == "transporte.placa")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->veicTransp->get_placa();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->veicTransp->get_placa();
     if (paramName == "transporte.veicTranspUF")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->veicTransp->get_UF();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->veicTransp->get_UF();
     if (paramName == "transporte.cnpj")
     {
-        if (!this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_CNPJ().isEmpty())
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_CNPJ();
+        if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_CNPJ().isEmpty())
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_CNPJ();
         else
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_CPF();
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_CPF();
     }
     if (paramName == "transporte.xEnder")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_xEnder();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_xEnder();
     if (paramName == "transporte.xEnder")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_xEnder();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_xEnder();
     if (paramName == "transporte.xMun")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_xMun();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_xMun();
     if (paramName == "transporte.UF")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_UF();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_UF();
     if (paramName == "transporte.IE")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->transporta->get_IE();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->transporta->get_IE();
 
     //----------transportador/volume
     if (paramName == "volume.qVol")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_qVol();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_qVol();
         else//se for nota de saída, deve haver ao menos 1 volume
-            if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->ide->get_tpNF() == TpNF::Saida)
+            if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->ide->get_tpNF() == TpNF::Saida)
                 paramValue = 1;
     }
     if (paramName == "volume.esp")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_esp();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_esp();
     }
     if (paramName == "volume.marca")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_marca();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_marca();
     }
     if (paramName == "volume.nVol")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-           paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_nVol();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+           paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_nVol();
     }
     if (paramName == "volume.pesoB")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_pesoB();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_pesoB();
     }
 
     if (paramName == "volume.pesoL")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->count() > 0)
-            paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->transp->vol->items->value(recNo)->get_pesoL();
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->count() > 0)
+            paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->transp->vol->value(recNo)->get_pesoL();
     }
     //----------prod
     if (paramName == "prod.nItem")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_nItem();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_nItem();
     if (paramName == "prod.cProd")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_cProd();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_cProd();
     if (paramName == "prod.xProd")
     {
-        QString _descOrig = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_xProd();
+        QString _descOrig = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_xProd();
         //caso o seja maior que 35 caracters, desce uma linha para NFe e Truncar para NFCe, já que o field do relatório não faz isso.
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_xProd().length() > 35)
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_xProd().length() > 35)
         {
             QString _descModif;
             _descModif = _descOrig.mid(0, 35);
@@ -619,41 +619,41 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
 
     }
     if (paramName == "prod.NCM")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_NCM();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_NCM();
     if (paramName == "prod.CST")
     {
-        if (this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_CST() !=
+        if (this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_CST() !=
             CstICMS::None)
         {
-            paramValue = ConvNF::cstICMSToStr(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_CST());
+            paramValue = ConvNF::cstICMSToStr(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_CST());
         }
         else
         {
-            paramValue = ConvNF::csosnICMSToStr(this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_CSOSN());
+            paramValue = ConvNF::csosnICMSToStr(this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_CSOSN());
         }
     }
     if (paramName == "prod.CFOP")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_CFOP();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_CFOP();
     if (paramName == "prod.uCom")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_uCom();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_uCom();
     if (paramName == "prod.qCom")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_qCom();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_qCom();
     if (paramName == "prod.vUnCom")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_vUnCom();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_vUnCom();
     if (paramName == "prod.vDesc")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_vDesc();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_vDesc();
     if (paramName == "prod.vProd")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->prod->get_vProd();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->prod->get_vProd();
     if (paramName == "prod.vBC")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_vBC();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_vBC();
     if (paramName == "prod.vICMS")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_vICMS();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_vICMS();
     if (paramName == "prod.vIPI")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->IPI->get_vIPI();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->IPI->get_vIPI();
     if (paramName == "prod.pICMS")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->ICMS->get_pICMS();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->ICMS->get_pICMS();
     if (paramName == "prod.pIPI")
-       paramValue = this->m_cppnfe->notafiscal->NFe->items->value(this->m_recNo)->infNFe->det->items->value(recNo)->imposto->IPI->get_pIPI();
+       paramValue = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->det->value(recNo)->imposto->IPI->get_pIPI();
 
     //informações complementares
     if (paramName == "infCpl")
