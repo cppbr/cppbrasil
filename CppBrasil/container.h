@@ -26,31 +26,56 @@ limitations under the License.
 template <class T>
 class Container
 {
+private:
+    QList<T *> m_items; //itens confirmados, o container e o dono.
 public:
-    QList<T *> *items;
-    T *obj;
+    T *obj; //rascunho: preencher e chamar add() para confirmar.
+
+    //obsoleto: acesso direto a lista. Use count(), value(i) ou for (auto *x : *container).
+    [[deprecated("use count(), value(i) ou for (auto *x : *container)")]]
+    QList<T *> *const items;
 public:
+    typedef typename QList<T *>::const_iterator const_iterator;
+
     Container();
     ~Container();
-    //proibe a copia: items e obj sao ponteiros donos, a copia causaria double delete.
+    //proibe a copia: o container e dono dos itens e do obj, a copia causaria double delete.
     Container(const Container&) = delete;
     Container& operator=(const Container&) = delete;
     void add();
     void add(std::unique_ptr<T> object); //o container assume a propriedade do objeto.
     void clear();
+
+    int count() const;
+    bool isEmpty() const;
+    T *value(const int &i) const; //retorna nullptr se o indice for invalido.
+    const_iterator begin() const;
+    const_iterator end() const;
 };
 
+//inicializar o items (obsoleto) nao deve gerar aviso de deprecated, apenas o uso dele.
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 template<class T>
-Container<T>::Container(): items(new QList<T *>), obj(new T)
+Container<T>::Container(): obj(new T), items(&m_items)
 {
 }
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 template<class T>
 Container<T>::~Container()
 {
-    qDeleteAll(*items);
-    items->clear();
-    delete items;
+    qDeleteAll(m_items);
+    m_items.clear();
     delete obj;
 }
 
@@ -59,14 +84,14 @@ void Container<T>::add()
 {
     //cria o novo obj antes do append, se o new lancar excecao o container continua consistente.
     std::unique_ptr<T> ptr = std::make_unique<T>();
-    items->append(obj);
+    m_items.append(obj);
     obj = ptr.release();
 }
 
 template<class T>
 void Container<T>::add(std::unique_ptr<T> object)
 {
-    items->append(object.get());
+    m_items.append(object.get());
     object.release();
 }
 
@@ -74,8 +99,38 @@ template<class T>
 void Container<T>::clear()
 {
     obj->clear();
-    qDeleteAll(*items);
-    items->clear();
+    qDeleteAll(m_items);
+    m_items.clear();
+}
+
+template<class T>
+int Container<T>::count() const
+{
+    return m_items.count();
+}
+
+template<class T>
+bool Container<T>::isEmpty() const
+{
+    return m_items.isEmpty();
+}
+
+template<class T>
+T *Container<T>::value(const int &i) const
+{
+    return m_items.value(i, nullptr);
+}
+
+template<class T>
+typename Container<T>::const_iterator Container<T>::begin() const
+{
+    return m_items.cbegin();
+}
+
+template<class T>
+typename Container<T>::const_iterator Container<T>::end() const
+{
+    return m_items.cend();
 }
 
 #endif // CONTAINER_H

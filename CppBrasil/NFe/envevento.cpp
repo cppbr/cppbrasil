@@ -148,23 +148,23 @@ bool EnvEvento::gerarXML(const int &idLote)
     if (this->m_versao.isEmpty())
       this->m_versao = "1.00";
 
-    for (int i = 0; i < evento->items->count(); ++i)
+    for (int i = 0; i < evento->count(); ++i)
     {
         //Só pode gerar o xml depois de fazer a atualização dos eventos, devido a alguns
         //campos que necessitam de ajustes.
         updateEvento(i);
-        evento->items->value(i)->gerarXML();
-        evento->items->value(i)->assinarXML(this->config);
+        evento->value(i)->gerarXML();
+        evento->value(i)->assinarXML(this->config);
         //assina xml
-        if (evento->items->value(i)->get_error().isEmpty())
+        if (evento->value(i)->get_error().isEmpty())
         {
-            _evento.append(CppUtility::extractStr(evento->items->value(i)->get_XMLAssinado(), "<evento", "/evento>"));
+            _evento.append(CppUtility::extractStr(evento->value(i)->get_XMLAssinado(), "<evento", "/evento>"));
         }
         else
         {
             //o erro será retornado em output
             this->m_error += "Evento: " + QString::number(i) + " - " +
-                             evento->items->value(i)->get_error();
+                             evento->value(i)->get_error();
             _ret = false;
         }
     }
@@ -184,30 +184,30 @@ bool EnvEvento::gerarXML(const int &idLote)
 void EnvEvento::updateEvento(int &index)
 {
     //versão
-    evento->items->value(index)->set_versao(this->m_versao);
+    evento->value(index)->set_versao(this->m_versao);
     //nSeqEvento deve ser tratado pelo software do usuário e não pela lib, portanto,
     //se não for informado ocorrerá erro na valização.
     //caso seja maior que 0 e menor que 10, será acrescido zero a esquerda.
     //nSeqEvento deve ter dois algarismos, para não ocorrer erro no ID.
     QString _strSeq;
-    if ((evento->items->value(index)->infEvento->get_nSeqEvento() > 0) &&
-        (evento->items->value(index)->infEvento->get_nSeqEvento() < 10))
+    if ((evento->value(index)->infEvento->get_nSeqEvento() > 0) &&
+        (evento->value(index)->infEvento->get_nSeqEvento() < 10))
     {
-        _strSeq = CppUtil::insZeroLeft(QString::number(evento->items->value(index)->infEvento->get_nSeqEvento()), 2);
+        _strSeq = CppUtil::insZeroLeft(QString::number(evento->value(index)->infEvento->get_nSeqEvento()), 2);
     }
     else
     {
-        _strSeq = QString::number(evento->items->value(index)->infEvento->get_nSeqEvento());
+        _strSeq = QString::number(evento->value(index)->infEvento->get_nSeqEvento());
     }
-    QString _id = "ID" + ConvNF::tpEventoToStr(evento->items->value(index)->infEvento->get_tpEvento())
-                 + evento->items->value(index)->infEvento->get_chNFe()
+    QString _id = "ID" + ConvNF::tpEventoToStr(evento->value(index)->infEvento->get_tpEvento())
+                 + evento->value(index)->infEvento->get_chNFe()
                  + _strSeq;
 
-    evento->items->value(index)->infEvento->set_Id(_id);
+    evento->value(index)->infEvento->set_Id(_id);
 
     //se não informou o ambiente, será o padrão de configurações
-    if (evento->items->value(index)->infEvento->get_tpAmb() == TpAmb::None)
-        evento->items->value(index)->infEvento->set_tpAmb(config->webservices->get_tpAmb());
+    if (evento->value(index)->infEvento->get_tpAmb() == TpAmb::None)
+        evento->value(index)->infEvento->set_tpAmb(config->webservices->get_tpAmb());
 }
 
 
@@ -216,9 +216,9 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     //Insucesso na Entrega da NF-e (NT 2023.005) é autorizado somente pela SVRS, independente
     //da UF do emitente. Por isso, não pode ser enviado no mesmo lote com outros tipos de evento.
     int _qtdInsucesso = 0;
-    for (int i = 0; i < evento->items->count(); ++i)
+    for (int i = 0; i < evento->count(); ++i)
     {
-        TpEvento _tpEvento = evento->items->value(i)->infEvento->get_tpEvento();
+        TpEvento _tpEvento = evento->value(i)->infEvento->get_tpEvento();
         if (_tpEvento == TpEvento::InsucessoEntregaNFe ||
             _tpEvento == TpEvento::CancelInsucessoEntregaNFe)
             ++_qtdInsucesso;
@@ -228,7 +228,7 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     if (_qtdInsucesso == 0)
         return true;
 
-    if (_qtdInsucesso != evento->items->count())
+    if (_qtdInsucesso != evento->count())
     {
         this->m_error = "Eventos de Insucesso na Entrega da NF-e devem ser enviados em lote "
                         "separado, pois são autorizados somente pela SVRS.";
@@ -266,19 +266,19 @@ void EnvEvento::tratarRetorno()
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema));
 
     //unindo xml assinado com o retorno do web services
-    if (this->retorno->retEvento->items->count() > 0)
+    if (this->retorno->retEvento->count() > 0)
     {
-        for (int i = 0; i < this->retorno->retEvento->items->count(); ++i)
+        for (int i = 0; i < this->retorno->retEvento->count(); ++i)
         {
-            int _cStat = this->retorno->retEvento->items->value(i)->infEvento->get_cStat();
+            int _cStat = this->retorno->retEvento->value(i)->infEvento->get_cStat();
 
-            for (int j = 0; j < evento->items->count(); ++j)
+            for (int j = 0; j < evento->count(); ++j)
             {
                 //verifica se é o mesmo evento
-                if ((this->retorno->retEvento->items->value(i)->infEvento->get_chNFe() ==
-                     this->evento->items->value(j)->infEvento->get_chNFe()) &&
-                    (this->retorno->retEvento->items->value(i)->infEvento->get_nSeqEvento() ==
-                     this->evento->items->value(j)->infEvento->get_nSeqEvento()))
+                if ((this->retorno->retEvento->value(i)->infEvento->get_chNFe() ==
+                     this->evento->value(j)->infEvento->get_chNFe()) &&
+                    (this->retorno->retEvento->value(i)->infEvento->get_nSeqEvento() ==
+                     this->evento->value(j)->infEvento->get_nSeqEvento()))
                 {
                     if (_cStat == 135)
                     {
@@ -287,12 +287,12 @@ void EnvEvento::tratarRetorno()
                         _procEventoNFe.append("</procEventoNFe>");
 
                         _xmlOriginal.append("<a>");
-                        _xmlOriginal.append(CppUtility::extractStr(this->evento->items->value(j)->get_XMLAssinado().toLocal8Bit(), "<evento", "/evento>"));
+                        _xmlOriginal.append(CppUtility::extractStr(this->evento->value(j)->get_XMLAssinado().toLocal8Bit(), "<evento", "/evento>"));
                         _xmlOriginal.append("</a>");
 
                         //xml do evento é inserido ao retornar do webservices.
                         _retEvento.append("<a>");
-                        _retEvento.append(CppUtility::extractStr(this->retorno->retEvento->items->value(i)->get_XML().toLocal8Bit(), "<retEvento", "/retEvento>"));
+                        _retEvento.append(CppUtility::extractStr(this->retorno->retEvento->value(i)->get_XML().toLocal8Bit(), "<retEvento", "/retEvento>"));
                         _retEvento.append("</a>");
 
                         //primeiro o xml original dentro de procEventoNFe
@@ -302,14 +302,14 @@ void EnvEvento::tratarRetorno()
                             if (_libxml->addChildXML(_procEventoNFe, _retEvento, QByteArray("procEventoNFe")))
                             {
                                 //atualiza o xml de retEvento da classe RetEnvEvento com o xml completo
-                                this->retorno->retEvento->items->value(i)->set_XML(_procEventoNFe);
+                                this->retorno->retEvento->value(i)->set_XML(_procEventoNFe);
                                 //caso esteja configurado para salvar
                                 if (this->config->arquivos->get_salvar())
                                 {
                                     //O nome do arquivo deve ser o Id enviado, já que o Id retornado é o mesmo protocolo.
-                                    QString _nomeArqEvento =  evento->items->value(j)->infEvento->get_Id().mid(3, evento->items->value(j)->infEvento->get_Id().length() - 3) +
+                                    QString _nomeArqEvento =  evento->value(j)->infEvento->get_Id().mid(3, evento->value(j)->infEvento->get_Id().length() - 3) +
                                                              "-procEventoNFe";
-                                    this->retorno->retEvento->items->value(i)->salvarXML(this->config->arquivos->get_caminhoEvento(), _nomeArqEvento);
+                                    this->retorno->retEvento->value(i)->salvarXML(this->config->arquivos->get_caminhoEvento(), _nomeArqEvento);
                                 }
                             }
                         }

@@ -928,26 +928,26 @@ void Nota::onReqGerarEnviar()
         _retLote += "cMsg: " + QString::number(m_nfe->notafiscal->retorno->get_cMsg()) +"\n";
         _retLote += "xMsg: " + m_nfe->notafiscal->retorno->get_xMsg() + "\n\n";
 
-        if(m_nfe->notafiscal->retorno->protNFe->items->count() > 0)
+        if(m_nfe->notafiscal->retorno->protNFe->count() > 0)
         {
              _retLote += "Informacoes das Notas \n\n";
 
-             for (int i = 0; i < m_nfe->notafiscal->retorno->protNFe->items->count(); ++i) {
-                 _retLote += "Versao: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_versao() +"\n";
-                 _retLote += "ID: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_Id() +"\n";
-                 _retLote += "tpAmb: " + ConvNF::tpAmbToStr(m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_tpAmb()) +"\n";
-                 _retLote += "verAplic: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_verAplic() +"\n";
-                 _retLote += "chNFe: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_chNFe() +"\n";
-                 _retLote += "dhRecbto: " +  m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_dhRecbto().toString("dd/MM/yyyy hh:mm:ss") +"\n";
-                 _retLote += "nProt: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_nProt() +"\n";
-                 _retLote += "digVal: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_digVal() +"\n";
-                 _retLote += "cStat: " + QString::number(m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_cStat()) +"\n";
-                 _retLote += "xMotivo: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_xMotivo() +"\n";
-                 _retLote += "cMsg: " + QString::number(m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_cMsg()) +"\n";
-                 _retLote += "xMsg: " + m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_xMsg() +"\n";
+             for (int i = 0; i < m_nfe->notafiscal->retorno->protNFe->count(); ++i) {
+                 _retLote += "Versao: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_versao() +"\n";
+                 _retLote += "ID: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_Id() +"\n";
+                 _retLote += "tpAmb: " + ConvNF::tpAmbToStr(m_nfe->notafiscal->retorno->protNFe->value(i)->get_tpAmb()) +"\n";
+                 _retLote += "verAplic: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_verAplic() +"\n";
+                 _retLote += "chNFe: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_chNFe() +"\n";
+                 _retLote += "dhRecbto: " +  m_nfe->notafiscal->retorno->protNFe->value(i)->get_dhRecbto().toString("dd/MM/yyyy hh:mm:ss") +"\n";
+                 _retLote += "nProt: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_nProt() +"\n";
+                 _retLote += "digVal: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_digVal() +"\n";
+                 _retLote += "cStat: " + QString::number(m_nfe->notafiscal->retorno->protNFe->value(i)->get_cStat()) +"\n";
+                 _retLote += "xMotivo: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_xMotivo() +"\n";
+                 _retLote += "cMsg: " + QString::number(m_nfe->notafiscal->retorno->protNFe->value(i)->get_cMsg()) +"\n";
+                 _retLote += "xMsg: " + m_nfe->notafiscal->retorno->protNFe->value(i)->get_xMsg() +"\n";
                  _retLote += QStringLiteral("-------------------------------") + "\n\n";
 
-                 _xml +=  m_nfe->notafiscal->retorno->protNFe->items->value(i)->get_xml();
+                 _xml +=  m_nfe->notafiscal->retorno->protNFe->value(i)->get_xml();
 
              }
 

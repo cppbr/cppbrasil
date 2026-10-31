@@ -129,13 +129,13 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
     // 100 ou 150-Autorizado o Uso, 101-Cancelamento de NF-e Homologado, 110-Uso Denegado
     if (_cStat == 100 || _cStat == 101 || _cStat == 110 || _cStat == 150)
     {
-        for (int i = 0; i < this->notafiscal->NFe->items->count(); ++i)
+        for (int i = 0; i < this->notafiscal->NFe->count(); ++i)
         {
-            if (this->notafiscal->NFe->items->value(i)->get_chNFe() == retorno->get_chNFe())
+            if (this->notafiscal->NFe->value(i)->get_chNFe() == retorno->get_chNFe())
             {
                 _xml.clear();
                 _xml.append("<a>");
-                _xml.append(CppUtility::extractStr(this->notafiscal->NFe->items->value(i)->get_XMLOriginal(),
+                _xml.append(CppUtility::extractStr(this->notafiscal->NFe->value(i)->get_XMLOriginal(),
                                                    "<NFe xmlns", "</NFe>").toLocal8Bit());
                 _xml.append("</a>");
                 //montando xml
@@ -163,7 +163,7 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
                         //atualiza o xml de protNFe da classe Retorno
                         this->retorno->protNFe->set_xml(_nfeProc);
                         //atualiza xml de NFe
-                        this->notafiscal->NFe->items->value(i)->set_XMLAutorizado(_nfeProc);
+                        this->notafiscal->NFe->value(i)->set_XMLAutorizado(_nfeProc);
                     }
                 }
 
@@ -184,7 +184,7 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
                             //atualiza o xml de protNFe da classe Retorno
                             this->retorno->protNFe->set_xml(_xmlDFe);
                             //atualiza xml de NFe
-                            this->notafiscal->NFe->items->value(i)->set_XMLAutorizado(_xmlDFe);
+                            this->notafiscal->NFe->value(i)->set_XMLAutorizado(_xmlDFe);
                         }
                     }
                 }
