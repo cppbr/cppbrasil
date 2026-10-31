@@ -57,6 +57,12 @@ container->add(std::make_unique<Nfe>());
 #### `Container` não pode mais ser copiado
 A cópia causava double delete (crash). Agora gera erro de compilação.
 
+#### `gerar()` valida a chave de acesso
+Se a chave de acesso montada (sem o dígito verificador) não tiver exatamente 43 dígitos numéricos, `gerar()`
+passa a devolver `false` com a mensagem `Chave de acesso invalida (...)`. Antes, a nota era gerada em silêncio
+com uma chave que a SEFAZ rejeitaria. A causa mais comum é o **CNPJ/CPF do emitente com máscara**
+(`12.345.678/0001-90`): informe somente os números.
+
 ### Adicionado
 - `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
   que permitem escrever `for (auto *x : *container)`.
@@ -79,6 +85,14 @@ A cópia causava double delete (crash). Agora gera erro de compilação.
 - DANFE: a lista de locais de retirada e entrega era global e compartilhada entre todas as instâncias. Duas impressões
   ao mesmo tempo podiam misturar os dados. Agora cada DANFE tem a sua lista, e campos numéricos sem valor saem zerados
   em vez de lixo de memória.
+- **Dígito verificador** (`CppUtility::dvModulo11`): sempre lia 43 posições, sem considerar o tamanho da string.
+  Na chave de contingência FS/FS-DA do DANFE (35 posições), lia além do fim da string, e o DV podia sair errado.
+  Agora o cálculo usa o tamanho real. Para chaves de 43 dígitos, o resultado não muda.
+- DANFE: a chave de contingência FS/FS-DA saía inválida para notas a partir de R$ 10.000,00, porque o valor
+  era formatado em notação científica (ex.: `1e+06`).
+- A assinatura alterava configurações globais da libxml2, afetando todos os parses seguintes (validação por XSD e
+  retornos da SEFAZ). As opções agora valem só para a assinatura. A assinatura gerada não muda.
+- Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 
 ### Alterado
