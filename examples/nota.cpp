@@ -885,7 +885,7 @@ void Nota::onReqStatusServico()
 
     m_nfe->eventos->statusServico->clear();
 
-    if (m_nfe->eventos->statusServico->get_status())
+    if (m_nfe->eventos->statusServico->status())
     {
         _status = "Versao: " + m_nfe->eventos->statusServico->retorno->get_versao() + "\n";
         _status += "cStat: " + QString::number(m_nfe->eventos->statusServico->retorno->get_cStat()) + "\n";
