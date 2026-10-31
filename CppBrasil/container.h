@@ -21,6 +21,7 @@ limitations under the License.
 #ifndef CONTAINER_H
 #define CONTAINER_H
 #include <QList>
+#include <memory>
 
 template <class T>
 class Container
@@ -31,8 +32,11 @@ public:
 public:
     Container();
     ~Container();
+    //proibe a copia: items e obj sao ponteiros donos, a copia causaria double delete.
+    Container(const Container&) = delete;
+    Container& operator=(const Container&) = delete;
     void add();
-    void add(T *object);
+    void add(std::unique_ptr<T> object); //o container assume a propriedade do objeto.
     void clear();
 };
 
@@ -53,15 +57,17 @@ Container<T>::~Container()
 template<class T>
 void Container<T>::add()
 {
+    //cria o novo obj antes do append, se o new lancar excecao o container continua consistente.
+    std::unique_ptr<T> ptr = std::make_unique<T>();
     items->append(obj);
-    T *ptr = new T;
-    obj = ptr;
+    obj = ptr.release();
 }
 
 template<class T>
-void Container<T>::add(T *object)
+void Container<T>::add(std::unique_ptr<T> object)
 {
-    items->append(object);
+    items->append(object.get());
+    object.release();
 }
 
 template<class T>
@@ -70,11 +76,6 @@ void Container<T>::clear()
     obj->clear();
     qDeleteAll(*items);
     items->clear();
-    if (obj == NULL)
-    {
-        T *ptr = new T;
-        obj = ptr;
-    }
 }
 
 #endif // CONTAINER_H
