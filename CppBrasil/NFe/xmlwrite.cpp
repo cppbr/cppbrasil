@@ -99,7 +99,7 @@ QByteArray XmlWrite::get_protNFe(const QString &versao, const QString &Id,
                                  const int &cMsg, const QString &xMsg)
 {
     QByteArray _strXML;
-    QXmlStreamWriter *_xmlw = new QXmlStreamWriter(&_strXML);
+    std::unique_ptr<QXmlStreamWriter> _xmlw(new QXmlStreamWriter(&_strXML));
 
     _xmlw->writeStartElement("a");
     _xmlw->writeStartElement("protNFe");
@@ -123,20 +123,18 @@ QByteArray XmlWrite::get_protNFe(const QString &versao, const QString &Id,
     _xmlw->writeEndElement(); //fechamento protNFe
     _xmlw->writeEndElement(); //fechamento a
 
-    delete _xmlw;
     return _strXML;
 }
 
 QByteArray XmlWrite::get_nfeProc(const QString &versao)
 {
     QByteArray _strXML;
-    QXmlStreamWriter *_xmlw = new QXmlStreamWriter(&_strXML);
+    std::unique_ptr<QXmlStreamWriter> _xmlw(new QXmlStreamWriter(&_strXML));
     _xmlw->writeStartElement("nfeProc");
     _xmlw->writeAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe");
     _xmlw->writeAttribute("versao", versao);
     _xmlw->writeEndElement(); //fechamento infProt
 
-    delete _xmlw;
     return _strXML;
 }
 

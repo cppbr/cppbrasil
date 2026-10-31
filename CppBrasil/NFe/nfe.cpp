@@ -79,7 +79,7 @@ void Nfe::assinarXML(const ConfigNFe *config)
     _nodesign.append("SignedInfo");
     _uri.append("NFe"); _uri.append(this->m_chaveacesso.toLocal8Bit());
 
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schema);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schema));
 
     this->m_error.clear(); //limpando erro
 
@@ -176,8 +176,6 @@ void Nfe::assinarXML(const ConfigNFe *config)
     _xml_infNFeSupl.clear();
     _xml_signature.clear();
     _digestvalue.clear();
-    delete _libxml;
-
 }
 
 void Nfe::gerarXML(const ConfigNFe *config)
@@ -202,7 +200,7 @@ void Nfe::validarXML(const ConfigNFe *config)
     _schemaName.append("nfe_v");
     _schemaName.append(ConvNF::versaoNFToStr(config->get_VersaoNF()).toLocal8Bit());
     _schemaName.append(".xsd");
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath));
 
     this->m_error.clear(); //limpando erro
     if (!_libxml->parseXML(this->m_xml_assinado.toLocal8Bit(), _schemaName))
@@ -210,8 +208,6 @@ void Nfe::validarXML(const ConfigNFe *config)
        this->m_error = _libxml->get_error();
        //qWarning() << this->m_error; //remover isso
     }
-
-    delete _libxml;
 }
 
 QString Nfe::get_XMLAutorizado() const

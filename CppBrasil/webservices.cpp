@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "webservices.h"
+#include <memory>
 
 WebServices::WebServices(const CppCrypto* crypto, const QNetworkProxy &proxy,
                         const QSsl::SslProtocol &protocol, const HttpType &httpType,
@@ -90,20 +91,19 @@ QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
 {
     this->m_error.clear();
     QByteArray _output;
-    HttpClient *_http;
+    std::unique_ptr<HttpClient> _http;
     if ((this->m_httpType == HttpType::None) || (this->m_httpType == HttpType::HttpQt))
     { //qt
-        _http = new HttpQt(m_crypto, m_proxy, m_protocol, m_timeout, m_verifyMode);
+        _http.reset(new HttpQt(m_crypto, m_proxy, m_protocol, m_timeout, m_verifyMode));
     }
     else
     {// openssl
-        _http = new HttpOpenSSL(m_crypto);
+        _http.reset(new HttpOpenSSL(m_crypto));
     }
 
-    connect(_http, &HttpClient::errorOccurred, this, &WebServices::onError);
+    connect(_http.get(), &HttpClient::errorOccurred, this, &WebServices::onError);
     _output.append(_http->send(host, data));
 
-    delete _http;
     return _output;
 }
 

@@ -56,12 +56,12 @@ bool EnvEvento::enviarEvento(const int &idLote)
         if (validarEvento())
         {
             //envia
-            WSEvento* _ws = new WSEvento(this->config,
-                                      this->config->certificado->get_cryptoLib(),
-                                      this->retorno.get());
+            std::unique_ptr<WSEvento> _ws(new WSEvento(this->config,
+                                                    this->config->certificado->get_cryptoLib(),
+                                                    this->retorno.get()));
 
-            connect(_ws, &WSEvento::wsChange, this, &EnvEvento::wsChange);
-            connect(_ws, &WSEvento::errorOccurred, this, &EnvEvento::onError);
+            connect(_ws.get(), &WSEvento::wsChange, this, &EnvEvento::wsChange);
+            connect(_ws.get(), &WSEvento::errorOccurred, this, &EnvEvento::onError);
 
 
             bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
@@ -70,8 +70,6 @@ bool EnvEvento::enviarEvento(const int &idLote)
 
             if (_ret)
               tratarRetorno();
-
-            delete _ws;
         }
         else
         {
@@ -122,7 +120,7 @@ bool EnvEvento::assinarEvento(const QString &evento, const QString &uri, QString
     _nodesign.append("SignedInfo");
     _uri.append(uri.toLocal8Bit());
 
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schema);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schema));
 
     //assina o xml
     if (_libxml->signXML(_xmldoc, _sha1, _nodedoc, _nodesign, _uri,
@@ -137,7 +135,6 @@ bool EnvEvento::assinarEvento(const QString &evento, const QString &uri, QString
         output = _libxml->get_error();
     }
 
-    delete _libxml;
     return _ret;
 }
 
@@ -250,7 +247,7 @@ bool EnvEvento::validarEvento()
     _schemaName.append("envEvento_v");
     _schemaName.append(this->m_versao.toLocal8Bit());
     _schemaName.append(".xsd");
-    CppXML * _libxml = new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath));
 
     this->m_error.clear(); //limpando erro
     if (!_libxml->parseXML(this->m_xml.toLocal8Bit(), _schemaName))
@@ -259,7 +256,6 @@ bool EnvEvento::validarEvento()
         _ret = false;
     }
 
-    delete _libxml;
     return _ret;
 }
 
@@ -267,7 +263,7 @@ void EnvEvento::tratarRetorno()
 {
     //atualiza e salva o xml do evento
     QByteArray _schema = this->config->arquivos->get_caminhoSchema().toLocal8Bit();
-    CppXML * _libxml = new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema));
 
     //unindo xml assinado com o retorno do web services
     if (this->retorno->retEvento->items->count() > 0)
@@ -323,6 +319,5 @@ void EnvEvento::tratarRetorno()
             }
         }
     }
-    delete _libxml;
 }
 

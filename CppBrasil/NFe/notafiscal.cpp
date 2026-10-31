@@ -103,12 +103,12 @@ bool NotaFiscal::enviar(const int &numLote)
 
     }
 
-    WSNFe* _ws = new WSNFe(this->config,
-                           this->config->certificado->get_cryptoLib(),
-                           this->retorno.get());
+    std::unique_ptr<WSNFe> _ws(new WSNFe(this->config,
+                                         this->config->certificado->get_cryptoLib(),
+                                         this->retorno.get()));
 
-    connect(_ws, SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
-    connect(_ws, &WSNFe::errorOccurred, this,
+    connect(_ws.get(), SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
+    connect(_ws.get(), &WSNFe::errorOccurred, this,
             [=]( const QString &error ) {
         set_error(error, 1);
     } );
@@ -119,7 +119,6 @@ bool NotaFiscal::enviar(const int &numLote)
     if (_ret)
       tratarRetorno();
 
-    delete _ws;
     return _ret;
 }
 
@@ -186,7 +185,7 @@ void NotaFiscal::tratarRetorno()
         QString _chNFe;
         QByteArray _nfeProc, _protNFe, _xmlOriginal, _schema;
         _schema.append(this->config->arquivos->get_caminhoSchema().toLocal8Bit());
-        CppXML * _libxml = new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema);
+        std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema));
 
         for(int i = 0; i < this->retorno->protNFe->items->count(); ++i)
         {
@@ -261,21 +260,18 @@ void NotaFiscal::tratarRetorno()
                 }
             }
         }
-
-        delete _libxml;
     }
 }
 
 bool NotaFiscal::importXML(const QByteArray &xml)
 {
     std::unique_ptr<Nfe> _nfe = std::make_unique<Nfe>();
-    XmlRead *_xRead = new XmlRead(_nfe.get(), xml);
+    std::unique_ptr<XmlRead> _xRead(new XmlRead(_nfe.get(), xml));
     bool _ret = _xRead->import();
 
     if (_ret)
         NFe->add(std::move(_nfe)); //caso a importação falhe, o unique_ptr exclui o _nfe automaticamente.
 
-    delete _xRead;
     return _ret;
 }
 

@@ -89,7 +89,7 @@ bool WSNFeBase::validarXML(const QString &schemaName, const QString &nomeGrupo, 
 {
     QByteArray _schemaPath(this->confgNFe->arquivos->get_caminhoSchema().toLocal8Bit());
     bool _ret = true;
-    CppXML * _libxml = new CppLibXml2(this->crypto, _schemaPath);
+    std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->crypto, _schemaPath));
 
     if (nomeGrupo.isEmpty())
     {
@@ -112,7 +112,6 @@ bool WSNFeBase::validarXML(const QString &schemaName, const QString &nomeGrupo, 
         //qWarning() << get_error(); //remover isso
     }
 
-    delete _libxml;
     return _ret;
 }
 
