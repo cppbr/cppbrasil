@@ -100,6 +100,13 @@ e derivados, é preciso liberar a assinatura SHA1 (ver README).
   retornos da SEFAZ). As opções agora valem só para a assinatura. A assinatura gerada não muda.
 - **Assinatura no Fedora/RHEL** (e derivados): falhava sempre com "Erro ao assinar documento", porque a lib ignorava
   a configuração do OpenSSL e o SHA1 ficava bloqueado sem como liberar. Agora basta liberar o SHA1 (ver README).
+- **`HttpOpenSSL`** (usado com `HttpType::HttpOpenSSL`; o padrão `HttpQt` não é afetado):
+  - a resposta vinha com lixo de memória depois do XML, e respostas grandes podiam vir cortadas. Agora a leitura
+    respeita o `Content-Length`, decodifica `Transfer-Encoding: chunked` e aceita servidor que fecha sem `close_notify`;
+  - não tinha timeout e podia travar a aplicação. Agora usa o timeout configurado (padrão de 15 s, como o `HttpQt`);
+  - XML com acentos podia ser corrompido no Windows (conversão para a codificação local) e o `Content-Length` ficava errado;
+  - linha do pedido HTTP inválida (espaço antes do fim de linha), SNI não enviado e `SSL_accept` indevido no cliente;
+  - socket, `SSL_CTX` e `SSL` vazavam nos retornos de erro.
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
 

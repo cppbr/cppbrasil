@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "httpclient.h"
 
-HttpClient::HttpClient(): QObject(nullptr)
+HttpClient::HttpClient(): QObject(nullptr), m_crypto(nullptr), m_timeout(0), m_verifyMode(true)
 {
 }
 
@@ -61,7 +61,7 @@ void HttpClient::set_verificarSslSocket(const bool &verifyMode)
     this->m_verifyMode = verifyMode;
 }
 
-HttpClient::HttpClient(const CppCrypto *crypto): m_crypto(crypto)
+HttpClient::HttpClient(const CppCrypto *crypto): m_crypto(crypto), m_timeout(0), m_verifyMode(true)
 {
 
 }

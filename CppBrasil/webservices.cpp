@@ -98,7 +98,7 @@ QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
     }
     else
     {// openssl
-        _http.reset(new HttpOpenSSL(m_crypto));
+        _http.reset(new HttpOpenSSL(m_crypto, m_timeout));
     }
 
     connect(_http.get(), &HttpClient::errorOccurred, this, &WebServices::onError);

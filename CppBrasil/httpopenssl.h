@@ -22,6 +22,7 @@ limitations under the License.
 #define HTTPOPENSSL_H
 
 #include <QObject>
+#include <memory>
 #include <QDebug>
 #ifdef __linux__
 #include <sys/socket.h>
@@ -53,7 +54,7 @@ class CPPNFE_EXPORT HttpOpenSSL : public HttpClient
 {
     Q_OBJECT
 public:
-    HttpOpenSSL(const CppCrypto* crypto);
+    HttpOpenSSL(const CppCrypto* crypto, const int &timeout = 0);
     ~HttpOpenSSL();
 
     virtual QByteArray send(const QByteArray &host, const QByteArray &data);
@@ -63,8 +64,11 @@ private:
     EVP_PKEY *m_pkey = NULL;
     X509 *m_cert = NULL;
     STACK_OF(X509) *m_ca = NULL;
-    void sendPacket(SSL *ssl, const char *buf);
+    bool sendPacket(SSL *ssl, const QByteArray &buf);
     void receivePacket(SSL *ssl);
+    bool responseComplete(const QByteArray &data);
+    QByteArray headerValue(const QByteArray &header, const QByteArray &name);
+    QByteArray decodeChunked(const QByteArray &body);
     QByteArray getCommand(const QByteArray &host, const QByteArray &data);
     QByteArray getHostName(const QByteArray &host, const THost &tipo);
     QString getErrorName(const int &err);
