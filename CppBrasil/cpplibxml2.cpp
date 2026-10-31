@@ -245,12 +245,13 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
     _ret_xml_sigin = NULL;
     _ret_xml_complete = NULL;
 
-    xmlLoadExtDtdDefaultValue = XML_DETECT_IDS | XML_COMPLETE_ATTRS;
-    xmlSubstituteEntitiesDefault(1);
-
+    //opcoes aplicadas so neste parse (antes eram globais da libxml2 e afetavam todos os parses seguintes):
+    //XML_PARSE_DTDLOAD|XML_PARSE_DTDATTR equivalem a XML_DETECT_IDS|XML_COMPLETE_ATTRS e
+    //XML_PARSE_NOENT equivale a xmlSubstituteEntitiesDefault(1).
+    const int _parseOptions = XML_PARSE_NOENT | XML_PARSE_DTDLOAD | XML_PARSE_DTDATTR;
 
     _len = xml_doc.length();
-    if ((_xml = xmlParseMemory(xml_doc.data(), _len)) == NULL)
+    if ((_xml = xmlReadMemory(xml_doc.data(), _len, NULL, NULL, _parseOptions)) == NULL)
       _ret = false;
 
 
@@ -294,7 +295,7 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
     if (_ret)
     {
         _len = _str_xmlsign.length();
-        if ((_xml_sigin = xmlParseMemory(_str_xmlsign.toLocal8Bit(), _len)) == NULL)
+        if ((_xml_sigin = xmlReadMemory(_str_xmlsign.toLocal8Bit(), _len, NULL, NULL, _parseOptions)) == NULL)
           _ret = false;
     }
 
