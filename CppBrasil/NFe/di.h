@@ -59,7 +59,7 @@ public:
     QString get_cExportador() const;
     void set_cExportador(const QString &cExportador);
 
-    std::shared_ptr<Container<Adi>> adi;
+    std::unique_ptr<Container<Adi>> adi;
 
 private:
     QString m_nDI;

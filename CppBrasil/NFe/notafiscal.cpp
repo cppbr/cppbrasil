@@ -20,8 +20,6 @@ limitations under the License.
 
 #include "notafiscal.h"
 
-Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)
-
 NotaFiscal::NotaFiscal(ConfigNFe *config): NFe(new Container<Nfe>),
     retorno(new RetConsReciNFe), m_tError(0), config(config)
 {

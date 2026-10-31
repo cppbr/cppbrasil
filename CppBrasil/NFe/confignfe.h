@@ -102,9 +102,9 @@ public:
     void set_TipoEmissao(const TpEmis &tipoEmissao);
 
 
-    std::shared_ptr<Certificado> certificado;
-    std::shared_ptr<ArquivosNF> arquivos;
-    std::shared_ptr<ConfWebServices> webservices;
+    std::unique_ptr<Certificado> certificado;
+    std::unique_ptr<ArquivosNF> arquivos;
+    std::unique_ptr<ConfWebServices> webservices;
 
 private:
     ModeloDF m_ModeloDF;

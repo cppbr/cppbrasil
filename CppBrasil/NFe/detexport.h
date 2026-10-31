@@ -35,7 +35,7 @@ public:
     QString get_nDraw() const;
     void set_nDraw(const QString &nDraw);
 
-    std::shared_ptr<ExportInd> exportInd;
+    std::unique_ptr<ExportInd> exportInd;
 
 private:
     QString m_nDraw;

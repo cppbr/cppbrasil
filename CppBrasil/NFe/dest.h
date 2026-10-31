@@ -52,7 +52,7 @@ public:
     QString get_email() const;
     void set_email(const QString &email);
 
-    std::shared_ptr<EnderDest> enderDest;
+    std::unique_ptr<EnderDest> enderDest;
 private:
     QString m_CNPJ;
     QString m_CPF;

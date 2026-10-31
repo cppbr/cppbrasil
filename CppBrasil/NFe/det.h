@@ -38,10 +38,10 @@ public:
     QString get_infAdProd() const;
     void set_infAdProd(const QString &infAdProd);
 
-    std::shared_ptr<Prod> prod;
-    std::shared_ptr<Imposto> imposto;
-    std::shared_ptr<ImpostoDevol> impostoDevol;
-    std::shared_ptr<ObsItem> obsItem;
+    std::unique_ptr<Prod> prod;
+    std::unique_ptr<Imposto> imposto;
+    std::unique_ptr<ImpostoDevol> impostoDevol;
+    std::unique_ptr<ObsItem> obsItem;
 
 private:
     QString m_infAdProd; //V01 abaixo de impostoDevol

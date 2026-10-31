@@ -35,7 +35,7 @@ public:
     double get_vTroco() const;
     void set_vTroco(const double &vTroco);
 
-    std::shared_ptr<Container<DetPag>> detPag;
+    std::unique_ptr<Container<DetPag>> detPag;
 private:
     //em baixo de card
     double m_vTroco;

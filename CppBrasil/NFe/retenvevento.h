@@ -90,7 +90,7 @@ public:
     void set_XML(const QString &xml);
     void salvarXML(const QString &caminho, const QString &nomeArquivo);
 
-    std::shared_ptr<InfEventoRet> infEvento;
+    std::unique_ptr<InfEventoRet> infEvento;
 private:
     QString m_versao;
     QString m_xml; //xml completo
@@ -120,7 +120,7 @@ public:
     QString get_xMotivo() const;
     void set_xMotivo(const QString &xMotivo);
 
-    std::shared_ptr<Container<RetEvento>> retEvento;
+    std::unique_ptr<Container<RetEvento>> retEvento;
 
 private:
     QString m_versao;

@@ -42,7 +42,7 @@ public:
     QString get_xPag() const;
     void set_xPag(const QString &xPag);
 
-    std::shared_ptr<Card> card;
+    std::unique_ptr<Card> card;
 
 private:
     IndPag m_indPag;

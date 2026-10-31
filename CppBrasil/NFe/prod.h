@@ -103,13 +103,13 @@ public:
     QString get_nRECOPI() const;
     void set_nRECOPI(const QString &nRECOPI);
 
-    std::shared_ptr<Container<Di>> DI;
-    std::shared_ptr<Container<DetExport>> detExport;
-    std::shared_ptr<Container<Rastro>> rastro;
-    std::shared_ptr<VeicProd> veicProd;
-    std::shared_ptr<Med> med;
-    std::shared_ptr<Container<Arma>> arma;
-    std::shared_ptr<Comb> comb;
+    std::unique_ptr<Container<Di>> DI;
+    std::unique_ptr<Container<DetExport>> detExport;
+    std::unique_ptr<Container<Rastro>> rastro;
+    std::unique_ptr<VeicProd> veicProd;
+    std::unique_ptr<Med> med;
+    std::unique_ptr<Container<Arma>> arma;
+    std::unique_ptr<Comb> comb;
 
 private:
     int m_nItem; //pertence a tag det H01 - Número do item

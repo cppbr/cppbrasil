@@ -34,8 +34,8 @@ public:
     ~Cobr();
     void clear();
 
-    std::shared_ptr<Fat> fat;
-    std::shared_ptr<Container<Dup>> dup;
+    std::unique_ptr<Fat> fat;
+    std::unique_ptr<Container<Dup>> dup;
 };
 
 #endif // COBR_H

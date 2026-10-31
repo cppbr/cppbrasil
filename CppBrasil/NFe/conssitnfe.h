@@ -27,7 +27,7 @@ public:
     void set_versao(const QString &versao);
     QString get_error() const;
 
-    std::shared_ptr<RetConsSitNFe> retorno;
+    std::unique_ptr<RetConsSitNFe> retorno;
 
 signals:
     void errorOccurred(const QString &error);

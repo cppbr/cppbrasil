@@ -52,7 +52,7 @@ public:
     Crt get_CRT() const;
     void set_CRT(const Crt &CRT);
 
-    std::shared_ptr<EnderEmit> enderEmit;
+    std::unique_ptr<EnderEmit> enderEmit;
 
 private:
     QString m_CNPJ;

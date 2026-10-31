@@ -84,7 +84,7 @@ public:
     QString get_xJust() const;
     void set_xJust(const QString &xJust);
 
-    std::shared_ptr<Container<NFRef>> NFref;
+    std::unique_ptr<Container<NFRef>> NFref;
 
 private:
     int m_cUF;

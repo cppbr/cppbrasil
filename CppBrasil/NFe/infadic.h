@@ -40,9 +40,9 @@ public:
     QString get_infCpl() const;
     void set_infCpl(const QString &infCpl);
 
-    std::shared_ptr<Container<ObsCont>> obsCont;
-    std::shared_ptr<Container<ObsFisco>> obsFisco;
-    std::shared_ptr<Container<ProcRef>> procRef;
+    std::unique_ptr<Container<ObsCont>> obsCont;
+    std::unique_ptr<Container<ObsFisco>> obsFisco;
+    std::unique_ptr<Container<ProcRef>> procRef;
 
 private:
     QString m_infAdFisco;
