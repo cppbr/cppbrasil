@@ -20,36 +20,6 @@ limitations under the License.
 
 #include "cppdanfeqtrpt.h"
 
-struct RetEnt{
-    QString m_descricao;
-    QString m_CNPJ;
-    QString m_CPF;
-    QString m_xNome;
-    QString m_xLgr;
-    int m_nro;
-    QString m_xCpl;
-    QString m_xBairro;
-    int m_cMun;
-    QString m_xMun;
-    QString m_UF;
-    int m_CEP;
-    int m_cPais;
-    QString m_xPais;
-    QString m_fone;
-    QString m_email;
-    QString m_IE;
-
-    RetEnt(){};
-
-    RetEnt(QString descricao, QString CNPJ, QString CPF, QString xNome, QString xLgr, int nro, QString xCpl,
-           QString xBairro, int cMun, QString xMun, QString UF, int CEP, int cPais, QString xPais, QString fone,
-           QString email, QString IE): m_descricao(descricao), m_CNPJ(CNPJ), m_CPF(CPF), m_xNome(xNome),
-                                       m_xLgr(xLgr), m_nro(nro), m_xCpl(xCpl), m_xBairro(xBairro), m_cMun(cMun),
-                                       m_xMun(xMun), m_UF(UF), m_CEP(CEP), m_cPais(cPais), m_xPais(xPais),
-                                       m_fone(fone), m_email(email), m_IE(IE) {};
-};
-QList<RetEnt> RetEntList;
-
 CppDanfeQtRPT::CppDanfeQtRPT(const CppNFe *cppnfe, const int &recNo): CppDanfe(cppnfe, recNo),
     m_report(new QtRPT)
 {
@@ -90,12 +60,12 @@ void CppDanfeQtRPT::print()
 
 void CppDanfeQtRPT::loadRetEnt()
 {
-    RetEntList.clear();
+    m_retEntList.clear();
     //se existir local de retirada
     if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xNome().isEmpty() ||
         !this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xLgr().isEmpty())
     {
-         RetEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE RETIRADA",
+         m_retEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE RETIRADA",
                                   this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_CNPJ(),
                                   this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_CPF(),
                                   this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->retirada->get_xNome(),
@@ -117,7 +87,7 @@ void CppDanfeQtRPT::loadRetEnt()
     if (!this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xNome().isEmpty() ||
         !this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xLgr().isEmpty())
     {
-        RetEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE ENTREGA",
+        m_retEntList.append(RetEnt("INFORMAÇÕES DO LOCAL DE ENTREGA",
                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_CNPJ(),
                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_CPF(),
                                  this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFe->entrega->get_xNome(),
@@ -141,7 +111,7 @@ void CppDanfeQtRPT::setDSInfo(DataSetInfo &dsInfo)
 {
     //retirada/entrega
     if (dsInfo.dsName == "dsRetEnt")
-       dsInfo.recordCount = RetEntList.count();
+       dsInfo.recordCount = m_retEntList.count();
 
     //fatura
     if (dsInfo.dsName == "dsFatura")
@@ -404,34 +374,34 @@ void CppDanfeQtRPT::setValue(const int recNo, const QString paramName, QVariant 
 
     //retirada/entrega
     if ((paramName == "retent.descricao"))
-       paramValue =  RetEntList.value(recNo).m_descricao;
+       paramValue =  m_retEntList.value(recNo).m_descricao;
     if ((paramName == "retent.xNome"))
-       paramValue =  RetEntList.value(recNo).m_xNome;
+       paramValue =  m_retEntList.value(recNo).m_xNome;
     if ((paramName == "retent.cnpj"))
     {
-        if (!RetEntList.value(recNo).m_CNPJ.isEmpty())
-           paramValue =  RetEntList.value(recNo).m_CNPJ;
+        if (!m_retEntList.value(recNo).m_CNPJ.isEmpty())
+           paramValue =  m_retEntList.value(recNo).m_CNPJ;
         else
-           paramValue =  RetEntList.value(recNo).m_CPF;
+           paramValue =  m_retEntList.value(recNo).m_CPF;
     }
     if (paramName == "retent.IE")
-       paramValue =  RetEntList.value(recNo).m_IE;
+       paramValue =  m_retEntList.value(recNo).m_IE;
     if (paramName == "retent.xLgr")
-       paramValue =  RetEntList.value(recNo).m_xLgr;
+       paramValue =  m_retEntList.value(recNo).m_xLgr;
     if (paramName == "retent.nro")
-       paramValue =  RetEntList.value(recNo).m_nro;
+       paramValue =  m_retEntList.value(recNo).m_nro;
     if (paramName == "retent.xCpl")
-       paramValue =  RetEntList.value(recNo).m_xCpl;
+       paramValue =  m_retEntList.value(recNo).m_xCpl;
     if (paramName == "retent.xBairro")
-       paramValue =  RetEntList.value(recNo).m_xBairro;
+       paramValue =  m_retEntList.value(recNo).m_xBairro;
     if (paramName == "retent.CEP")
-       paramValue =  RetEntList.value(recNo).m_CEP;
+       paramValue =  m_retEntList.value(recNo).m_CEP;
     if (paramName == "retent.xMun")
-       paramValue =  RetEntList.value(recNo).m_xMun;
+       paramValue =  m_retEntList.value(recNo).m_xMun;
     if (paramName == "retent.UF")
-       paramValue =  RetEntList.value(recNo).m_UF;
+       paramValue =  m_retEntList.value(recNo).m_UF;
     if (paramName == "retent.fone")
-       paramValue =  RetEntList.value(recNo).m_fone;
+       paramValue =  m_retEntList.value(recNo).m_fone;
 
     //fatura
     if (paramName == "fatura.nFat")

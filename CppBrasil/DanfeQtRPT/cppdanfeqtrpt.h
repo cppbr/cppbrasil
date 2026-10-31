@@ -41,7 +41,38 @@ public:
     virtual void print();
 
 private:
+    //local de retirada/entrega exibido no DANFE (dsRetEnt)
+    struct RetEnt{
+        QString m_descricao;
+        QString m_CNPJ;
+        QString m_CPF;
+        QString m_xNome;
+        QString m_xLgr;
+        int m_nro = 0;
+        QString m_xCpl;
+        QString m_xBairro;
+        int m_cMun = 0;
+        QString m_xMun;
+        QString m_UF;
+        int m_CEP = 0;
+        int m_cPais = 0;
+        QString m_xPais;
+        QString m_fone;
+        QString m_email;
+        QString m_IE;
+
+        RetEnt(){};
+
+        RetEnt(QString descricao, QString CNPJ, QString CPF, QString xNome, QString xLgr, int nro, QString xCpl,
+               QString xBairro, int cMun, QString xMun, QString UF, int CEP, int cPais, QString xPais, QString fone,
+               QString email, QString IE): m_descricao(descricao), m_CNPJ(CNPJ), m_CPF(CPF), m_xNome(xNome),
+                                           m_xLgr(xLgr), m_nro(nro), m_xCpl(xCpl), m_xBairro(xBairro), m_cMun(cMun),
+                                           m_xMun(xMun), m_UF(UF), m_CEP(CEP), m_cPais(cPais), m_xPais(xPais),
+                                           m_fone(fone), m_email(email), m_IE(IE) {};
+    };
+
     std::unique_ptr<QtRPT> m_report; //sem parent, o unique_ptr e o unico dono.
+    QList<RetEnt> m_retEntList; //por instancia: antes era global e compartilhada entre DANFEs.
     void loadRetEnt();
 private slots:
     void setDSInfo(DataSetInfo &dsInfo);
