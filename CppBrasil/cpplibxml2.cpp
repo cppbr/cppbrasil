@@ -19,6 +19,22 @@ limitations under the License.
 
 
 #include "cpplibxml2.h"
+
+namespace {
+//guarda o primeiro erro reportado pela libxml2 em userData (QString*), em vez de imprimir no stderr
+#if LIBXML_VERSION >= 21200
+void captureError(void *userData, const xmlError *error)
+#else
+void captureError(void *userData, xmlErrorPtr error)
+#endif
+{
+    QString *_msg = static_cast<QString*>(userData);
+    if (_msg->isEmpty() && (error != NULL) && (error->message != NULL))
+        *_msg = QString("%1%2%3").arg(QString::number(error->code), " - ",
+                                      QString::fromUtf8(error->message).trimmed());
+}
+}
+
 CppLibXml2::CppLibXml2(CppCrypto *cppcrypto, const QByteArray &schemapath)
     :cppcrypto(cppcrypto), m_schemapath(schemapath)
 {
@@ -34,7 +50,7 @@ bool CppLibXml2::addChildXML(const QByteArray &xml_doc, const QByteArray &xml_ch
     char * _res = NULL;
     if ((xml_doc.isEmpty()) || (xml_child.isEmpty()))
     {
-        set_error(QStringLiteral("Erro ao adichinar xml filho: documento xml vazio."));
+        set_error(QStringLiteral("Erro ao adicionar xml filho: documento xml vazio."));
         return false;
     }
 
@@ -42,7 +58,7 @@ bool CppLibXml2::addChildXML(const QByteArray &xml_doc, const QByteArray &xml_ch
     if (!addChildFromString(xml_doc.data(), xml_child.data(),
                             (parent_node.isEmpty() ? NULL : parent_node.data()), &_res))
     {
-        set_error(QStringLiteral("Erro ao adichinar xml filho: documento xml com erros."));
+        set_error(QStringLiteral("Erro ao adicionar xml filho: documento xml com erros."));
         return false;
     }
 
@@ -66,7 +82,7 @@ bool CppLibXml2::addChildXML(QByteArray &xml_doc, const QByteArray &xml_child, c
     char * _res = NULL;
     if ((xml_doc.isEmpty()) || (xml_child.isEmpty()))
     {
-        set_error(QStringLiteral("Erro ao adichinar xml filho: documento xml vazio."));
+        set_error(QStringLiteral("Erro ao adicionar xml filho: documento xml vazio."));
         return false;
     }
 
@@ -74,7 +90,7 @@ bool CppLibXml2::addChildXML(QByteArray &xml_doc, const QByteArray &xml_child, c
     if (!addChildFromString(xml_doc.data(), xml_child.data(),
                             (parent_node.isEmpty() ? NULL : parent_node.data()), &_res))
     {
-        set_error(QStringLiteral("Erro ao adichinar xml filho: documento xml com erros."));
+        set_error(QStringLiteral("Erro ao adicionar xml filho: documento xml com erros."));
         return false;
     }
 
@@ -110,7 +126,7 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     xmlSchemaParserCtxt *_parser_ctxt = NULL;
     xmlSchema *_schema = NULL;
     xmlSchemaValidCtxt *_valid_ctxt = NULL;
-    const xmlError *_schemError = NULL;
+    QString _schemaError, _validError;
     _xml = NULL;
     _xsd = NULL;
     bool _ret = true;
@@ -119,7 +135,7 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     if (!CppUtility::parsePath(QString::fromLocal8Bit(m_schemapath.data(),m_schemapath.length()), _path))
     {
        set_error(QStringLiteral("Diretório do schema inválido ou sem permissão para leitura"));
-       _ret =  false;
+       return false;
     }
     _schemafile.append(_path.toLocal8Bit());
     _schemafile.append(schema_name.data());
@@ -127,8 +143,13 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     _xml = xmlParseMemory(xml_doc.data(),xml_doc.length());
     _xsd = xmlParseFile(_schemafile.data());
     _parser_ctxt = xmlSchemaNewDocParserCtxt(_xsd);
-    _schema = xmlSchemaParse(_parser_ctxt);
-    _valid_ctxt = xmlSchemaNewValidCtxt(_schema);
+    if (_parser_ctxt != NULL)
+    {
+        xmlSchemaSetParserStructuredErrors(_parser_ctxt, captureError, &_schemaError);
+        _schema = xmlSchemaParse(_parser_ctxt);
+    }
+    if (_schema != NULL)
+        _valid_ctxt = xmlSchemaNewValidCtxt(_schema);
 
 
     if (_ret)
@@ -143,7 +164,8 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     {
         if (_schema == NULL)
         {
-            set_error(QStringLiteral("Erro: Schema inválido"));
+            set_error(QStringLiteral("Erro: Schema inválido") +
+                      (_schemaError.isEmpty() ? QString() : QStringLiteral(": ") + _schemaError));
             _ret = false;
         }
     }
@@ -158,13 +180,13 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
     }
     if (_ret)
     {
+        xmlSchemaSetValidStructuredErrors(_valid_ctxt, captureError, &_validError);
         if (xmlSchemaValidateDoc(_valid_ctxt, _xml) != 0)
         {
-            _schemError = xmlGetLastError();
             _ret = false;
-            if (_schemError != NULL)
+            if (!_validError.isEmpty())
             {
-                set_error(QString("%1%2%3%4").arg("Erro: ",QString::number(_schemError->code), " - ", _schemError->message));
+                set_error(QStringLiteral("Erro: ") + _validError);
             }
             else
             {
@@ -173,16 +195,16 @@ bool CppLibXml2::parseXML(const QByteArray &xml_doc, const QByteArray &schema_na
         }
     }
 
-    if (_xml != NULL)
-      xmlFreeDoc(_xml);
-    if (_xsd != NULL)
-      xmlFreeDoc(_xsd);
-    if (_parser_ctxt != NULL)
-      xmlSchemaFreeParserCtxt(_parser_ctxt);
-    if (_schema != NULL)
-      xmlSchemaFree(_schema);
     if (_valid_ctxt != NULL)
       xmlSchemaFreeValidCtxt(_valid_ctxt);
+    if (_schema != NULL)
+      xmlSchemaFree(_schema);
+    if (_parser_ctxt != NULL)
+      xmlSchemaFreeParserCtxt(_parser_ctxt);
+    if (_xsd != NULL)
+      xmlFreeDoc(_xsd);
+    if (_xml != NULL)
+      xmlFreeDoc(_xml);
     return _ret;
 }
 
@@ -259,7 +281,7 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
 
     if ((xml_doc.isEmpty()) || (node_doc.isEmpty()) || (node_sign.isEmpty()))
     {
-        set_error(QStringLiteral("Erro: xmldoc ou nó do coumento vazio"));
+        set_error(QStringLiteral("Erro: xmldoc ou nó do documento vazio"));
         _ret = false;
     }
 
@@ -294,8 +316,8 @@ bool CppLibXml2::signXML(const QByteArray &xml_doc, const HashType &hashtype,
     }
     if (_ret)
     {
-        _len = _str_xmlsign.length();
-        if ((_xml_sigin = xmlReadMemory(_str_xmlsign.toLocal8Bit(), _len, NULL, NULL, _parseOptions)) == NULL)
+        QByteArray _xmlsign = _str_xmlsign.toUtf8();
+        if ((_xml_sigin = xmlReadMemory(_xmlsign.constData(), _xmlsign.size(), NULL, NULL, _parseOptions)) == NULL)
           _ret = false;
     }
 
@@ -386,7 +408,7 @@ bool CppLibXml2::c14n(const xmlDoc *xml_doc, const char *node_name,
     _new_node = NULL;
     bool _ret = true;
     unsigned char *_res = NULL;
-    int _len;
+    int _len = 0;
 
 
     if((_root_node = xmlDocGetRootElement(xml_doc)) == NULL) {
@@ -396,11 +418,11 @@ bool CppLibXml2::c14n(const xmlDoc *xml_doc, const char *node_name,
     if (_ret)
     {
        //find element
+       //a raiz pertence a xml_doc: não liberar aqui
        if((_node_element = find_node(_root_node, node_name)) == NULL)
        {
-            xmlFreeNode(_root_node);
             _ret = false;
-        }
+       }
     }
 
     if (_ret)
@@ -413,17 +435,19 @@ bool CppLibXml2::c14n(const xmlDoc *xml_doc, const char *node_name,
     if (_ret)
     {
         _new_xmldoc = xmlNewDoc((const xmlChar *) "1.0");
-        xmlDocSetRootElement(_new_xmldoc, _new_node);
-
         if(_new_xmldoc == NULL)
         {
+            xmlFreeNode(_new_node);
             _ret = false;
         }
+        else
+            xmlDocSetRootElement(_new_xmldoc, _new_node);
     }
-    _len = xmlC14NDocDumpMemory(_new_xmldoc, NULL, 0, NULL, 0, &_res);
+    if (_ret)
+        _len = xmlC14NDocDumpMemory(_new_xmldoc, NULL, 0, NULL, 0, &_res);
 
     //copy result
-    if(_len > 0)
+    if(_ret && _len > 0)
     {
         //se a saída não tiver memória, obtenha memória para a saída
         if ((*output == NULL) || (*output[0] == '\0')) {
@@ -533,7 +557,6 @@ bool CppLibXml2::addChildFromXMLDOC(const xmlDoc *xml_doc, const xmlDoc *xml_chi
        xmlFree(_res);
     if (_newdoc != NULL)
        xmlFreeDoc(_newdoc);
-    xmlCleanupParser();
     return _ret;
 }
 

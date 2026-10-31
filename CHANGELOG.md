@@ -107,6 +107,13 @@ e derivados, é preciso liberar a assinatura SHA1 (ver README).
   - XML com acentos podia ser corrompido no Windows (conversão para a codificação local) e o `Content-Length` ficava errado;
   - linha do pedido HTTP inválida (espaço antes do fim de linha), SNI não enviado e `SSL_accept` indevido no cliente;
   - socket, `SSL_CTX` e `SSL` vazavam nos retornos de erro.
+- **Crash na assinatura** (`CppLibXml2::c14n`): quando o nó a assinar não existia no XML, a lib liberava a raiz do documento
+  duas vezes (`double free`) e a aplicação fechava. Agora a assinatura falha com erro.
+- A assinatura chamava `xmlCleanupParser()`, que limpa o estado global da libxml2 e não deve ser chamada com a biblioteca em uso
+  (risco com threads ou com outras partes da aplicação que usam a libxml2).
+- Validação por XSD (`parseXML`): os erros da libxml2 eram impressos no stderr da aplicação e a mensagem de erro terminava com
+  quebra de linha. Agora os erros são capturados pela lib, e a mensagem informa o **primeiro** erro do XML (antes era o último).
+  Diretório de schemas inválido encerra a validação na hora.
 - `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
 - Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
 - Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
