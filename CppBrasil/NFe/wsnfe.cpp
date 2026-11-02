@@ -762,6 +762,17 @@ bool WSEvento::send(const QByteArray &xml, const QString &verLayout, const QStri
 
 bool WSEvento::gerarXML(const QByteArray &xml)
 {
+    m_tpEvento = TpEvento::None;
+    QXmlStreamReader leitor(xml);
+    while (!leitor.atEnd())
+    {
+        leitor.readNext();
+        if (leitor.isStartElement() && leitor.name() == QStringLiteral("tpEvento"))
+        {
+            m_tpEvento = ConvNF::strToTpEvento(leitor.readElementText());
+            break;
+        }
+    }
     //só será necessário gerar o envelop soap, já que o xml foi assinado e validado na sua criação
     bool _ret = true;
     //envelop soap
@@ -781,6 +792,10 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
 {
     //consultar schema e analizar o resultado
     QString _schemaName = "retEnvEvento_v" + get_verLayout() + ".xsd";
+    if (m_tpEvento == TpEvento::ECONF)
+        _schemaName = "retEventoEConf_v" + get_verLayout() + ".xsd";
+    else if (m_tpEvento == TpEvento::CancelECONF)
+        _schemaName = "retEventoCancEConf_v" + get_verLayout() + ".xsd";
     StatusRetorno _ret = (validarXML(_schemaName, "retEnvEvento", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
 
     if (_ret == StatusRetorno::Processado)

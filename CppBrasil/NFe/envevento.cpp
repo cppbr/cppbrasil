@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "envevento.h"
+#include "urlnfe.h"
 
 EnvEvento::EnvEvento(ConfigNFe *confgNFe, NotaFiscal *notafiscal): evento(new Container<TEvento>),
    retorno(new RetEnvEvento()), config(confgNFe), notafiscal(notafiscal)
@@ -64,7 +65,7 @@ bool EnvEvento::enviarEvento(const int &idLote)
             connect(_ws.get(), &WSEvento::errorOccurred, this, &EnvEvento::onError);
 
 
-            bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
+            _ret = _ws->send(this->m_xml.toLocal8Bit(),
                                   ConvNF::versaoLayout(WebServicesNF::NFeRecepcaoEvento),
                                   _servidor);
 
@@ -143,6 +144,7 @@ bool EnvEvento::gerarXML(const int &idLote)
     bool _ret = true;
     QString _evento;
     this->m_error.clear();
+    this->m_xml.clear();
 
     //versão - Caso não seja informado, será 1.00 que é a versão do momento.
     if (this->m_versao.isEmpty())
@@ -183,6 +185,26 @@ bool EnvEvento::gerarXML(const int &idLote)
 
 void EnvEvento::updateEvento(int &index)
 {
+    const TpEvento tipo = evento->value(index)->infEvento->get_tpEvento();
+    if (tipo == TpEvento::ECONF || tipo == TpEvento::CancelECONF)
+    {
+        evento->value(index)->infEvento->set_verEvento("1.00");
+        evento->value(index)->infEvento->detEvento->set_descEvento(
+            tipo == TpEvento::ECONF ? "ECONF" : "Cancelamento Conciliação Financeira");
+        if (config->get_ModeloDF() == ModeloDF::NFe)
+            evento->value(index)->infEvento->set_cOrgao(92);
+        else
+        {
+            const QString url = UrlNFe::get_urlServidor(config->webservices->get_uf(),
+                config->webservices->get_tpAmb(), TpEmis::Normal, ModeloDF::NFCe,
+                config->get_VersaoNF(), WebServicesNF::NFeRecepcaoEvento);
+            const QString urlSVRS = UrlNFe::get_urlServidor(config->webservices->get_uf(),
+                config->webservices->get_tpAmb(), TpEmis::Normal, ModeloDF::NFCe,
+                config->get_VersaoNF(), WebServicesNF::NFeRecepcaoEvento, "SVRS");
+            evento->value(index)->infEvento->set_cOrgao(!urlSVRS.isEmpty() && url == urlSVRS
+                ? 92 : ConvNF::ufToInt(config->webservices->get_uf()));
+        }
+    }
     //versão
     evento->value(index)->set_versao(this->m_versao);
     //nSeqEvento deve ser tratado pelo software do usuário e não pela lib, portanto,
@@ -213,6 +235,29 @@ void EnvEvento::updateEvento(int &index)
 
 bool EnvEvento::get_servidorEvento(QString &servidor)
 {
+    servidor.clear();
+    if (!evento->isEmpty())
+    {
+        const TpEvento primeiro = evento->value(0)->infEvento->get_tpEvento();
+        bool temEconf = false;
+        for (const TEvento *item : *evento)
+            temEconf = temEconf || item->infEvento->get_tpEvento() == TpEvento::ECONF ||
+                       item->infEvento->get_tpEvento() == TpEvento::CancelECONF;
+        if (temEconf)
+        {
+            for (const TEvento *item : *evento)
+            {
+                if (item->infEvento->get_tpEvento() != primeiro)
+                {
+                    m_error = "Envie ECONF e cancelamento de ECONF em lotes separados por tipo de evento.";
+                    return false;
+                }
+            }
+            if (config->get_ModeloDF() == ModeloDF::NFe)
+                servidor = "SVRS";
+            return true;
+        }
+    }
     //Insucesso na Entrega da NF-e (NT 2023.005) é autorizado somente pela SVRS, independente
     //da UF do emitente. Por isso, não pode ser enviado no mesmo lote com outros tipos de evento.
     int _qtdInsucesso = 0;
@@ -244,7 +289,12 @@ bool EnvEvento::validarEvento()
     bool _ret = true;
     QByteArray _schemaPath(config->arquivos->get_caminhoSchema().toLocal8Bit());
     QByteArray _schemaName;
-    _schemaName.append("envEvento_v");
+    if (!evento->isEmpty() && evento->value(0)->infEvento->get_tpEvento() == TpEvento::ECONF)
+        _schemaName.append("envEventoEConf_v");
+    else if (!evento->isEmpty() && evento->value(0)->infEvento->get_tpEvento() == TpEvento::CancelECONF)
+        _schemaName.append("envEventoCancEConf_v");
+    else
+        _schemaName.append("envEvento_v");
     _schemaName.append(this->m_versao.toLocal8Bit());
     _schemaName.append(".xsd");
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath));

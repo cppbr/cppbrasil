@@ -58,6 +58,26 @@ Windows, Debian e Ubuntu não têm esse bloqueio.
   contra a versão nova; os binários compilados com a antiga não carregam a nova.
 - A lib funciona com a libxml2 compilada sem a interface antiga SAX1 (`--without-sax1`).
 
+## Evento ECONF (NT 2024.002 v1.00)
+O acesso é feito por `cppnfe->eventos->envEvento`. Preencha os eventos em `evento->obj`
+e confirme com `evento->add()`, usando `TpEvento::ECONF` ou `TpEvento::CancelECONF`.
+Os pagamentos ficam em `evento->obj->infEvento->detEvento->detPag`, um `Container<DetPag>`.
+O grupo reutiliza `DetPag` e seu objeto `card`: `card->set_CNPJ(...)` fornece `CNPJIF` no evento;
+`card->set_tBand(...)` e `card->set_cAut(...)` fornecem os campos correspondentes,
+serializados diretamente em `detPag` no XML de ECONF.
+Recompile as aplicações após atualizar a biblioteca, pois `DetPag` recebeu novos membros.
+Informe a versão do aplicativo em `detEvento->set_verAplic(...)` e, no cancelamento,
+o protocolo do evento original em `detEvento->set_nProtEvento(...)`.
+Envie com `cppnfe->eventos->envEvento->enviarEvento(idLote)` e consulte o retorno em
+`cppnfe->eventos->envEvento->retorno`.
+
+Configure a pasta de schemas com os XSDs de ECONF e cancelamento, incluindo seus arquivos
+de dependência. No ambiente de desenvolvimento, eles estão em `build/schemas-nfe/`.
+Envie conciliação e cancelamento em lotes separados, com até 20 eventos; cada ECONF aceita
+de 1 a 100 pagamentos. A biblioteca preenche a descrição, versão do detalhe e órgão receptor:
+NF-e usa SVRS (92); NFC-e usa o serviço da UF. No XSD fornecido, `CNPJIF`, `tBand` e `cAut`
+dependem do preenchimento de `CNPJPag` e `UFPag`.
+
 ## Compilação
 ### Linux
 A compilação no Linux pode ser feita via cmake ou utilizando o script MakeLinux.sh. O script utiliza o cmake e o ninja e será instalado dentro do diretório /usr.
