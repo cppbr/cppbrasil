@@ -11,6 +11,7 @@
 #include <CppBrasil/container.h>
 #include <CppBrasil/NFe/convnf.h>
 #include <CppBrasil/NFe/confignfe.h>
+#include <CppBrasil/NFe/detpag.h>
 
 
 class CPPNFE_EXPORT AutXMLAtor
@@ -146,6 +147,7 @@ public:
     std::unique_ptr<DestEPEC> dest;
     std::unique_ptr<Container<ItemPedProrrog>> itemPedido;
     std::unique_ptr<AutXMLAtor> autXML;
+    std::unique_ptr<Container<DetPag>> detPag;
 private:
     QString m_versao;
     QString m_descEvento;

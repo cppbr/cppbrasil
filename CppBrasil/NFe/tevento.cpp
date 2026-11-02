@@ -160,7 +160,7 @@ void DestEPEC::set_IE(const QString &IE)
 //------------------------------------------------------------------------
 
 DetEvento::DetEvento(): dest(new DestEPEC()), itemPedido(new Container<ItemPedProrrog>),
-    autXML(new AutXMLAtor()), m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
+    autXML(new AutXMLAtor()), detPag(new Container<DetPag>), m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
     m_tpNF(TpNF::None), m_vNF(0.0), m_vICMS(0.0), m_vST(0.0), m_tpAutorizacao(TpAutorizacao::None),
     m_nTentativa(0), m_tpMotivo(TpMotivo::None)
 {
@@ -177,6 +177,7 @@ void DetEvento::clear()
     this->dest->clear();
     this->itemPedido->clear();
     this->autXML->clear();
+    this->detPag->clear();
     this->m_versao.clear();
     this->m_descEvento.clear();
     this->m_cOrgaoAutor = 0;
@@ -724,6 +725,8 @@ void TEvento::assinarXML(const ConfigNFe *config)
 
 void TEvento::gerarXML()
 {
+    this->m_error.clear();
+    this->m_xml_assinado.clear();
     QByteArray _strXML;
     QXmlStreamWriter _xmlw(&_strXML);
 
@@ -874,6 +877,39 @@ void TEvento::gerarXML()
     {
         _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
     }
+
+    //Conciliação Financeira (NT 2024.002)
+    if (this->infEvento->get_tpEvento() == TpEvento::ECONF)
+    {
+        for (const DetPag *pag : *this->infEvento->detEvento->detPag)
+        {
+            _xmlw.writeStartElement("detPag");
+            if (pag->get_indPag() != IndPag::None)
+                _xmlw.writeTextElement("indPag", ConvNF::indPagToStr(pag->get_indPag()));
+            _xmlw.writeTextElement("tPag", ConvNF::tPagToStr(pag->get_tPag()));
+            if (!pag->get_xPag().isEmpty())
+                _xmlw.writeTextElement("xPag", pag->get_xPag());
+            _xmlw.writeTextElement("vPag", CppUtility::doubleToStrDecimal(pag->get_vPag(), 2));
+            _xmlw.writeTextElement("dPag", pag->get_dPag().toString(Qt::ISODate));
+            if (!pag->get_CNPJPag().isEmpty())
+                _xmlw.writeTextElement("CNPJPag", pag->get_CNPJPag());
+            if (pag->get_UFPag() != UF::None)
+                _xmlw.writeTextElement("UFPag", ConvNF::ufToStr(pag->get_UFPag()));
+            if (!pag->card->get_CNPJ().isEmpty())
+                _xmlw.writeTextElement("CNPJIF", pag->card->get_CNPJ());
+            if (pag->card->get_tBand() != TBand::None)
+                _xmlw.writeTextElement("tBand", ConvNF::tBandToStr(pag->card->get_tBand()));
+            if (!pag->card->get_cAut().isEmpty())
+                _xmlw.writeTextElement("cAut", pag->card->get_cAut());
+            if (!pag->get_CNPJReceb().isEmpty())
+                _xmlw.writeTextElement("CNPJReceb", pag->get_CNPJReceb());
+            if (pag->get_UFReceb() != UF::None)
+                _xmlw.writeTextElement("UFReceb", ConvNF::ufToStr(pag->get_UFReceb()));
+            _xmlw.writeEndElement();
+        }
+    }
+    if (this->infEvento->get_tpEvento() == TpEvento::CancelECONF)
+        _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
 
     _xmlw.writeEndElement(); //fechamento detEvento
     _xmlw.writeEndElement(); //fechamento infEvento

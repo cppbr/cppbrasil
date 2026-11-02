@@ -23,6 +23,7 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
+#include <QDate>
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/NFe/card.h>
 #include <CppBrasil/NFe/convnf.h>
@@ -42,6 +43,17 @@ public:
     QString get_xPag() const;
     void set_xPag(const QString &xPag);
 
+    QDate get_dPag() const;
+    void set_dPag(const QDate &dPag);
+    QString get_CNPJPag() const;
+    void set_CNPJPag(const QString &CNPJPag);
+    UF get_UFPag() const;
+    void set_UFPag(const UF &UFPag);
+    QString get_CNPJReceb() const;
+    void set_CNPJReceb(const QString &CNPJReceb);
+    UF get_UFReceb() const;
+    void set_UFReceb(const UF &UFReceb);
+
     std::unique_ptr<Card> card;
 
 private:
@@ -49,6 +61,11 @@ private:
     TPag m_tPag;
     double m_vPag;
     QString m_xPag;
+    QDate m_dPag;
+    QString m_CNPJPag;
+    UF m_UFPag;
+    QString m_CNPJReceb;
+    UF m_UFReceb;
 };
 
 #endif // DETPAG_H

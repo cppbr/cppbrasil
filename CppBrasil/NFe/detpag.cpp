@@ -21,7 +21,8 @@ limitations under the License.
 #include "detpag.h"
 
 DetPag::DetPag() :
-    card(new Card), m_indPag(IndPag::None), m_tPag(TPag::None), m_vPag(0.0)
+    card(new Card), m_indPag(IndPag::None), m_tPag(TPag::None), m_vPag(0.0),
+    m_UFPag(UF::None), m_UFReceb(UF::None)
 {
 }
 
@@ -35,6 +36,11 @@ void DetPag::clear()
     this->m_tPag = TPag::None;
     this->m_vPag = 0.0;
     this->m_xPag.clear();
+    this->m_dPag = QDate();
+    this->m_CNPJPag = QString();
+    this->m_UFPag = UF::None;
+    this->m_CNPJReceb = QString();
+    this->m_UFReceb = UF::None;
 
     this->card->clear();
 }
@@ -77,4 +83,54 @@ QString DetPag::get_xPag() const
 void DetPag::set_xPag(const QString &xPag)
 {
     this->m_xPag = xPag;
+}
+
+QDate DetPag::get_dPag() const
+{
+    return this->m_dPag;
+}
+
+void DetPag::set_dPag(const QDate &dPag)
+{
+    this->m_dPag = dPag;
+}
+
+QString DetPag::get_CNPJPag() const
+{
+    return this->m_CNPJPag;
+}
+
+void DetPag::set_CNPJPag(const QString &CNPJPag)
+{
+    this->m_CNPJPag = CNPJPag;
+}
+
+UF DetPag::get_UFPag() const
+{
+    return this->m_UFPag;
+}
+
+void DetPag::set_UFPag(const UF &UFPag)
+{
+    this->m_UFPag = UFPag;
+}
+
+QString DetPag::get_CNPJReceb() const
+{
+    return this->m_CNPJReceb;
+}
+
+void DetPag::set_CNPJReceb(const QString &CNPJReceb)
+{
+    this->m_CNPJReceb = CNPJReceb;
+}
+
+UF DetPag::get_UFReceb() const
+{
+    return this->m_UFReceb;
+}
+
+void DetPag::set_UFReceb(const UF &UFReceb)
+{
+    this->m_UFReceb = UFReceb;
 }

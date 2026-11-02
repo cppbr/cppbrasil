@@ -77,12 +77,22 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- Evento de Conciliação Financeira da NT 2024.002 v1.00, usando diretamente
+  `EventoNotaFiscal::envEvento`, `TEvento` e `RetEnvEvento`. Inclui os eventos
+  `TpEvento::ECONF` (110750) e `TpEvento::CancelECONF` (110751), os pagamentos em
+  `DetEvento::detPag` (`Container<DetPag>`), geração e assinatura XML, schemas específicos
+  de envio/retorno e direcionamento da NF-e para a SVRS e da NFC-e para a UF.
+- `DetPag` ampliada com `dPag`, `CNPJPag`, `UFPag`, `CNPJReceb` e `UFReceb`,
+  reutilizando `Card` para os dados da instituição de pagamento. Aplicações devem ser
+  recompiladas devido à alteração do layout da classe.
 - `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
   que permitem escrever `for (auto *x : *container)`.
 - Valores padrão em `ConfigNFe`: `ModeloDF::NFe`, `VersaoNF::v400`, `VersaoQrCodeNF::v200`, `IndSinc::Nao` e `TpEmis::Normal`.
 - Este arquivo de changelog.
 
 ### Corrigido
+- `EnvEvento::enviarEvento()` passa a retornar a falha do web service corretamente; a geração
+  repetida limpa o XML do lote e o erro/assinatura anterior do evento.
 - **XML de NF-e com DI inválido**: a tag `UFDesemb` era gerada duas vezes no grupo `DI`, e a SEFAZ rejeitava
   notas de importação.
 - **XML duplicado ao gerar de novo**: `gerar()` numa nota importada, ou chamado mais de uma vez, produzia um XML

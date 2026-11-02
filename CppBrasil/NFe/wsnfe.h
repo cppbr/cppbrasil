@@ -127,6 +127,7 @@ public:
 
 private:
     RetEnvEvento* retorno;
+    TpEvento m_tpEvento = TpEvento::None;
     bool gerarXML(const QByteArray &xml);
     StatusRetorno tratarRetorno();
 
