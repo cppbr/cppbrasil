@@ -798,6 +798,10 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
         _schemaName = "retEventoCancEConf_v" + get_verLayout() + ".xsd";
     else if (m_tpEvento == TpEvento::AtorInteressadoNFeTransp)
         _schemaName = "retEnvEventoAtorInteressado_v" + get_verLayout() + ".xsd";
+    else if (m_tpEvento == TpEvento::Cancelamento)
+        _schemaName = "retEnvEventoCancNFe_v" + get_verLayout() + ".xsd";
+    else if (m_tpEvento == TpEvento::CancelamentoSubstituicao)
+        _schemaName = "retEnvEventoCancSubst_v" + get_verLayout() + ".xsd";
     StatusRetorno _ret = (validarXML(_schemaName, "retEnvEvento", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
 
     if (_ret == StatusRetorno::Processado)
@@ -874,7 +878,7 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
                     {
                         _xmlRetEvento.writeStartElement("infEvento");
 
-                        //attributes = _xml.attributes();
+                        attributes = _xml.attributes();
                         if(attributes.hasAttribute("Id"))
                         {
                            _valor = attributes.value("Id").toString();

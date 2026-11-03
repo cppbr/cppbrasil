@@ -30,6 +30,7 @@ limitations under the License.
 #include <CppBrasil/NFe/notafiscal.h>
 #include <CppBrasil/NFe/envevento.h>
 #include <CppBrasil/NFe/conssitnfe.h>
+#include <CppBrasil/NFe/cancnfe.h>
 
 
 class CPPNFE_EXPORT EventoNotaFiscal : public QObject
@@ -43,6 +44,7 @@ public:
     std::unique_ptr<StatusServico> statusServico;
     std::unique_ptr<EnvEvento> envEvento;
     std::unique_ptr<ConsSitNFe> consSitNFe;
+    std::unique_ptr<::CancNFe> CancNFe;
 
 signals:
     void errorOccurred(const QString &error);
