@@ -67,7 +67,7 @@ enum class ProcEmi {None = -1, AplicativoContribuinte = 0, AvulsaFisco = 1,
                    AvulsaContribuinte = 2, ContribuinteAplicativoFisco = 3};
 
 //CRT - Código de Regime Tributário
-enum class Crt {None = -1, SimplesNacional = 1, SimplesExcesso = 2, RegimeNormal = 3};
+enum class Crt {None = -1, SimplesNacional = 1, SimplesExcesso = 2, RegimeNormal = 3, SimplesMEI = 4};
 
 //indIEDest - Indicador da IE do Destinatário
 enum class IndIEDest {None = -1, ContribuinteICMS = 1, ContribuinteIsento = 2, NaoContribuinte = 9};
