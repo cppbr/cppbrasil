@@ -590,7 +590,7 @@ QString InfEvento::get_CPF() const
 
 void InfEvento::set_CPF(const QString &CPF)
 {
-    this->m_CNPJ = CPF;
+    this->m_CPF = CPF;
 }
 
 QString InfEvento::get_chNFe() const
@@ -727,6 +727,27 @@ void TEvento::gerarXML()
 {
     this->m_error.clear();
     this->m_xml_assinado.clear();
+    this->m_xml_original.clear();
+    if (infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp)
+    {
+        const auto autor = infEvento->detEvento->get_tpAutor();
+        const auto autorizacao = infEvento->detEvento->get_tpAutorizacao();
+        if (infEvento->get_chNFe().mid(20, 2) != "55")
+            m_error = "Ator interessado exige uma chave de NF-e modelo 55.";
+        else if (autor != TpAutor::EmpresaEmitente && autor != TpAutor::EmpresaDestinataria &&
+                 autor != TpAutor::EmpresaTerceiros)
+            m_error = "Ator interessado exige tpAutor 1, 2 ou 3.";
+        else if (autor == TpAutor::EmpresaTerceiros && autorizacao != TpAutorizacao::None)
+            m_error = "Transportador contratado não pode informar tpAutorizacao.";
+        else if (autor != TpAutor::EmpresaTerceiros &&
+                 autorizacao != TpAutorizacao::NaoPermite && autorizacao != TpAutorizacao::PermiteTranspAutTransp)
+            m_error = "Emitente e destinatário devem informar tpAutorizacao 0 ou 1.";
+        else if (autorizacao != TpAutorizacao::PermiteTranspAutTransp &&
+                 !infEvento->detEvento->get_xCondUso().isEmpty())
+            m_error = "xCondUso só pode ser informado com tpAutorizacao 1.";
+        if (!m_error.isEmpty())
+            return;
+    }
     QByteArray _strXML;
     QXmlStreamWriter _xmlw(&_strXML);
 
@@ -829,8 +850,10 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("CPF", this->infEvento->detEvento->autXML->get_CPF());
         _xmlw.writeEndElement(); //fechamento autXML
 
-        _xmlw.writeTextElement("TpAutorizacao", ConvNF::tpAutorizacaoToStr(this->infEvento->detEvento->get_tpAutorizacao()));
-        _xmlw.writeTextElement("xCondUso", this->infEvento->detEvento->get_xCondUso());
+        if (this->infEvento->detEvento->get_tpAutorizacao() != TpAutorizacao::None)
+            _xmlw.writeTextElement("tpAutorizacao", ConvNF::tpAutorizacaoToStr(this->infEvento->detEvento->get_tpAutorizacao()));
+        if (!this->infEvento->detEvento->get_xCondUso().isEmpty())
+            _xmlw.writeTextElement("xCondUso", this->infEvento->detEvento->get_xCondUso());
     }
     //Comprovante de Entrega
     if (this->infEvento->get_tpEvento() == TpEvento::ComprovanteEntregaNFe ||

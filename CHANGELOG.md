@@ -91,6 +91,15 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Este arquivo de changelog.
 
 ### Corrigido
+- Evento Ator Interessado na NF-e — Transportador (110150), conforme NT 2020.007 v1.40:
+  reutiliza `EnvEvento`, `TEvento`, `DetEvento::autXML` e os enums existentes. Corrigida a tag
+  `tpAutorizacao` e a emissão dos opcionais; valida as combinações de autor/autorização e
+  restringe o evento à NF-e modelo 55. Preenche descrição, versão 1.00, órgão 91 e condição
+  de uso quando autorizada. Direciona ao Ambiente Nacional em lote separado, usa os XSDs
+  específicos de envio/retorno e gera XML processado para os status 135 e 136.
+- `InfEvento::set_CPF()` gravava no membro CNPJ, impossibilitando informar corretamente
+  o CPF do autor nos eventos.
+- A associação de retorno e evento passa a conferir também `tpEvento`, além da chave e sequência.
 - `EnvEvento::enviarEvento()` passa a retornar a falha do web service corretamente; a geração
   repetida limpa o XML do lote e o erro/assinatura anterior do evento.
 - **XML de NF-e com DI inválido**: a tag `UFDesemb` era gerada duas vezes no grupo `DI`, e a SEFAZ rejeitava
