@@ -77,6 +77,9 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- Suporte a `Crt::SimplesMEI` (CRT 4) da NT 2024.001 v1.20, incluindo conversão
+  na leitura e geração. Nos grupos `ICMSSN102` e `ICMSSN900`, a origem não preenchida
+  (`Orig::None`) é omitida para MEI; origens informadas, inclusive nacional (0), são preservadas.
 - Evento de Conciliação Financeira da NT 2024.002 v1.00, usando diretamente
   `EventoNotaFiscal::envEvento`, `TEvento` e `RetEnvEvento`. Inclui os eventos
   `TpEvento::ECONF` (110750) e `TpEvento::CancelECONF` (110751), os pagamentos em
@@ -91,6 +94,8 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Este arquivo de changelog.
 
 ### Corrigido
+- CSOSN 103, 300 e 400 passam a usar o grupo XML `ICMSSN102`, conservando o valor de
+  `CSOSN`. Antes eram gerados grupos inexistentes (`ICMSSN103`, `ICMSSN300` e `ICMSSN400`).
 - Evento Ator Interessado na NF-e — Transportador (110150), conforme NT 2020.007 v1.40:
   reutiliza `EnvEvento`, `TEvento`, `DetEvento::autXML` e os enums existentes. Corrigida a tag
   `tpAutorizacao` e a emissão dos opcionais; valida as combinações de autor/autorização e
@@ -169,3 +174,75 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   zlib 1.3 e libiconv). As versões novas serão distribuídas como pacotes compactados. Até lá, o `installer/MakeMSVC.bat`
   e os `CMakeLists.txt` dos exemplos apontam para caminhos que não existem mais.
 - Exemplo `examples/QtCon-2022` (legado, sem manutenção).
+
+### Orientações de uso das Notas Técnicas
+
+#### Evento ECONF (NT 2024.002 v1.00)
+O acesso é feito por `cppnfe->eventos->envEvento`. Preencha os eventos em `evento->obj`
+e confirme com `evento->add()`, usando `TpEvento::ECONF` ou `TpEvento::CancelECONF`.
+Os pagamentos ficam em `evento->obj->infEvento->detEvento->detPag`, um `Container<DetPag>`.
+O grupo reutiliza `DetPag` e seu objeto `card`: `card->set_CNPJ(...)` fornece `CNPJIF` no evento;
+`card->set_tBand(...)` e `card->set_cAut(...)` fornecem os campos correspondentes,
+serializados diretamente em `detPag` no XML de ECONF.
+Recompile as aplicações após atualizar a biblioteca, pois `DetPag` recebeu novos membros.
+Informe a versão do aplicativo em `detEvento->set_verAplic(...)` e, no cancelamento,
+o protocolo do evento original em `detEvento->set_nProtEvento(...)`.
+Envie com `cppnfe->eventos->envEvento->enviarEvento(idLote)` e consulte o retorno em
+`cppnfe->eventos->envEvento->retorno`.
+
+Configure a pasta de schemas com os XSDs de ECONF e cancelamento, incluindo seus arquivos
+de dependência. No ambiente de desenvolvimento, eles estão em `build/schemas-nfe/`.
+Envie conciliação e cancelamento em lotes separados, com até 20 eventos; cada ECONF aceita
+de 1 a 100 pagamentos. A biblioteca preenche a descrição, versão do detalhe e órgão receptor:
+NF-e usa SVRS (92); NFC-e usa o serviço da UF. No XSD fornecido, `CNPJIF`, `tBand` e `cAut`
+dependem do preenchimento de `CNPJPag` e `UFPag`.
+
+#### Ator interessado na NF-e — Transportador (NT 2020.007 v1.40)
+Use `cppnfe->eventos->envEvento`, com `TpEvento::AtorInteressadoNFeTransp` (110150).
+Preencha CNPJ **ou** CPF do autor, chave da NF-e modelo 55, data/hora e sequência de 1 a 20
+em `evento->obj->infEvento`. Em `infEvento->detEvento`, informe:
+
+- `set_cOrgaoAutor(...)`: código IBGE da UF do autor do evento;
+- `set_tpAutor(...)`: `EmpresaEmitente` (1), `EmpresaDestinataria` (2) ou
+  `EmpresaTerceiros` (3, transportador contratado);
+- `set_verAplic(...)`: versão do aplicativo;
+- `autXML->set_CNPJ(...)` **ou** `autXML->set_CPF(...)`: transportador autorizado;
+- `set_tpAutorizacao(...)`: emitente/destinatário devem escolher `NaoPermite` (0) ou
+  `PermiteTranspAutTransp` (1). Para transportador contratado, deixe `None`.
+
+A biblioteca preenche descrição, versão do detalhe 1.00 e órgão receptor 91. Com autorização 1,
+preenche também o texto oficial de `xCondUso` quando vazio. Nas demais opções, não informe esse texto.
+Confirme cada evento com `evento->add()` e envie com `envEvento->enviarEvento(idLote)`;
+o retorno fica em `envEvento->retorno`, incluindo `cOrgaoAutor`. Os status 135 e 136 geram
+o XML `procEventoNFe`.
+
+O envio usa exclusivamente o Ambiente Nacional, em lote separado dos demais tipos, com até
+20 eventos. Configure os schemas `envEventoAtorInteressado_v1.00.xsd`,
+`retEnvEventoAtorInteressado_v1.00.xsd` e suas dependências, incluindo
+`leiauteEventoAtorInteressado_v1.00.xsd`. Para validar o XML processado, use
+`procEventoAtorInteressado_v1.00.xsd`. Cópias locais para teste estão em `build/schemas-nfe/`.
+A versão 1.40 da NT mantém o leiaute 1.00; a regra 4P24-10, sobre habilitação do autorizado
+como emitente de CT-e, depende do cadastro consultado pela SEFAZ. O serviço também verifica
+o prazo de seis meses e os demais requisitos fiscais do evento.
+
+#### MEI — CRT 4 (NT 2024.001 v1.20)
+Informe `emite->set_CRT(Crt::SimplesMEI)`. A leitura de `<CRT>4</CRT>` preserva esse regime.
+Nos grupos `ICMSSN102` (CSOSN 102, 103, 300 ou 400) e `ICMSSN900`, `orig` é omitido
+quando o emitente é MEI e `ICMS->get_orig()` vale `Orig::None`. Se informado, o valor é
+preservado, inclusive `Orig::Nacional` (0). Nos demais regimes/grupos, a origem continua exigida.
+
+Para MEI, `cEAN` e `cEANTrib` podem ficar vazios; as tags continuam presentes no XML.
+Em operação interna, o NCM pode ser informado como `00000000`; nas operações interestaduais
+e com o exterior, informe o NCM completo correto. O grupo `ICMSUFDest` não é exigido para CRT 4.
+A biblioteca mantém os valores preenchidos pela aplicação, sem substituir NCM, CFOP, CSOSN
+ou grupos de imposto automaticamente. Use schemas atualizados que aceitem CRT 4 e a origem
+opcional nesses dois grupos.
+
+A validação local por XSD verifica o leiaute. As regras fiscais da NT são aplicadas pela SEFAZ:
+nas operações internas/interestaduais (`idDest != 3`), MEI pode usar CSOSN 102, 300, 400 e 900
+na NF-e; na NFC-e, somente 102 e 300. Para CSOSN 102, os CFOPs de NF-e são 5102/6102;
+para NFC-e, a regra do MEI permite somente 5102. CSOSN 900 e devoluções têm listas próprias
+de CFOP na NT, que devem ser observadas pela aplicação.
+
+A NT também substitui denegações por rejeições (302, 303 e 307) e exclui a denegação 301;
+os códigos e motivos recebidos continuam disponíveis nos retornos da biblioteca.

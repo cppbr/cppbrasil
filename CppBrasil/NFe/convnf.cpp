@@ -307,7 +307,7 @@ QString ConvNF::crtToStr(const Crt &value)
 
 Crt ConvNF::strToCrt(const QString &value)
 {
-    QList<QString> _r = {"-1","1","2","3"};
+    QList<QString> _r = {"-1","1","2","3","4"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return Crt::None;

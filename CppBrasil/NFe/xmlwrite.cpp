@@ -1303,13 +1303,21 @@ void XmlWrite::get_ICMS(const int &i)
             this->m_xmlw->writeEndElement();//fechamento grupo ICMS00, ICMS10, etc->->->
 
         }
-        else //CSOSN Grupo CRT=1 – Simples Nacional
+        else //CSOSN - Simples Nacional, incluindo CRT=4 (MEI)
         {
             QString csosn = ConvNF::csosnICMSToStr(_icms->get_CSOSN());
             QString cab = QString("%1%2").arg("ICMSSN", csosn);
+            if (_icms->get_CSOSN() == CsosnICMS::ICMSSN103 ||
+                _icms->get_CSOSN() == CsosnICMS::ICMSSN300 ||
+                _icms->get_CSOSN() == CsosnICMS::ICMSSN400)
+                cab = "ICMSSN102";
 
             this->m_xmlw->writeStartElement(cab); //abertura grupo ICMSSN101, ICMSSN102, etc->->->
-            this->m_xmlw->writeTextElement("orig", orig);
+            //NT 2024.001: apenas ICMSSN102 e ICMSSN900 permitem omitir a origem para MEI.
+            const bool origemOpcional = this->m_infNFe->emite->get_CRT() == Crt::SimplesMEI &&
+                (cab == "ICMSSN102" || cab == "ICMSSN900");
+            if (!origemOpcional || _icms->get_orig() != Orig::None)
+                this->m_xmlw->writeTextElement("orig", orig);
             this->m_xmlw->writeTextElement("CSOSN", csosn);
 
             //CSOSN=101
