@@ -156,7 +156,8 @@ bool EnvEvento::gerarXML(const int &idLote)
         //campos que necessitam de ajustes.
         updateEvento(i);
         evento->value(i)->gerarXML();
-        evento->value(i)->assinarXML(this->config);
+        if (evento->value(i)->get_error().isEmpty())
+            evento->value(i)->assinarXML(this->config);
         //assina xml
         if (evento->value(i)->get_error().isEmpty())
         {
@@ -186,6 +187,16 @@ bool EnvEvento::gerarXML(const int &idLote)
 void EnvEvento::updateEvento(int &index)
 {
     const TpEvento tipo = evento->value(index)->infEvento->get_tpEvento();
+    if (tipo == TpEvento::AtorInteressadoNFeTransp)
+    {
+        auto *inf = evento->value(index)->infEvento.get();
+        inf->set_cOrgao(91);
+        inf->set_verEvento("1.00");
+        inf->detEvento->set_descEvento("Ator interessado na NF-e");
+        if (inf->detEvento->get_tpAutorizacao() == TpAutorizacao::PermiteTranspAutTransp &&
+            inf->detEvento->get_xCondUso().isEmpty())
+            inf->detEvento->set_xCondUso("O emitente ou destinatário da NF-e, declara que permite o transportador declarado no campo CNPJ/CPF deste evento a autorizar os transportadores subcontratados ou redespachados a terem acesso ao download da NF-e");
+    }
     if (tipo == TpEvento::ECONF || tipo == TpEvento::CancelECONF)
     {
         evento->value(index)->infEvento->set_verEvento("1.00");
@@ -239,6 +250,25 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     if (!evento->isEmpty())
     {
         const TpEvento primeiro = evento->value(0)->infEvento->get_tpEvento();
+        bool temAtor = false;
+        for (const TEvento *item : *evento)
+            temAtor = temAtor || item->infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp;
+        if (temAtor)
+        {
+            if (config->get_ModeloDF() != ModeloDF::NFe)
+            {
+                m_error = "Ator interessado é um evento exclusivo da NF-e modelo 55.";
+                return false;
+            }
+            for (const TEvento *item : *evento)
+                if (item->infEvento->get_tpEvento() != TpEvento::AtorInteressadoNFeTransp)
+                {
+                    m_error = "Envie Ator interessado em lote separado dos demais tipos de evento.";
+                    return false;
+                }
+            servidor = "AN";
+            return true;
+        }
         bool temEconf = false;
         for (const TEvento *item : *evento)
             temEconf = temEconf || item->infEvento->get_tpEvento() == TpEvento::ECONF ||
@@ -293,6 +323,8 @@ bool EnvEvento::validarEvento()
         _schemaName.append("envEventoEConf_v");
     else if (!evento->isEmpty() && evento->value(0)->infEvento->get_tpEvento() == TpEvento::CancelECONF)
         _schemaName.append("envEventoCancEConf_v");
+    else if (!evento->isEmpty() && evento->value(0)->infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp)
+        _schemaName.append("envEventoAtorInteressado_v");
     else
         _schemaName.append("envEvento_v");
     _schemaName.append(this->m_versao.toLocal8Bit());
@@ -328,9 +360,12 @@ void EnvEvento::tratarRetorno()
                 if ((this->retorno->retEvento->value(i)->infEvento->get_chNFe() ==
                      this->evento->value(j)->infEvento->get_chNFe()) &&
                     (this->retorno->retEvento->value(i)->infEvento->get_nSeqEvento() ==
-                     this->evento->value(j)->infEvento->get_nSeqEvento()))
+                     this->evento->value(j)->infEvento->get_nSeqEvento()) &&
+                    (this->retorno->retEvento->value(i)->infEvento->get_tpEvento() ==
+                     this->evento->value(j)->infEvento->get_tpEvento()))
                 {
-                    if (_cStat == 135)
+                    if (_cStat == 135 || (_cStat == 136 &&
+                        this->evento->value(j)->infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp))
                     {
                         QByteArray _procEventoNFe, _xmlOriginal, _retEvento;
                         _procEventoNFe.append(QString("<procEventoNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao =\"" + get_versao() + "\">").toLocal8Bit());

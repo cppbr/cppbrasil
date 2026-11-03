@@ -796,6 +796,8 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
         _schemaName = "retEventoEConf_v" + get_verLayout() + ".xsd";
     else if (m_tpEvento == TpEvento::CancelECONF)
         _schemaName = "retEventoCancEConf_v" + get_verLayout() + ".xsd";
+    else if (m_tpEvento == TpEvento::AtorInteressadoNFeTransp)
+        _schemaName = "retEnvEventoAtorInteressado_v" + get_verLayout() + ".xsd";
     StatusRetorno _ret = (validarXML(_schemaName, "retEnvEvento", this->m_msgRetorno) ? StatusRetorno::Processado : StatusRetorno::Erro );
 
     if (_ret == StatusRetorno::Processado)
