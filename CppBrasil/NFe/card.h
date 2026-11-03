@@ -39,11 +39,18 @@ public:
     void set_tBand(const TBand &tBand);
     QString get_cAut() const;
     void set_cAut(const QString &cAut);
+    QString get_CNPJReceb() const;
+    void set_CNPJReceb(const QString &CNPJReceb);
+    QString get_idTermPag() const;
+    void set_idTermPag(const QString &idTermPag);
+
 private:
     TpIntegra m_tpIntegra;
     QString m_CNPJ;
     TBand m_tBand;
     QString m_cAut;
+    QString m_CNPJReceb;
+    QString m_idTermPag;
 };
 
 #endif // CARD_H

@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "icms.h"
 
-Icms::Icms(): m_orig(Orig::None), m_CST(CstICMS::None), m_CSOSN(CsosnICMS::None),
+Icms::Icms(): m_indDeduzDeson(IndDeduzDeson::None), m_orig(Orig::None), m_CST(CstICMS::None), m_CSOSN(CsosnICMS::None),
     m_modBC(ModBC::None), m_vBC(0.0), m_pICMS(0.0), m_vICMS(0.0), m_pFCP(0.0),
     m_vFCP(0.0), m_vBCFCP(0.0), m_modBCST(ModBCST::None), m_pMVAST(0.0),
     m_pRedBCST(0.0), m_vBCST(0.0), m_pICMSST(0.0), m_vICMSST(0.0), m_vBCFCPST(0.0), m_pFCPST(0.0),
@@ -42,6 +42,7 @@ Icms::~Icms()
 
 void Icms::clear()
 {
+    this->m_indDeduzDeson = IndDeduzDeson::None;
     this->m_orig = Orig::None;
     this->m_CST = CstICMS::None;
     this->m_CSOSN = CsosnICMS::None;
@@ -703,4 +704,14 @@ double Icms::get_vICMSMonoRet() const
 void Icms::set_vICMSMonoRet(const double &vICMSMonoRet)
 {
     this->m_vICMSMonoRet = vICMSMonoRet;
+}
+
+IndDeduzDeson Icms::get_indDeduzDeson() const
+{
+    return this->m_indDeduzDeson;
+}
+
+void Icms::set_indDeduzDeson(const IndDeduzDeson &indDeduzDeson)
+{
+    this->m_indDeduzDeson = indDeduzDeson;
 }

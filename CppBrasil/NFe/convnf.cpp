@@ -528,7 +528,7 @@ CstICMS ConvNF::strToCstICMS(const QString &value)
     if (_i == -1 || value.isEmpty())
         return CstICMS::None;
     else
-        return static_cast<CstICMS>(_r[_i].toInt());
+        return static_cast<CstICMS>(_i - 1);
 }
 
 QString ConvNF::csosnICMSToStr(const CsosnICMS &value)
@@ -815,6 +815,20 @@ TBand ConvNF::strToTBand(const QString &value)
         return static_cast<TBand>(_r[_i].toInt());
 }
 
+QString ConvNF::indDeduzDesonToStr(const IndDeduzDeson &value)
+{
+    return value == IndDeduzDeson::None ? QString() : QString::number(static_cast<int>(value));
+}
+
+IndDeduzDeson ConvNF::strToIndDeduzDeson(const QString &value)
+{
+    if (value == "0")
+        return IndDeduzDeson::Nao;
+    if (value == "1")
+        return IndDeduzDeson::Sim;
+    return IndDeduzDeson::None;
+}
+
 QString ConvNF::indProcToStr(const IndProc &value)
 {
     if (value == IndProc::None)
@@ -825,7 +839,7 @@ QString ConvNF::indProcToStr(const IndProc &value)
 
 IndProc ConvNF::strToIndProc(const QString &value)
 {
-    QList<QString> _r = {"-1","0","1","2","3","9"};
+    QList<QString> _r = {"-1","0","1","2","3","4","9"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return IndProc::None;
@@ -838,12 +852,12 @@ QString ConvNF::tpAtoToStr(const TpAto &value)
     if (value == TpAto::None)
         return QString();
     else
-        return QString::number(static_cast<int>(value));
+        return QString::number(static_cast<int>(value)).rightJustified(2, '0');
 }
 
 TpAto ConvNF::strToTpAto(const QString &value)
 {
-    QList<QString> _r = {"-1","8","10","12"};
+    QList<QString> _r = {"-1","8","08","10","12","14","15"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpAto::None;
