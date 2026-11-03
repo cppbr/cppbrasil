@@ -95,6 +95,7 @@ SOURCES += \
     autxml.cpp \
     avulsa.cpp \
     cana.cpp \
+    cancnfe.cpp \
     card.cpp \
     cide.cpp \
     cobr.cpp \
@@ -198,6 +199,7 @@ HEADERS += \
     autxml.h \
     avulsa.h \
     cana.h \
+    cancnfe.h \
     card.h \
     cide.h \
     cobr.h \

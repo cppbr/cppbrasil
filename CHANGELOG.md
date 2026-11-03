@@ -77,6 +77,43 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- `CancNFe`, em `cancnfe.h`/`cancnfe.cpp`, disponível em `EventoNotaFiscal::CancNFe`,
+  com envio independente de `EnvEvento`. Suporta cancelamento de NF-e/NFC-e
+  (`TpEvento::Cancelamento`, 110111) e cancelamento por substituição exclusivo da NFC-e
+  (`TpEvento::CancelamentoSubstituicao`, 110112), conforme o leiaute 1.00.
+  Recompilar a biblioteca e as aplicações devido à ampliação de `EventoNotaFiscal`.
+- O cancelamento usa um único `TEvento` em `CancNFe::evento` e `RetEnvEvento` em
+  `CancNFe::retorno`. Preencher CNPJ **ou** CPF do emitente, chave, protocolo de autorização
+  e justificativa de 15 a 255 caracteres. Versão, descrição, ID e sequência 1 são preparados
+  automaticamente; ambiente e órgão não informados vêm da configuração, e a data não
+  informada usa o horário atual. Informar modelo, UF e ambiente correspondentes à nota.
+  Exemplo, após configurar os schemas e carregar o certificado do emitente:
+
+  ```cpp
+  auto &cancelamento = *cppnfe->eventos->CancNFe;
+  cancelamento.clear();
+  auto *inf = cancelamento.evento->infEvento.get();
+  inf->set_CNPJ(cnpjEmitente); // ou set_CPF(cpfEmitente)
+  inf->set_chNFe(chaveNFe);
+  inf->detEvento->set_nProt(protocoloAutorizacao);
+  inf->detEvento->set_xJust(justificativa);
+  bool enviado = cancelamento.cancelar(1); // idLote
+  // Consultar retorno->get_cStat() e retorno->retEvento para a decisão da SEFAZ.
+  ```
+
+  Para substituição, definir também `inf->set_tpEvento(TpEvento::CancelamentoSubstituicao)`,
+  `inf->detEvento->set_chNFeRef(chaveSubstituta)` e `set_verAplic(versaoAplicativo)` no
+  detalhe. `cOrgaoAutor` e `tpAutor=1` são preparados quando não informados. A nota
+  cancelada deve ter emissão normal e a substituta deve ser distinta, da mesma UF,
+  emitente e modelo, emitida em contingência. Usar `clear()` antes de preparar outro pedido.
+- Assinatura do cancelamento e validação pelos XSDs específicos `envEventoCancNFe` /
+  `envEventoCancSubst`, `retEnvEventoCancNFe` / `retEnvEventoCancSubst` e
+  `procEventoCancNFe` / `procEventoCancSubst`, todos na versão 1.00.
+  O XML `procEventoNFe` é montado e validado para lote 128 com evento 135 ou 155,
+  somente quando chave, tipo, sequência e ambiente correspondem ao pedido; sua gravação
+  segue a configuração de arquivos de eventos. `cancelar()` retornar `true` indica que o
+  envio e o tratamento da resposta concluíram: a aceitação fiscal depende dos códigos
+  retornados. Prazos, autorização, protocolo e impedimentos fiscais dependem da SEFAZ.
 - Leiaute da NT 2023.004 v1.20: `Di::CPF`, `Icms::indDeduzDeson`
   (`IndDeduzDeson::None/Nao/Sim`), `Card::CNPJReceb` e `Card::idTermPag`, com
   leitura, escrita e limpeza dos campos. Geração de `indDeduzDeson` nos grupos
@@ -104,6 +141,7 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Este arquivo de changelog.
 
 ### Corrigido
+- Preservação do atributo `infEvento/@Id` na leitura do retorno de `WSEvento`.
 - Conversão de leitura dos CSTs do ICMS: agora usa a posição do enum, em vez do
   número fiscal, preservando também Part10/Part90/ST41/ST60. Antes a leitura podia
   resultar em CST incorreto ou acesso inválido ao gerar novamente.

@@ -65,6 +65,8 @@ set(cppnfe_SRC
     avulsa.cpp
     cana.h
     cana.cpp
+    cancnfe.h
+    cancnfe.cpp
     card.h
     card.cpp
     cide.h
@@ -254,6 +256,7 @@ set(HEADER_NFE
     autxml.h
     avulsa.h
     cana.h
+    cancnfe.h
     card.h
     cide.h
     cobr.h
