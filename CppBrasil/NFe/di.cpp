@@ -32,6 +32,7 @@ Di::~Di()
 
 void Di::clear()
 {
+    this->m_CPF = QString();
     this->m_nDI.clear();
     CppUtility::clearDateTime(this->m_dDI);
     this->m_xLocDesemb.clear();
@@ -155,4 +156,14 @@ QString Di::get_cExportador() const
 void Di::set_cExportador(const QString &cExportador)
 {
     this->m_cExportador = cExportador;
+}
+
+QString Di::get_CPF() const
+{
+    return this->m_CPF;
+}
+
+void Di::set_CPF(const QString &CPF)
+{
+    this->m_CPF = CPF;
 }

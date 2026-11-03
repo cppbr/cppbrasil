@@ -151,7 +151,11 @@ public:
     void set_adRemICMSRet(const double &adRemICMSRet);
     double get_vICMSMonoRet() const;
     void set_vICMSMonoRet(const double &vICMSMonoRet);
+    IndDeduzDeson get_indDeduzDeson() const;
+    void set_indDeduzDeson(const IndDeduzDeson &indDeduzDeson);
+
 private:
+    IndDeduzDeson m_indDeduzDeson;
     Orig m_orig;
     CstICMS m_CST;
     CsosnICMS m_CSOSN;

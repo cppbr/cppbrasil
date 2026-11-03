@@ -1485,6 +1485,12 @@ void XmlRead::set_DI(QXmlStreamReader &xml) const
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->prod->DI->obj->set_tpIntermedio(ConvNF::strToTpIntermedio(_valor));
         }
+        if (xml.name() == QStringLiteral("CPF"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->det->obj->prod->DI->obj->set_CPF(_valor);
+        }
         if (xml.name() == QStringLiteral("CNPJ")) //I23d
         {
             _valor = xml.readElementText();
@@ -2233,6 +2239,12 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->imposto->ICMS->set_vICMSDeson(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("indDeduzDeson"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->det->obj->imposto->ICMS->set_indDeduzDeson(ConvNF::strToIndDeduzDeson(_valor));
         }
         if (xml.name() == QStringLiteral("motDesICMS"))
         {
@@ -3671,6 +3683,25 @@ void XmlRead::set_pag_detPag(QXmlStreamReader &xml) const
                nota->infNFe->pag->detPag->obj->set_vPag(_valor.toDouble());
         }
 
+        if (xml.name() == QStringLiteral("dPag"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->pag->detPag->obj->set_dPag(QDate::fromString(_valor, Qt::ISODate));
+        }
+        if (xml.name() == QStringLiteral("CNPJPag"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->pag->detPag->obj->set_CNPJPag(_valor);
+        }
+        if (xml.name() == QStringLiteral("UFPag"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->pag->detPag->obj->set_UFPag(ConvDF::strToUF(_valor));
+        }
+
         //Grupo de Cartões
         if (xml.name() == QStringLiteral("card")) //YA04
           set_pag_detPag_card(xml);
@@ -3703,6 +3734,18 @@ void XmlRead::set_pag_detPag_card(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->pag->detPag->obj->card->set_tBand(ConvNF::strToTBand(_valor));
+        }
+        if (xml.name() == QStringLiteral("CNPJReceb"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->pag->detPag->obj->card->set_CNPJReceb(_valor);
+        }
+        if (xml.name() == QStringLiteral("idTermPag"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->pag->detPag->obj->card->set_idTermPag(_valor);
         }
         if (xml.name() == QStringLiteral("cAut")) //YA07
         {

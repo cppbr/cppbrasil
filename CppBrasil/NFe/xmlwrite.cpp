@@ -615,6 +615,8 @@ void XmlWrite::get_prod(const int &i)
             this->m_xmlw->writeTextElement("tpIntermedio", ConvNF::tpIntermedioToStr(_di->get_tpIntermedio()));
             if (!_di->get_CNPJ().isEmpty())
                 this->m_xmlw->writeTextElement("CNPJ", _di->get_CNPJ());
+            if (!_di->get_CPF().isEmpty())
+                this->m_xmlw->writeTextElement("CPF", _di->get_CPF());
             if (!_di->get_UFTerceiro().isEmpty())
                 this->m_xmlw->writeTextElement("UFTerceiro", _di->get_UFTerceiro());
             this->m_xmlw->writeTextElement("cExportador", _di->get_cExportador());
@@ -851,15 +853,16 @@ void XmlWrite::get_ICMS(const int &i)
             QString cab;
             if (cst.length() == 2)
             {
-                cab = QString("%1%2").arg("ICMS", cst);
+                cab = (cst == "41" || cst == "50") ? QStringLiteral("ICMS40")
+                                                       : QString("%1%2").arg("ICMS", cst);
             }
             else
             {
-                cst = cst.right(2);
                 if (cst.length() > 4)   //Part10 ou Part90
                     cab = "ICMSPart";
                 else                    //ST41 ou ST60
                     cab = "ICMSST";
+                cst = cst.right(2);
             }
 
             this->m_xmlw->writeStartElement(cab); //abertura grupo ICMS00, ICMS10, etc
@@ -968,6 +971,8 @@ void XmlWrite::get_ICMS(const int &i)
                 {
                     this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
             }
 
@@ -996,6 +1001,8 @@ void XmlWrite::get_ICMS(const int &i)
                 {
                     this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
             }
 
@@ -1009,6 +1016,8 @@ void XmlWrite::get_ICMS(const int &i)
                 {
                     this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
             }
 
@@ -1180,6 +1189,8 @@ void XmlWrite::get_ICMS(const int &i)
                 {
                     this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
 
                 if (_icms->get_vICMSSTDeson() > 0)
@@ -1245,6 +1256,8 @@ void XmlWrite::get_ICMS(const int &i)
                 {
                     this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
 
                 if (_icms->get_vICMSSTDeson() > 0)
@@ -2181,11 +2194,20 @@ void XmlWrite::get_pag()
                 if (!_detPag->get_xPag().isEmpty())
                     this->m_xmlw->writeTextElement("xPag", _detPag->get_xPag());
                 this->m_xmlw->writeTextElement("vPag", CppUtility::doubleToStrDecimal(_detPag->get_vPag(), 2));
+                if (_detPag->get_dPag().isValid())
+                    this->m_xmlw->writeTextElement("dPag", _detPag->get_dPag().toString(Qt::ISODate));
+                if (!_detPag->get_CNPJPag().isEmpty() || _detPag->get_UFPag() != UF::None)
+                {
+                    this->m_xmlw->writeTextElement("CNPJPag", _detPag->get_CNPJPag());
+                    this->m_xmlw->writeTextElement("UFPag", ConvDF::ufToStr(_detPag->get_UFPag()));
+                }
                 //card - YA04
                 if (_card->get_tpIntegra() != TpIntegra::None ||
                     !_card->get_CNPJ().isEmpty() ||
                     _card->get_tBand() != TBand::None ||
-                    !_card->get_cAut().isEmpty())
+                    !_card->get_cAut().isEmpty() ||
+                    !_card->get_CNPJReceb().isEmpty() ||
+                    !_card->get_idTermPag().isEmpty())
                 {
                     this->m_xmlw->writeStartElement("card");//abertura grupo card
                     this->m_xmlw->writeTextElement("tpIntegra", ConvNF::tpIntegraToStr(_card->get_tpIntegra()));
@@ -2195,6 +2217,10 @@ void XmlWrite::get_pag()
                         this->m_xmlw->writeTextElement("tBand", ConvNF::tBandToStr(_card->get_tBand()));
                     if (!_card->get_cAut().isEmpty())
                         this->m_xmlw->writeTextElement("cAut", _card->get_cAut());
+                    if (!_card->get_CNPJReceb().isEmpty())
+                        this->m_xmlw->writeTextElement("CNPJReceb", _card->get_CNPJReceb());
+                    if (!_card->get_idTermPag().isEmpty())
+                        this->m_xmlw->writeTextElement("idTermPag", _card->get_idTermPag());
                     this->m_xmlw->writeEndElement();//fechamento grupo card
                 }
 

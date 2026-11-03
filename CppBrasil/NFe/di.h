@@ -54,6 +54,8 @@ public:
     void set_tpIntermedio(const TpIntermedio &tpIntermedio);
     QString get_CNPJ() const;
     void set_CNPJ(const QString &CNPJ);
+    QString get_CPF() const;
+    void set_CPF(const QString &CPF);
     QString get_UFTerceiro() const;
     void set_UFTerceiro(const QString &UFTerceiro);
     QString get_cExportador() const;
@@ -71,6 +73,7 @@ private:
     double m_vAFRMM;
     TpIntermedio m_tpIntermedio;
     QString m_CNPJ;
+    QString m_CPF;
     QString m_UFTerceiro;
     QString m_cExportador;
 };

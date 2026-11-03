@@ -77,6 +77,16 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- Leiaute da NT 2023.004 v1.20: `Di::CPF`, `Icms::indDeduzDeson`
+  (`IndDeduzDeson::None/Nao/Sim`), `Card::CNPJReceb` e `Card::idTermPag`, com
+  leitura, escrita e limpeza dos campos. Geração de `indDeduzDeson` nos grupos
+  ICMS20/30/40 (CST 40/41/50)/70/90, dentro dos dados de desoneração.
+- Na NF-e/NFC-e, leitura e escrita de `DetPag::dPag`, `CNPJPag` e `UFPag`,
+  já existentes para ECONF. Preencher CNPJPag/UFPag juntos; na DI, informar CNPJ
+  ou CPF. O CNPJ do beneficiário da NF-e fica em `detPag->card->set_CNPJReceb(...)`,
+  junto a `set_idTermPag(...)`; o ECONF conserva `DetPag::CNPJReceb/UFReceb`.
+- `IndProc::CONFAZ` (4), `TpAto::AjusteSINIEF` (14) e `TpAto::ConvenioICMS` (15).
+  Recompilar a biblioteca e as aplicações devido à ampliação das classes.
 - Suporte a `Crt::SimplesMEI` (CRT 4) da NT 2024.001 v1.20, incluindo conversão
   na leitura e geração. Nos grupos `ICMSSN102` e `ICMSSN900`, a origem não preenchida
   (`Orig::None`) é omitida para MEI; origens informadas, inclusive nacional (0), são preservadas.
@@ -94,6 +104,12 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Este arquivo de changelog.
 
 ### Corrigido
+- Conversão de leitura dos CSTs do ICMS: agora usa a posição do enum, em vez do
+  número fiscal, preservando também Part10/Part90/ST41/ST60. Antes a leitura podia
+  resultar em CST incorreto ou acesso inválido ao gerar novamente.
+- CST 41/50 passam a gerar o grupo compartilhado `ICMS40`, preservando o CST;
+  ICMSPart10/90 usam `ICMSPart` (a identificação do grupo agora precede o corte do CST).
+- Ato concessório 08 passa a ser escrito com dois dígitos; leitura aceita 08 e 8.
 - CSOSN 103, 300 e 400 passam a usar o grupo XML `ICMSSN102`, conservando o valor de
   `CSOSN`. Antes eram gerados grupos inexistentes (`ICMSSN103`, `ICMSSN300` e `ICMSSN400`).
 - Evento Ator Interessado na NF-e — Transportador (110150), conforme NT 2020.007 v1.40:
@@ -246,3 +262,27 @@ de CFOP na NT, que devem ser observadas pela aplicação.
 
 A NT também substitui denegações por rejeições (302, 303 e 307) e exclui a denegação 301;
 os códigos e motivos recebidos continuam disponíveis nos retornos da biblioteca.
+
+#### Informações de pagamentos e outros — NT 2023.004 v1.20
+
+`validar()` verifica o XSD; as regras fiscais desta NT são avaliadas pela SEFAZ.
+A biblioteca conserva os valores informados pela aplicação, sem recalcular totais
+ou criar automaticamente grupos de pagamento.
+
+- A versão 1.20 aumenta o limite fiscal do troco para **R$ 300.000,00** (YA09-20).
+  A biblioteca já permitia representar esse valor, sem limite local de R$ 1.000,00.
+- `indDeduzDeson`: ausência (`None`) e 0 (`Nao`) não exigem subtrair a desoneração
+  do total, conforme a exceção 4 de W16-10. Com 1 (`Sim`), a aplicação deve compor
+  os totais considerando a dedução. Para motivo 7 (SUFRAMA), N28-12 exige 1.
+- `CNPJPag`/`UFPag` identificam o estabelecimento onde o pagamento foi processado;
+  `card/CNPJReceb` identifica o beneficiário e `idTermPag` o terminal. `cAut` aceita
+  autorização de cartões, PIX, boletos e outros pagamentos eletrônicos, até 128 caracteres.
+- YA04-20 permite `card` para tPag 03/04/10/11/12/13/15/17/18. A exigência de
+  `card` para cartão/PIX na NFC-e (YA04-10) depende da UF. Preencher `tpIntegra`
+  quando houver `card`; a biblioteca não inventa os dados de integração.
+- A aplicação deve informar data de pagamento válida e documentos com dígitos
+  verificadores válidos. Essas verificações fiscais não são feitas pelo XSD.
+- X03-10/X03-20 foram desabilitadas pela NT; não há bloqueio local correspondente.
+  A exceção de NFA-e à habilitação do emitente (1C17-34) depende da SEFAZ.
+- Utilizar schemas atualizados. O ECONF foi transferido para a NT 2024.002,
+  implementada anteriormente.

@@ -30,6 +30,8 @@ Card::~Card()
 
 void Card::clear()
 {
+    this->m_idTermPag = QString();
+    this->m_CNPJReceb = QString();
     this->m_tpIntegra = TpIntegra::None ;
     this->m_CNPJ.clear();
     this->m_tBand = TBand::None;
@@ -74,4 +76,24 @@ QString Card::get_cAut() const
 void Card::set_cAut(const QString &cAut)
 {
     this->m_cAut = cAut;
+}
+
+QString Card::get_CNPJReceb() const
+{
+    return this->m_CNPJReceb;
+}
+
+void Card::set_CNPJReceb(const QString &CNPJReceb)
+{
+    this->m_CNPJReceb = CNPJReceb;
+}
+
+QString Card::get_idTermPag() const
+{
+    return this->m_idTermPag;
+}
+
+void Card::set_idTermPag(const QString &idTermPag)
+{
+    this->m_idTermPag = idTermPag;
 }

@@ -191,12 +191,15 @@ enum class TBand {None = -1, Visa = 1, Mastercard = 2, AmericanExpress = 3,
                   Mais = 19, MaxVan = 20, Policard = 21, RedeCompras = 22, Sodexo = 23,
                   ValeCard = 24, Verocheque = 25, VR = 26, Ticket = 27, Outros = 99};
 
+//indDeduzDeson - Dedução do ICMS desonerado no valor do item/total
+enum class IndDeduzDeson {None = -1, Nao = 0, Sim = 1};
+
 //indProc - Indicador da origem do processo
 enum class IndProc {None = -1, SEFAZ = 0, JusticaFederal = 1,
-                    JusticaEstadual = 2, SecexRFB = 3, Outros = 9};
+                    JusticaEstadual = 2, SecexRFB = 3, CONFAZ = 4, Outros = 9};
 
 //tpAto - Tipo do ato concessório
-enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspecifica=12 };
+enum class TpAto {None = -1, TermoAcordo=8, RegimeEspecial=10, AutorizacaoEspecifica=12, AjusteSINIEF=14, ConvenioICMS=15 };
 
 //tpEvento - Eventos Registrados pelo Emitente / Eventos Registrados pelo Destinatário
 enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
@@ -312,6 +315,8 @@ public:
     static TpIntegra strToTpIntegra(const QString &value);
     static QString tBandToStr(const TBand &value);
     static TBand strToTBand(const QString &value);
+    static QString indDeduzDesonToStr(const IndDeduzDeson &value);
+    static IndDeduzDeson strToIndDeduzDeson(const QString &value);
     static QString indProcToStr(const IndProc &value);
     static IndProc strToIndProc(const QString &value);
     static QString tpAtoToStr(const TpAto &value);
