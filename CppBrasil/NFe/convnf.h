@@ -209,7 +209,10 @@ enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
                      ECONF = 110750, CancelECONF = 110751,
                      PedidoProrrogacao1 = 111500,
                      PedidoProrrogacao2 = 111501, CancelPedidoProrrogacao1 = 111502,
-                     CancelPedidoProrrogacao2 = 111503, AtorInteressadoNFeTransp = 110150,
+                     CancelPedidoProrrogacao2 = 111503,
+                     FiscoPedidoProrrogacao1 = 411500, FiscoPedidoProrrogacao2 = 411501,
+                     FiscoCancelPedidoProrrogacao1 = 411502, FiscoCancelPedidoProrrogacao2 = 411503,
+                     AtorInteressadoNFeTransp = 110150,
                      ConfirmacaoOperacaoDest = 210200, CienciaOperacaoDest = 210210,
                      DesconhecimentoOperacaoDest = 210220, OperacaoNaoRealizadaDest = 210240};
 

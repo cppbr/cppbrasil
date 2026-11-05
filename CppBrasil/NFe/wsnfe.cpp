@@ -1340,9 +1340,9 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
             {
                 while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("procEventoNFe")))
                 {
-                    if(attributes.hasAttribute("versao"))
+                    if (_xml.isStartElement() && _xml.attributes().hasAttribute("versao"))
                     {
-                        _valor = attributes.value("versao").toString();
+                        _valor = _xml.attributes().value("versao").toString();
                         if (!_valor.isEmpty())
                             this->retorno->procEventoNFe->obj->set_versao(_valor);
                     }
@@ -1351,9 +1351,9 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                     {
                         while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("evento")))
                         {
-                            if(attributes.hasAttribute("versao"))
+                            if (_xml.isStartElement() && _xml.attributes().hasAttribute("versao"))
                             {
-                                _valor = attributes.value("versao").toString();
+                                _valor = _xml.attributes().value("versao").toString();
                                 if (!_valor.isEmpty())
                                     this->retorno->procEventoNFe->obj->evento->set_versao(_valor);
                             }
@@ -1361,9 +1361,9 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                             {
                                 while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infEvento")))
                                 {
-                                    if(attributes.hasAttribute("Id"))
+                                    if (_xml.isStartElement() && _xml.attributes().hasAttribute("Id"))
                                     {
-                                        _valor = attributes.value("Id").toString();
+                                        _valor = _xml.attributes().value("Id").toString();
                                         if (!_valor.isEmpty())
                                             this->retorno->procEventoNFe->obj->evento->infEvento->set_Id(_valor);
                                     }
@@ -1650,28 +1650,8 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                                                 }
                                             }
 
-                                            if(_xml.name() == QStringLiteral("itemPedido"))
-                                            {
-                                                while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("itemPedido")))
-                                                {
-                                                    if(_xml.name() == QStringLiteral("numItem"))
-                                                    {
-                                                        _valor = _xml.readElementText();
-                                                        if (!_valor.isEmpty())
-                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->obj->set_numItem(_valor.toInt());
-                                                    }
-                                                    if(_xml.name() == QStringLiteral("qtdeItem"))
-                                                    {
-                                                        _valor = _xml.readElementText();
-                                                        if (!_valor.isEmpty())
-                                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->obj->set_qtdeItem(_valor.toInt());
-                                                    }
-
-                                                    _xml.readNext();
-                                                    //while itemPedido
-                                                }
-                                                this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->itemPedido->add();
-                                            }
+                                            // A leitura consome o grupo completo e preserva atributo e frações.
+                                            this->retorno->procEventoNFe->obj->evento->infEvento->detEvento->lerProrrogacao(_xml);
 
                                             if(_xml.name() == QStringLiteral("autXML"))
                                             {
@@ -1709,9 +1689,9 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                     {
                         while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEvento")))
                         {
-                            if(attributes.hasAttribute("versao"))
+                            if (_xml.isStartElement() && _xml.attributes().hasAttribute("versao"))
                             {
-                                _valor = attributes.value("versao").toString();
+                                _valor = _xml.attributes().value("versao").toString();
                                 if (!_valor.isEmpty())
                                     this->retorno->procEventoNFe->obj->retEvento->set_versao(_valor);
                             }
@@ -1720,9 +1700,9 @@ WSNFeBase::StatusRetorno WSConsultaProtocolo::tratarRetorno()
                             {
                                 while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("infEvento")))
                                 {
-                                    if(_xml.name() == QStringLiteral("Id"))
+                                    if (_xml.isStartElement() && _xml.name() == QStringLiteral("infEvento"))
                                     {
-                                        _valor = _xml.readElementText();
+                                        _valor = _xml.attributes().value("Id").toString();
                                         if (!_valor.isEmpty())
                                             this->retorno->procEventoNFe->obj->retEvento->infEvento->set_Id(_valor);
                                     }

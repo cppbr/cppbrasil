@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
+#include <QXmlStreamReader>
 #include <CppBrasil/cppbrasil_global.h>
 #include <CppBrasil/cpputility.h>
 #include <CppBrasil/container.h>
@@ -46,6 +47,58 @@ public:
 private:
     int m_numItem;
     double m_qtdeItem;
+};
+
+//-----------------------------------------------------
+
+// Respostas do Fisco (NT 2015.001). Os códigos são os do leiaute.
+class CPPNFE_EXPORT ItemRespPedido
+{
+public:
+    ItemRespPedido();
+    void clear();
+    int get_numItem() const;
+    void set_numItem(const int &valor);
+    int get_statPedido() const;
+    void set_statPedido(const int &valor);
+    int get_justStatus() const;
+    void set_justStatus(const int &valor);
+    QString get_justStaOutra() const;
+    void set_justStaOutra(const QString &valor);
+private:
+    int m_numItem;
+    int m_statPedido;
+    int m_justStatus;
+    QString m_justStaOutra;
+};
+
+class CPPNFE_EXPORT RespPedido
+{
+public:
+    RespPedido();
+    void clear();
+    int get_statPrazo() const;
+    void set_statPrazo(const int &valor);
+    std::unique_ptr<Container<ItemRespPedido>> itemPedido;
+private:
+    int m_statPrazo; // -1: não informado; 0: após o prazo; 1: dentro do prazo.
+};
+
+class CPPNFE_EXPORT RespCancPedido
+{
+public:
+    RespCancPedido();
+    void clear();
+    int get_statCancPedido() const;
+    void set_statCancPedido(const int &valor);
+    int get_justStatus() const;
+    void set_justStatus(const int &valor);
+    QString get_justStaOutra() const;
+    void set_justStaOutra(const QString &valor);
+private:
+    int m_statCancPedido;
+    int m_justStatus;
+    QString m_justStaOutra;
 };
 
 //-----------------------------------------------------
@@ -93,6 +146,10 @@ public:
     void set_verAplic(const QString &verAplic);
     QString get_nProt() const;
     void set_nProt(const QString &nProt);
+    QString get_idPedidoCancelado() const;
+    void set_idPedidoCancelado(const QString &valor);
+    QString get_idPedido() const;
+    void set_idPedido(const QString &valor);
     QString get_xJust() const;
     void set_xJust(const QString &xJust);
     QString get_chNFeRef() const;
@@ -148,7 +205,14 @@ public:
     std::unique_ptr<Container<ItemPedProrrog>> itemPedido;
     std::unique_ptr<AutXMLAtor> autXML;
     std::unique_ptr<Container<DetPag>> detPag;
+    std::unique_ptr<RespPedido> respPedido;
+    std::unique_ptr<RespCancPedido> respCancPedido;
 private:
+    friend class TEvento;
+    friend class WSConsultaProtocolo;
+    bool lerProrrogacao(QXmlStreamReader &xml);
+    QString m_idPedidoCancelado;
+    QString m_idPedido;
     QString m_versao;
     QString m_descEvento;
     int m_cOrgaoAutor;
@@ -248,11 +312,16 @@ public:
 
     void assinarXML(const ConfigNFe *config);
     void gerarXML();
+    // Importa evento/procEventoNFe da NT 2015.001 e valida envelope e detalhe por XSD.
+    // Não consulta NFeDistribuicaoDFe nem verifica a assinatura digital do XML importado.
+    bool lerXMLProrrogacao(const QString &xml, const ConfigNFe *config);
+    bool validarProrrogacao(const ConfigNFe *config);
     QString get_error() const;
 
     std::unique_ptr<InfEvento> infEvento;
 
 private:
+    bool validarDadosProrrogacao();
     QString m_versao;
     QString m_xml_original;
     QString m_xml_assinado;
