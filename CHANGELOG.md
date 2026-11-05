@@ -1,89 +1,15 @@
 # Changelog
 
-Todas as mudanças relevantes do projeto são registradas aqui.
+Todas as mudanças relevantes do projeto são registradas neste arquivo.
 O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
+As alterações ainda sem versão de lançamento estão agrupadas em **Não publicado**.
 
-## [Não lançado]
-
-### ⚠️ Mudanças que exigem atenção (quebra de compatibilidade)
-
-#### NT 2023.001: recompilar as aplicações
-As classes `Comb` e `Icms` receberam membros para o índice de mistura e o controle
-de presença de campos opcionais. Recompile a biblioteca e as aplicações que a utilizam.
-Nos CSTs monofásicos, quantidades opcionais não preenchidas passam a ser omitidas;
-chamar o setter com zero mantém a tag com zero. No CST 53, o mesmo vale para
-alíquota, valores e percentual de diferimento. `clear()` restaura a ausência.
-
-#### Membros das classes da NFe não podem mais ser copiados
-Os membros da árvore da NFe (`CppNFe`, `NotaFiscal`, `Nfe`, `InfNFe`, `Det`, `Prod`, ...) passaram de
-`std::shared_ptr` para `std::unique_ptr`. O acesso pelo `->` **não muda**, mas copiar um membro deixa de compilar.
-
-```cpp
-// Antes (não compila mais)
-auto nf = cppnfe->notafiscal;
-std::shared_ptr<NotaFiscal> nf = cppnfe->notafiscal;
-
-// Agora
-auto &nf = cppnfe->notafiscal;               // referência
-NotaFiscal *nf = cppnfe->notafiscal.get();   // ponteiro (não dono)
-
-// Continua igual
-cppnfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(1);
-```
-
-#### `Container`: acesso direto a `items` está obsoleto (deprecated)
-O `Container` ganhou uma API própria de leitura. `items` continua funcionando nesta versão, mas gera aviso
-de compilação e **será removido numa versão futura**.
-
-```cpp
-// Antes (gera aviso de deprecated)
-for (int i = 0; i < nfe->infNFe->det->items->count(); ++i)
-    nfe->infNFe->det->items->value(i)->prod->get_cProd();
-
-// Agora
-for (int i = 0; i < nfe->infNFe->det->count(); ++i)
-    nfe->infNFe->det->value(i)->prod->get_cProd();
-
-// ou, com for por intervalo
-for (Det *det : *nfe->infNFe->det)
-    det->prod->get_cProd();
-```
-
-A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add()`.
-
-#### `Container::add(T*)` passou a receber `std::unique_ptr<T>`
-Isso deixa explícito que o container vira o dono do objeto.
-
-```cpp
-// Antes
-container->add(new Nfe);
-// Agora
-container->add(std::make_unique<Nfe>());
-```
-
-#### `Container` não pode mais ser copiado
-A cópia causava double delete (crash). Agora gera erro de compilação.
-
-#### `gerar()` valida a chave de acesso
-Se a chave de acesso montada (sem o dígito verificador) não tiver exatamente 43 dígitos numéricos, `gerar()`
-passa a devolver `false` com a mensagem `Chave de acesso invalida (...)`. Antes, a nota era gerada em silêncio
-com uma chave que a SEFAZ rejeitaria. A causa mais comum é o **CNPJ/CPF do emitente com máscara**
-(`12.345.678/0001-90`): informe somente os números.
-
-#### OpenSSL 1.1.1 ou superior e leitura do `openssl.cnf`
-A lib passa a exigir o **OpenSSL 1.1.1 ou superior** (com versões antigas, a compilação para com uma mensagem clara)
-e a **carregar o arquivo de configuração do OpenSSL** (`openssl.cnf` do sistema ou o indicado em `OPENSSL_CONF`).
-Antes, a configuração era ignorada. Com isso, a política de criptografia do sistema passa a valer: no Fedora/RHEL
-e derivados, é preciso liberar a assinatura SHA1 (ver README).
-
-#### libxml2: recomendado 2.13 ou superior, e recompilar ao passar para a 2.14 ou superior
-A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas e mesmo resultado nas validações por XSD).
-- Na **2.13 ou superior**, erros em XSDs incluídos pelo schema principal (ex.: `leiauteNFe_v4.00.xsd` corrompido) vão para a
-  mensagem de erro da validação. Na 2.12 ou anterior, também são impressos no stderr da aplicação.
-- Na **2.14 ou superior**, a libxml2 mudou o nome do arquivo da biblioteca (`libxml2.so.2` → `libxml2.so.16`). Quem atualizar
-  a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
+## [Não publicado]
 
 ### Adicionado
+
+#### Combustíveis monofásicos — NT 2023.001 v1.60
+
 - NT 2023.001 v1.60: `Comb::pBio`, com leitura, escrita e limpeza, independente
   do grupo de encerrante. Mantido o acesso legado por `Encerrante::pBio`, agora
   inicializado e limpo corretamente; quando ambos forem preenchidos, o valor
@@ -95,13 +21,54 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   `has_adRemICMS()`, `has_vICMSMono()`, `has_vICMSMonoOp()`, `has_pDif()`,
   `has_vICMSMonoDif()` e `has_pRedAdRem()` para distinguir campos opcionais
   ausentes de valores explicitamente informados, inclusive zero.
-- Endereços dos serviços NF-e/NFC-e e consultas públicas atualizados.
-  Corrigidos o uso de produção na homologação da
-  NFC-e de SP, os serviços de GO apontando para CE, o retorno de autorização de GO,
-  o roteamento da NFC-e de CE para SVRS e os endereços de cadastro e contingência.
-  Atualizadas também as URLs de QR Code/consulta, removidos espaços externos e
-  corrigida a base de SC para evitar duplicação de `?p=`. Recompilar a biblioteca
-  para incorporar os novos endereços ao recurso embarcado.
+
+##### Orientações de uso
+
+Use os grupos existentes em `det->imposto->ICMS`, com `CstICMS::ICMS02`,
+`ICMS15`, `ICMS53` ou `ICMS61`. A biblioteca conserva os valores informados;
+não calcula o imposto, os saldos ou os totais automaticamente.
+
+Informe o índice de mistura em `det->prod->comb->set_pBio(...)`: percentual
+de biodiesel no Diesel B ou de etanol anidro na Gasolina C, maior que zero e
+até 100, com até quatro casas. Zero omite a tag. O campo é filho de `comb`
+e pode ser utilizado sem dados de encerrante.
+
+Preencha cada origem em `comb->origComb->obj`, com `set_indImport(...)`,
+`set_cUFOrig(...)` e `set_pOrig(...)`, e confirme com `origComb->add()`.
+O leiaute permite até 30 origens. A exigência ou proibição de `pBio` e de
+`origComb` depende da tabela ANP e da operação, incluindo as exceções para
+consumidor final, complementar/devolução e CFOP 5922/6922. A v1.60 ativa
+LA18-10, que exige origem conforme a tabela e suas exceções.
+
+Nos CSTs 02/15/53, use `qBCMono`, `adRemICMS` e `vICMSMono`. No CST 15,
+preencha também `qBCMonoReten`, `adRemICMSReten` e `vICMSMonoReten`;
+se houver redução, informe juntos `pRedAdRem` e `motRedAdRem` (1 ou 9).
+No CST 53, os campos opcionais `vICMSMonoOp`, `pDif`, `vICMSMonoDif`
+e `vICMSMono` representam operação, percentual diferido, valor diferido
+e valor devido. Para diferimento total, informe `pDif=100` e os valores
+correspondentes, inclusive zero quando aplicável. No CST 61, use
+`qBCMonoRet`, `adRemICMSRet` e `vICMSMonoRet`.
+
+A v1.60 amplia a lista ANP especial de N41-10/N41-20 para incluir Diesel B.
+Na hipótese descrita para refinarias ou suas bases, a retenção do CST 15 usa
+`qBCMonoReten * adRemICMSReten * 0,3333`, com arredondamento a duas casas;
+o fator não se aplica indistintamente a todos os combustíveis. O exemplo
+da NT informa quantidade 140, alíquota 1,12 e retenção 52,26. São valores
+ilustrativos; utilize a alíquota e a mistura aplicáveis à operação.
+
+Preencha os seis totais monofásicos em `total->ICMSTot` com os somatórios
+correspondentes, a duas casas. Observe a inclusão de `vICMSMonoReten` em
+`vNF` conforme W16-10 e as demais regras vigentes de composição do total.
+Informe os textos exigidos pela seção 6 em `infAdic->infCpl` e em
+`det->infAdProd`; a biblioteca não os compõe automaticamente. A apresentação
+das informações adicionais por produto depende do componente de DANFE utilizado.
+
+`validar()` verifica a estrutura pelo XSD. Tabela ANP, unidade tributável,
+exceções, cálculos, tolerâncias e demais regras fiscais dependem dos dados
+preparados pela aplicação e das validações da SEFAZ. Utilize schemas atualizados.
+
+#### Prorrogação da suspensão do ICMS — NT 2015.001 v1.30
+
 - NT 2015.001 v1.30: pedidos de prorrogação da suspensão do ICMS para o primeiro
   e segundo prazos (`111500`/`111501`) e seus cancelamentos (`111502`/`111503`)
   em `EventoNotaFiscal::envEvento`, exclusivos da NF-e modelo 55. Versão 1.00,
@@ -157,35 +124,45 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   completa. O cancelamento do primeiro prazo pode depender do cancelamento prévio
   do segundo; pedidos vigentes podem impedir o cancelamento da NF-e (rejeição 811).
   Essas condições dependem do estado fiscal mantido pela SEFAZ.
-- `CancNFe`, em `cancnfe.h`/`cancnfe.cpp`, disponível em `EventoNotaFiscal::CancNFe`,
-  com envio independente de `EnvEvento`. Suporta cancelamento de NF-e/NFC-e
-  (`TpEvento::Cancelamento`, 110111) e cancelamento por substituição exclusivo da NFC-e
-  (`TpEvento::CancelamentoSubstituicao`, 110112), conforme o leiaute 1.00.
-  Recompilar a biblioteca e as aplicações devido à ampliação de `EventoNotaFiscal`.
-- O cancelamento usa um único `TEvento` em `CancNFe::evento` e `RetEnvEvento` em
-  `CancNFe::retorno`. Preencher CNPJ **ou** CPF do emitente, chave, protocolo de autorização
-  e justificativa de 15 a 255 caracteres. Versão, descrição, ID e sequência 1 são preparados
-  automaticamente; ambiente e órgão não informados vêm da configuração, e a data não
-  informada usa o horário atual. Informar modelo, UF e ambiente correspondentes à nota.
-  Exemplo, após configurar os schemas e carregar o certificado do emitente:
+
+#### Cancelamento de NF-e e NFC-e
+
+- `CancNFe`, em `cancnfe.h`/`cancnfe.cpp`, disponível em `EventoNotaFiscal::cancNFe`,
+  é o caminho do cancelamento de NF-e/NFC-e (`TpEvento::Cancelamento`, 110111, padrão) e do
+  cancelamento por substituição exclusivo da NFC-e (`TpEvento::CancelamentoSubstituicao`,
+  110112), conforme o leiaute 1.00. Usa a configuração e o certificado definidos em
+  `cppnfe->configuracoes`. Recompilar a biblioteca e as aplicações devido à ampliação
+  de `EventoNotaFiscal`.
+- Os campos do evento ficam na própria `CancNFe`, sem `TEvento`: preencher CNPJ **ou** CPF
+  do emitente, chave, protocolo de autorização e justificativa de 15 a 255 caracteres.
+  Versão, descrição, ID, sequência 1, ambiente e órgão são preparados pela biblioteca, e a
+  data não informada usa o horário do envio. Informar modelo e UF correspondentes à nota.
+  Exemplo, com os schemas configurados e o certificado do emitente carregado em
+  `cppnfe->configuracoes`:
 
   ```cpp
-  auto &cancelamento = *cppnfe->eventos->CancNFe;
-  cancelamento.clear();
-  auto *inf = cancelamento.evento->infEvento.get();
-  inf->set_CNPJ(cnpjEmitente); // ou set_CPF(cpfEmitente)
-  inf->set_chNFe(chaveNFe);
-  inf->detEvento->set_nProt(protocoloAutorizacao);
-  inf->detEvento->set_xJust(justificativa);
-  bool enviado = cancelamento.cancelar(1); // idLote
-  // Consultar retorno->get_cStat() e retorno->retEvento para a decisão da SEFAZ.
+  cppnfe->eventos->cancNFe->clear();
+  cppnfe->eventos->cancNFe->set_CNPJ(cnpjEmitente); // ou set_CPF(cpfEmitente)
+  cppnfe->eventos->cancNFe->set_chNFe(chaveNFe);
+  cppnfe->eventos->cancNFe->set_nProt(protocoloAutorizacao);
+  cppnfe->eventos->cancNFe->set_xJust(justificativa);
+  bool enviado = cppnfe->eventos->cancNFe->cancelar(1); // idLote
+  // A decisão da SEFAZ está em cppnfe->eventos->cancNFe->retorno.
   ```
 
-  Para substituição, definir também `inf->set_tpEvento(TpEvento::CancelamentoSubstituicao)`,
-  `inf->detEvento->set_chNFeRef(chaveSubstituta)` e `set_verAplic(versaoAplicativo)` no
-  detalhe. `cOrgaoAutor` e `tpAutor=1` são preparados quando não informados. A nota
-  cancelada deve ter emissão normal e a substituta deve ser distinta, da mesma UF,
-  emitente e modelo, emitida em contingência. Usar `clear()` antes de preparar outro pedido.
+  Para substituição, definir também `set_tpEvento(TpEvento::CancelamentoSubstituicao)`,
+  `set_chNFeRef(chaveSubstituta)` e `set_verAplic(versaoAplicativo)`. A nota cancelada deve
+  ter emissão normal e a substituta deve ser distinta, com dígito verificador válido, da
+  mesma UF, emitente e modelo, emitida em contingência, no mesmo ano e mês da nota
+  cancelada ou no mês anterior. Usar `clear()` antes de preparar outro pedido.
+- O autor informado é conferido com o CNPJ/CPF da chave antes do envio, considerando a
+  série da nota.
+- `RetEventoCancNFe`, em `CancNFe::retorno`, reúne o resultado do lote e do evento.
+  `get_cStat()`, `get_xMotivo()`, `get_nProt()` e `get_dhRegEvento()` trazem a decisão sobre
+  o evento; `get_cStatLote()`, `get_xMotivoLote()` e `get_XMLLote()` trazem os dados do lote.
+  Se a SEFAZ recusar o lote, `get_cStat()` permanece 0 e `get_XML()` fica vazio; consultar
+  os dados do lote. `get_XML()` traz o `procEventoNFe` quando homologado e, nos demais
+  casos, o `retEvento` recebido.
 - Assinatura do cancelamento e validação pelos XSDs específicos `envEventoCancNFe` /
   `envEventoCancSubst`, `retEnvEventoCancNFe` / `retEnvEventoCancSubst` e
   `procEventoCancNFe` / `procEventoCancSubst`, todos na versão 1.00.
@@ -194,6 +171,12 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   segue a configuração de arquivos de eventos. `cancelar()` retornar `true` indica que o
   envio e o tratamento da resposta concluíram: a aceitação fiscal depende dos códigos
   retornados. Prazos, autorização, protocolo e impedimentos fiscais dependem da SEFAZ.
+- `EnvEvento::enviarEvento()` passa a recusar os eventos 110111 e 110112, que devem ser
+  enviados por `cancNFe`. A consulta de protocolo continua a devolver os eventos da nota,
+  inclusive cancelamentos, em `procEventoNFe`.
+
+#### Informações de pagamentos e outros — NT 2023.004 v1.20
+
 - Leiaute da NT 2023.004 v1.20: `Di::CPF`, `Icms::indDeduzDeson`
   (`IndDeduzDeson::None/Nao/Sim`), `Card::CNPJReceb` e `Card::idTermPag`, com
   leitura, escrita e limpeza dos campos. Geração de `indDeduzDeson` nos grupos
@@ -204,234 +187,8 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   junto a `set_idTermPag(...)`; o ECONF conserva `DetPag::CNPJReceb/UFReceb`.
 - `IndProc::CONFAZ` (4), `TpAto::AjusteSINIEF` (14) e `TpAto::ConvenioICMS` (15).
   Recompilar a biblioteca e as aplicações devido à ampliação das classes.
-- Suporte a `Crt::SimplesMEI` (CRT 4) da NT 2024.001 v1.20, incluindo conversão
-  na leitura e geração. Nos grupos `ICMSSN102` e `ICMSSN900`, a origem não preenchida
-  (`Orig::None`) é omitida para MEI; origens informadas, inclusive nacional (0), são preservadas.
-- Evento de Conciliação Financeira da NT 2024.002 v1.00, usando diretamente
-  `EventoNotaFiscal::envEvento`, `TEvento` e `RetEnvEvento`. Inclui os eventos
-  `TpEvento::ECONF` (110750) e `TpEvento::CancelECONF` (110751), os pagamentos em
-  `DetEvento::detPag` (`Container<DetPag>`), geração e assinatura XML, schemas específicos
-  de envio/retorno e direcionamento da NF-e para a SVRS e da NFC-e para a UF.
-- `DetPag` ampliada com `dPag`, `CNPJPag`, `UFPag`, `CNPJReceb` e `UFReceb`,
-  reutilizando `Card` para os dados da instituição de pagamento. Aplicações devem ser
-  recompiladas devido à alteração do layout da classe.
-- `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
-  que permitem escrever `for (auto *x : *container)`.
-- Valores padrão em `ConfigNFe`: `ModeloDF::NFe`, `VersaoNF::v400`, `VersaoQrCodeNF::v200`, `IndSinc::Nao` e `TpEmis::Normal`.
-- Este arquivo de changelog.
 
-### Corrigido
-- Leitura dos combustíveis: `pGNi`, `nBomba` e `vEncFin` passam a preencher seus
-  próprios campos, sem sobrescrever `pGNn`, `nBico` e `vEncIni`, respectivamente.
-- CST 15: `pRedAdRem=0` explicitamente informado é preservado na geração.
-  A sequência de redução exige também `motRedAdRem`; pares incompletos são
-  rejeitados pela validação por XSD.
-- Preservação do atributo `infEvento/@Id` na leitura do retorno de `WSEvento`.
-- Conversão de leitura dos CSTs do ICMS: agora usa a posição do enum, em vez do
-  número fiscal, preservando também Part10/Part90/ST41/ST60. Antes a leitura podia
-  resultar em CST incorreto ou acesso inválido ao gerar novamente.
-- CST 41/50 passam a gerar o grupo compartilhado `ICMS40`, preservando o CST;
-  ICMSPart10/90 usam `ICMSPart` (a identificação do grupo agora precede o corte do CST).
-- Ato concessório 08 passa a ser escrito com dois dígitos; leitura aceita 08 e 8.
-- CSOSN 103, 300 e 400 passam a usar o grupo XML `ICMSSN102`, conservando o valor de
-  `CSOSN`. Antes eram gerados grupos inexistentes (`ICMSSN103`, `ICMSSN300` e `ICMSSN400`).
-- Evento Ator Interessado na NF-e — Transportador (110150), conforme NT 2020.007 v1.40:
-  reutiliza `EnvEvento`, `TEvento`, `DetEvento::autXML` e os enums existentes. Corrigida a tag
-  `tpAutorizacao` e a emissão dos opcionais; valida as combinações de autor/autorização e
-  restringe o evento à NF-e modelo 55. Preenche descrição, versão 1.00, órgão 91 e condição
-  de uso quando autorizada. Direciona ao Ambiente Nacional em lote separado, usa os XSDs
-  específicos de envio/retorno e gera XML processado para os status 135 e 136.
-- `InfEvento::set_CPF()` gravava no membro CNPJ, impossibilitando informar corretamente
-  o CPF do autor nos eventos.
-- A associação de retorno e evento passa a conferir também `tpEvento`, além da chave e sequência.
-- `EnvEvento::enviarEvento()` passa a retornar a falha do web service corretamente; a geração
-  repetida limpa o XML do lote e o erro/assinatura anterior do evento.
-- **XML de NF-e com DI inválido**: a tag `UFDesemb` era gerada duas vezes no grupo `DI`, e a SEFAZ rejeitava
-  notas de importação.
-- **XML duplicado ao gerar de novo**: `gerar()` numa nota importada, ou chamado mais de uma vez, produzia um XML
-  com duas raízes `<NFe>`. Agora o XML, a assinatura e o erro anteriores são limpos antes de gerar.
-- `gerar()` devolvia `false` quando havia um erro de uma etapa anterior (por exemplo, de `validar()`), mesmo gerando corretamente.
-- `gerar()` devolvia `true` quando a geração do XML falhava. Agora o erro é informado.
-- A mensagem "Erro ao assinar/gerar/validar N nota(s)" mostrava a contagem anterior (por exemplo, "0 nota(s)").
-- **Configuração sem valor inicial**: membros de `ConfigNFe`, `ArquivosNF` e `ConfWebServices` não eram
-  inicializados. Sem chamar os `set_...`, eles ficavam com lixo de memória, o que podia, por exemplo, quebrar a geração do QR Code da NFC-e.
-- Acesso fora dos limites da string ao montar a versão do QR Code (online e offline).
-- DANFE: o objeto do relatório tinha dois donos, e cada chamada de `print()` no mesmo objeto duplicava as conexões
-  (os campos eram preenchidos várias vezes).
-- DANFE: a lista de locais de retirada e entrega era global e compartilhada entre todas as instâncias. Duas impressões
-  ao mesmo tempo podiam misturar os dados. Agora cada DANFE tem a sua lista, e campos numéricos sem valor saem zerados
-  em vez de lixo de memória.
-- **Dígito verificador** (`CppUtility::dvModulo11`): sempre lia 43 posições, sem considerar o tamanho da string.
-  Na chave de contingência FS/FS-DA do DANFE (35 posições), lia além do fim da string, e o DV podia sair errado.
-  Agora o cálculo usa o tamanho real. Para chaves de 43 dígitos, o resultado não muda.
-- DANFE: a chave de contingência FS/FS-DA saía inválida para notas a partir de R$ 10.000,00, porque o valor
-  era formatado em notação científica (ex.: `1e+06`).
-- A assinatura alterava configurações globais da libxml2, afetando todos os parses seguintes (validação por XSD e
-  retornos da SEFAZ). As opções agora valem só para a assinatura. A assinatura gerada não muda.
-- **Assinatura no Fedora/RHEL** (e derivados): falhava sempre com "Erro ao assinar documento", porque a lib ignorava
-  a configuração do OpenSSL e o SHA1 ficava bloqueado sem como liberar. Agora basta liberar o SHA1 (ver README).
-- **`HttpOpenSSL`** (usado com `HttpType::HttpOpenSSL`; o padrão `HttpQt` não é afetado):
-  - a resposta vinha com lixo de memória depois do XML, e respostas grandes podiam vir cortadas. Agora a leitura
-    respeita o `Content-Length`, decodifica `Transfer-Encoding: chunked` e aceita servidor que fecha sem `close_notify`;
-  - não tinha timeout e podia travar a aplicação. Agora usa o timeout configurado (padrão de 15 s, como o `HttpQt`);
-  - XML com acentos podia ser corrompido no Windows (conversão para a codificação local) e o `Content-Length` ficava errado;
-  - linha do pedido HTTP inválida (espaço antes do fim de linha), SNI não enviado e `SSL_accept` indevido no cliente;
-  - socket, `SSL_CTX` e `SSL` vazavam nos retornos de erro.
-- **Crash na assinatura** (`CppLibXml2::c14n`): quando o nó a assinar não existia no XML, a lib liberava a raiz do documento
-  duas vezes (`double free`) e a aplicação fechava. Agora a assinatura falha com erro.
-- A assinatura chamava `xmlCleanupParser()`, que limpa o estado global da libxml2 e não deve ser chamada com a biblioteca em uso
-  (risco com threads ou com outras partes da aplicação que usam a libxml2).
-- Validação por XSD (`parseXML`): os erros da libxml2 eram impressos no stderr da aplicação e a mensagem de erro terminava com
-  quebra de linha. Agora os erros são capturados pela lib, e a mensagem informa o **primeiro** erro do XML (antes era o último).
-  Diretório de schemas inválido encerra a validação na hora.
-- **Assinatura com DOCTYPE** (`signXML`): um XML com `<!DOCTYPE>` e entidade externa fazia o conteúdo de arquivos locais
-  entrar no XML assinado (XXE), e podia acessar a rede. Agora XML com DOCTYPE é recusado na assinatura (o XML da NF-e
-  não tem DOCTYPE; a assinatura das notas não muda).
-- `CppXML::setNode` (`CppLibXml2`): valor com `&` ou `<` era tratado como XML já escapado. Na libxml2 2.12 a tag ficava
-  vazia (e o erro saía no stderr); na 2.15 o `&` era descartado. Agora o valor é gravado como texto, escapado corretamente,
-  igual nas duas versões. A assinatura não é afetada.
-- `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
-- Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
-- Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
-
-### Alterado
-- **Validação por XSD mais rápida** (`CppLibXml2::parseXML`): o schema era lido e interpretado a cada validação. Agora fica
-  em cache no processo, compartilhado entre as threads (cerca de 11 vezes mais rápido: 1.600 validações de NF-e caíram de
-  12 s para 1 s). Se algum `.xsd` da pasta for alterado, incluído ou removido, o schema é interpretado de novo
-  automaticamente, sem reiniciar a aplicação. Os schemas usados ficam em memória até o fim do processo.
-- `CppLibXml2`: troca as funções antigas `xmlParseMemory`/`xmlParseFile` (interface SAX1, que pode estar desligada na
-  compilação da libxml2) por `xmlReadMemory`/`xmlReadFile`. A lib compila com libxml2 sem SAX1 e não acessa a rede ao ler XML.
-  Os erros de leitura não vão mais para o stderr, e a mensagem de XML malformado informa o motivo
-  (ex.: `Erro: Falha ao interpretar o XML: 77 - Premature end of data in tag vBC line 1`).
-- Objetos temporários internos (`CppLibXml2`, web services, `XmlRead`, cliente HTTP, ...) passaram a usar
-  `std::unique_ptr`, sem vazamento de memória em caso de exceção.
-- `Container::add()` ficou seguro contra exceção.
-- O layout interno de `CppDanfeQtRPT` mudou: as aplicações que usam a lib do DANFE precisam ser recompiladas.
-
-### Removido
-- Dependências pré-compiladas antigas para Windows em `third-party/windows/` (OpenSSL 3.1.3, libxml2 2.11.5,
-  zlib 1.3 e libiconv). As versões novas serão distribuídas como pacotes compactados. Até lá, o `installer/MakeMSVC.bat`
-  e os `CMakeLists.txt` dos exemplos apontam para caminhos que não existem mais.
-- Exemplo `examples/QtCon-2022` (legado, sem manutenção).
-
-### Orientações de uso das Notas Técnicas
-
-#### Combustíveis monofásicos — NT 2023.001 v1.60
-
-Use os grupos existentes em `det->imposto->ICMS`, com `CstICMS::ICMS02`,
-`ICMS15`, `ICMS53` ou `ICMS61`. A biblioteca conserva os valores informados;
-não calcula o imposto, os saldos ou os totais automaticamente.
-
-Informe o índice de mistura em `det->prod->comb->set_pBio(...)`: percentual
-de biodiesel no Diesel B ou de etanol anidro na Gasolina C, maior que zero e
-até 100, com até quatro casas. Zero omite a tag. O campo é filho de `comb`
-e pode ser utilizado sem dados de encerrante.
-
-Preencha cada origem em `comb->origComb->obj`, com `set_indImport(...)`,
-`set_cUFOrig(...)` e `set_pOrig(...)`, e confirme com `origComb->add()`.
-O leiaute permite até 30 origens. A exigência ou proibição de `pBio` e de
-`origComb` depende da tabela ANP e da operação, incluindo as exceções para
-consumidor final, complementar/devolução e CFOP 5922/6922. A v1.60 ativa
-LA18-10, que exige origem conforme a tabela e suas exceções.
-
-Nos CSTs 02/15/53, use `qBCMono`, `adRemICMS` e `vICMSMono`. No CST 15,
-preencha também `qBCMonoReten`, `adRemICMSReten` e `vICMSMonoReten`;
-se houver redução, informe juntos `pRedAdRem` e `motRedAdRem` (1 ou 9).
-No CST 53, os campos opcionais `vICMSMonoOp`, `pDif`, `vICMSMonoDif`
-e `vICMSMono` representam operação, percentual diferido, valor diferido
-e valor devido. Para diferimento total, informe `pDif=100` e os valores
-correspondentes, inclusive zero quando aplicável. No CST 61, use
-`qBCMonoRet`, `adRemICMSRet` e `vICMSMonoRet`.
-
-A v1.60 amplia a lista ANP especial de N41-10/N41-20 para incluir Diesel B.
-Na hipótese descrita para refinarias ou suas bases, a retenção do CST 15 usa
-`qBCMonoReten * adRemICMSReten * 0,3333`, com arredondamento a duas casas;
-o fator não se aplica indistintamente a todos os combustíveis. O exemplo
-da NT informa quantidade 140, alíquota 1,12 e retenção 52,26. São valores
-ilustrativos; utilize a alíquota e a mistura aplicáveis à operação.
-
-Preencha os seis totais monofásicos em `total->ICMSTot` com os somatórios
-correspondentes, a duas casas. Observe a inclusão de `vICMSMonoReten` em
-`vNF` conforme W16-10 e as demais regras vigentes de composição do total.
-Informe os textos exigidos pela seção 6 em `infAdic->infCpl` e em
-`det->infAdProd`; a biblioteca não os compõe automaticamente. A apresentação
-das informações adicionais por produto depende do componente de DANFE utilizado.
-
-`validar()` verifica a estrutura pelo XSD. Tabela ANP, unidade tributável,
-exceções, cálculos, tolerâncias e demais regras fiscais dependem dos dados
-preparados pela aplicação e das validações da SEFAZ. Utilize schemas atualizados.
-
-#### Evento ECONF (NT 2024.002 v1.00)
-O acesso é feito por `cppnfe->eventos->envEvento`. Preencha os eventos em `evento->obj`
-e confirme com `evento->add()`, usando `TpEvento::ECONF` ou `TpEvento::CancelECONF`.
-Os pagamentos ficam em `evento->obj->infEvento->detEvento->detPag`, um `Container<DetPag>`.
-O grupo reutiliza `DetPag` e seu objeto `card`: `card->set_CNPJ(...)` fornece `CNPJIF` no evento;
-`card->set_tBand(...)` e `card->set_cAut(...)` fornecem os campos correspondentes,
-serializados diretamente em `detPag` no XML de ECONF.
-Recompile as aplicações após atualizar a biblioteca, pois `DetPag` recebeu novos membros.
-Informe a versão do aplicativo em `detEvento->set_verAplic(...)` e, no cancelamento,
-o protocolo do evento original em `detEvento->set_nProtEvento(...)`.
-Envie com `cppnfe->eventos->envEvento->enviarEvento(idLote)` e consulte o retorno em
-`cppnfe->eventos->envEvento->retorno`.
-
-Configure a pasta de schemas com os XSDs de ECONF e cancelamento, incluindo seus arquivos
-de dependência. No ambiente de desenvolvimento, eles estão em `build/schemas-nfe/`.
-Envie conciliação e cancelamento em lotes separados, com até 20 eventos; cada ECONF aceita
-de 1 a 100 pagamentos. A biblioteca preenche a descrição, versão do detalhe e órgão receptor:
-NF-e usa SVRS (92); NFC-e usa o serviço da UF. No XSD fornecido, `CNPJIF`, `tBand` e `cAut`
-dependem do preenchimento de `CNPJPag` e `UFPag`.
-
-#### Ator interessado na NF-e — Transportador (NT 2020.007 v1.40)
-Use `cppnfe->eventos->envEvento`, com `TpEvento::AtorInteressadoNFeTransp` (110150).
-Preencha CNPJ **ou** CPF do autor, chave da NF-e modelo 55, data/hora e sequência de 1 a 20
-em `evento->obj->infEvento`. Em `infEvento->detEvento`, informe:
-
-- `set_cOrgaoAutor(...)`: código IBGE da UF do autor do evento;
-- `set_tpAutor(...)`: `EmpresaEmitente` (1), `EmpresaDestinataria` (2) ou
-  `EmpresaTerceiros` (3, transportador contratado);
-- `set_verAplic(...)`: versão do aplicativo;
-- `autXML->set_CNPJ(...)` **ou** `autXML->set_CPF(...)`: transportador autorizado;
-- `set_tpAutorizacao(...)`: emitente/destinatário devem escolher `NaoPermite` (0) ou
-  `PermiteTranspAutTransp` (1). Para transportador contratado, deixe `None`.
-
-A biblioteca preenche descrição, versão do detalhe 1.00 e órgão receptor 91. Com autorização 1,
-preenche também o texto oficial de `xCondUso` quando vazio. Nas demais opções, não informe esse texto.
-Confirme cada evento com `evento->add()` e envie com `envEvento->enviarEvento(idLote)`;
-o retorno fica em `envEvento->retorno`, incluindo `cOrgaoAutor`. Os status 135 e 136 geram
-o XML `procEventoNFe`.
-
-O envio usa exclusivamente o Ambiente Nacional, em lote separado dos demais tipos, com até
-20 eventos. Configure os schemas `envEventoAtorInteressado_v1.00.xsd`,
-`retEnvEventoAtorInteressado_v1.00.xsd` e suas dependências, incluindo
-`leiauteEventoAtorInteressado_v1.00.xsd`. Para validar o XML processado, use
-`procEventoAtorInteressado_v1.00.xsd`. Cópias locais para teste estão em `build/schemas-nfe/`.
-A versão 1.40 da NT mantém o leiaute 1.00; a regra 4P24-10, sobre habilitação do autorizado
-como emitente de CT-e, depende do cadastro consultado pela SEFAZ. O serviço também verifica
-o prazo de seis meses e os demais requisitos fiscais do evento.
-
-#### MEI — CRT 4 (NT 2024.001 v1.20)
-Informe `emite->set_CRT(Crt::SimplesMEI)`. A leitura de `<CRT>4</CRT>` preserva esse regime.
-Nos grupos `ICMSSN102` (CSOSN 102, 103, 300 ou 400) e `ICMSSN900`, `orig` é omitido
-quando o emitente é MEI e `ICMS->get_orig()` vale `Orig::None`. Se informado, o valor é
-preservado, inclusive `Orig::Nacional` (0). Nos demais regimes/grupos, a origem continua exigida.
-
-Para MEI, `cEAN` e `cEANTrib` podem ficar vazios; as tags continuam presentes no XML.
-Em operação interna, o NCM pode ser informado como `00000000`; nas operações interestaduais
-e com o exterior, informe o NCM completo correto. O grupo `ICMSUFDest` não é exigido para CRT 4.
-A biblioteca mantém os valores preenchidos pela aplicação, sem substituir NCM, CFOP, CSOSN
-ou grupos de imposto automaticamente. Use schemas atualizados que aceitem CRT 4 e a origem
-opcional nesses dois grupos.
-
-A validação local por XSD verifica o leiaute. As regras fiscais da NT são aplicadas pela SEFAZ:
-nas operações internas/interestaduais (`idDest != 3`), MEI pode usar CSOSN 102, 300, 400 e 900
-na NF-e; na NFC-e, somente 102 e 300. Para CSOSN 102, os CFOPs de NF-e são 5102/6102;
-para NFC-e, a regra do MEI permite somente 5102. CSOSN 900 e devoluções têm listas próprias
-de CFOP na NT, que devem ser observadas pela aplicação.
-
-A NT também substitui denegações por rejeições (302, 303 e 307) e exclui a denegação 301;
-os códigos e motivos recebidos continuam disponíveis nos retornos da biblioteca.
-
-#### Informações de pagamentos e outros — NT 2023.004 v1.20
+##### Orientações de uso
 
 `validar()` verifica o XSD; as regras fiscais desta NT são avaliadas pela SEFAZ.
 A biblioteca conserva os valores informados pela aplicação, sem recalcular totais
@@ -454,3 +211,320 @@ ou criar automaticamente grupos de pagamento.
   A exceção de NFA-e à habilitação do emitente (1C17-34) depende da SEFAZ.
 - Utilizar schemas atualizados. O ECONF foi transferido para a NT 2024.002,
   implementada anteriormente.
+
+#### MEI — CRT 4 — NT 2024.001 v1.20
+
+- Suporte a `Crt::SimplesMEI` (CRT 4) da NT 2024.001 v1.20, incluindo conversão
+  na leitura e geração. Nos grupos `ICMSSN102` e `ICMSSN900`, a origem não preenchida
+  (`Orig::None`) é omitida para MEI; origens informadas, inclusive nacional (0), são preservadas.
+
+##### Orientações de uso
+
+Informe `emite->set_CRT(Crt::SimplesMEI)`. A leitura de `<CRT>4</CRT>` preserva esse regime.
+Nos grupos `ICMSSN102` (CSOSN 102, 103, 300 ou 400) e `ICMSSN900`, `orig` é omitido
+quando o emitente é MEI e `ICMS->get_orig()` vale `Orig::None`. Se informado, o valor é
+preservado, inclusive `Orig::Nacional` (0). Nos demais regimes/grupos, a origem continua exigida.
+
+Para MEI, `cEAN` e `cEANTrib` podem ficar vazios; as tags continuam presentes no XML.
+Em operação interna, o NCM pode ser informado como `00000000`; nas operações interestaduais
+e com o exterior, informe o NCM completo correto. O grupo `ICMSUFDest` não é exigido para CRT 4.
+A biblioteca mantém os valores preenchidos pela aplicação, sem substituir NCM, CFOP, CSOSN
+ou grupos de imposto automaticamente. Use schemas atualizados que aceitem CRT 4 e a origem
+opcional nesses dois grupos.
+
+A validação local por XSD verifica o leiaute. As regras fiscais da NT são aplicadas pela SEFAZ:
+nas operações internas/interestaduais (`idDest != 3`), MEI pode usar CSOSN 102, 300, 400 e 900
+na NF-e; na NFC-e, somente 102 e 300. Para CSOSN 102, os CFOPs de NF-e são 5102/6102;
+para NFC-e, a regra do MEI permite somente 5102. CSOSN 900 e devoluções têm listas próprias
+de CFOP na NT, que devem ser observadas pela aplicação.
+
+A NT também substitui denegações por rejeições (302, 303 e 307) e exclui a denegação 301;
+os códigos e motivos recebidos continuam disponíveis nos retornos da biblioteca.
+
+#### Evento ECONF — NT 2024.002 v1.00
+
+- Evento de Conciliação Financeira da NT 2024.002 v1.00, usando diretamente
+  `EventoNotaFiscal::envEvento`, `TEvento` e `RetEnvEvento`. Inclui os eventos
+  `TpEvento::ECONF` (110750) e `TpEvento::CancelECONF` (110751), os pagamentos em
+  `DetEvento::detPag` (`Container<DetPag>`), geração e assinatura XML, schemas específicos
+  de envio/retorno e direcionamento da NF-e para a SVRS e da NFC-e para a UF.
+- `DetPag` ampliada com `dPag`, `CNPJPag`, `UFPag`, `CNPJReceb` e `UFReceb`,
+  reutilizando `Card` para os dados da instituição de pagamento. Aplicações devem ser
+  recompiladas devido à alteração do layout da classe.
+
+##### Orientações de uso
+
+O acesso é feito por `cppnfe->eventos->envEvento`. Preencha os eventos em `evento->obj`
+e confirme com `evento->add()`, usando `TpEvento::ECONF` ou `TpEvento::CancelECONF`.
+Os pagamentos ficam em `evento->obj->infEvento->detEvento->detPag`, um `Container<DetPag>`.
+O grupo reutiliza `DetPag` e seu objeto `card`: `card->set_CNPJ(...)` fornece `CNPJIF` no evento;
+`card->set_tBand(...)` e `card->set_cAut(...)` fornecem os campos correspondentes,
+serializados diretamente em `detPag` no XML de ECONF.
+Recompile as aplicações após atualizar a biblioteca, pois `DetPag` recebeu novos membros.
+Informe a versão do aplicativo em `detEvento->set_verAplic(...)` e, no cancelamento,
+o protocolo do evento original em `detEvento->set_nProtEvento(...)`.
+Envie com `cppnfe->eventos->envEvento->enviarEvento(idLote)` e consulte o retorno em
+`cppnfe->eventos->envEvento->retorno`.
+
+Configure a pasta de schemas com os XSDs de ECONF e cancelamento, incluindo seus arquivos
+de dependência.
+Envie conciliação e cancelamento em lotes separados, com até 20 eventos; cada ECONF aceita
+de 1 a 100 pagamentos. A biblioteca preenche a descrição, versão do detalhe e órgão receptor:
+NF-e usa SVRS (92); NFC-e usa o serviço da UF. No XSD fornecido, `CNPJIF`, `tBand` e `cAut`
+dependem do preenchimento de `CNPJPag` e `UFPag`.
+
+#### API de containers
+
+- `Container::count()`, `isEmpty()`, `value(i)` (retorna `nullptr` para índice inválido) e `begin()`/`end()`,
+  que permitem escrever `for (auto *x : *container)`.
+
+### Modificado
+
+As alterações de compatibilidade abaixo exigem atenção ao atualizar a biblioteca e as aplicações.
+
+#### NT 2023.001: recompilar as aplicações
+
+As classes `Comb` e `Icms` receberam membros para o índice de mistura e o controle
+de presença de campos opcionais. Recompile a biblioteca e as aplicações que a utilizam.
+Nos CSTs monofásicos, quantidades opcionais não preenchidas passam a ser omitidas;
+chamar o setter com zero mantém a tag com zero. No CST 53, o mesmo vale para
+alíquota, valores e percentual de diferimento. `clear()` restaura a ausência.
+
+#### Membros das classes da NFe não podem mais ser copiados
+
+Os membros da árvore da NFe (`CppNFe`, `NotaFiscal`, `Nfe`, `InfNFe`, `Det`, `Prod`, ...) passaram de
+`std::shared_ptr` para `std::unique_ptr`. O acesso pelo `->` **não muda**, mas copiar um membro deixa de compilar.
+
+```cpp
+// Antes (não compila mais)
+auto nf = cppnfe->notafiscal;
+std::shared_ptr<NotaFiscal> nf = cppnfe->notafiscal;
+
+// Agora
+auto &nf = cppnfe->notafiscal;               // referência
+NotaFiscal *nf = cppnfe->notafiscal.get();   // ponteiro (não dono)
+
+// Continua igual
+cppnfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(1);
+```
+
+#### `Container::add(T*)` passou a receber `std::unique_ptr<T>`
+
+Isso deixa explícito que o container vira o dono do objeto.
+
+```cpp
+// Antes
+container->add(new Nfe);
+// Agora
+container->add(std::make_unique<Nfe>());
+```
+
+#### `Container` não pode mais ser copiado
+
+A cópia causava double delete (crash). Agora gera erro de compilação.
+
+#### OpenSSL 1.1.1 ou superior e leitura do `openssl.cnf`
+
+A lib passa a exigir o **OpenSSL 1.1.1 ou superior** (com versões antigas, a compilação para com uma mensagem clara)
+e a **carregar o arquivo de configuração do OpenSSL** (`openssl.cnf` do sistema ou o indicado em `OPENSSL_CONF`).
+Antes, a configuração era ignorada. Com isso, a política de criptografia do sistema passa a valer: no Fedora/RHEL
+e derivados, é preciso liberar a assinatura SHA1 (ver README).
+
+#### libxml2: recomendado 2.13 ou superior, e recompilar ao passar para a 2.14 ou superior
+
+A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas e mesmo resultado nas validações por XSD).
+
+- Na **2.13 ou superior**, erros em XSDs incluídos pelo schema principal (ex.: `leiauteNFe_v4.00.xsd` corrompido) vão para a
+  mensagem de erro da validação. Na 2.12 ou anterior, também são impressos no stderr da aplicação.
+- Na **2.14 ou superior**, a libxml2 mudou o nome do arquivo da biblioteca (`libxml2.so.2` → `libxml2.so.16`). Quem atualizar
+  a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
+
+#### Validação XML e gerenciamento de recursos
+
+- **Validação por XSD mais rápida** (`CppLibXml2::parseXML`): o schema era lido e interpretado a cada validação. Agora fica
+  em cache no processo, compartilhado entre as threads (cerca de 11 vezes mais rápido: 1.600 validações de NF-e caíram de
+  12 s para 1 s). Se algum `.xsd` da pasta for alterado, incluído ou removido, o schema é interpretado de novo
+  automaticamente, sem reiniciar a aplicação. Os schemas usados ficam em memória até o fim do processo.
+- `CppLibXml2`: troca as funções antigas `xmlParseMemory`/`xmlParseFile` (interface SAX1, que pode estar desligada na
+  compilação da libxml2) por `xmlReadMemory`/`xmlReadFile`. A lib compila com libxml2 sem SAX1 e não acessa a rede ao ler XML.
+  Os erros de leitura não vão mais para o stderr, e a mensagem de XML malformado informa o motivo
+  (ex.: `Erro: Falha ao interpretar o XML: 77 - Premature end of data in tag vBC line 1`).
+- Objetos temporários internos (`CppLibXml2`, web services, `XmlRead`, cliente HTTP, ...) passaram a usar
+  `std::unique_ptr`, sem vazamento de memória em caso de exceção.
+- O layout interno de `CppDanfeQtRPT` mudou: as aplicações que usam a lib do DANFE precisam ser recompiladas.
+
+### Obsoleto
+
+#### `Container`: acesso direto a `items` está obsoleto (deprecated)
+
+O `Container` ganhou uma API própria de leitura. `items` continua funcionando nesta versão, mas gera aviso
+de compilação e **será removido numa versão futura**.
+
+```cpp
+// Antes (gera aviso de deprecated)
+for (int i = 0; i < nfe->infNFe->det->items->count(); ++i)
+    nfe->infNFe->det->items->value(i)->prod->get_cProd();
+
+// Agora
+for (int i = 0; i < nfe->infNFe->det->count(); ++i)
+    nfe->infNFe->det->value(i)->prod->get_cProd();
+
+// ou, com for por intervalo
+for (Det *det : *nfe->infNFe->det)
+    det->prod->get_cProd();
+```
+
+A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add()`.
+
+### Removido
+
+- Dependências pré-compiladas antigas para Windows: OpenSSL 3.1.3, libxml2 2.11.5,
+  zlib 1.3 e libiconv. As versões novas serão distribuídas como pacotes compactados.
+  Até lá, o instalador MSVC e os exemplos precisam de ajustes nas referências às dependências.
+- Exemplo legado QtCon-2022, sem manutenção.
+
+### Corrigido
+
+#### NF-e e NFC-e
+
+- Leitura dos combustíveis: `pGNi`, `nBomba` e `vEncFin` passam a preencher seus
+  próprios campos, sem sobrescrever `pGNn`, `nBico` e `vEncIni`, respectivamente.
+- CST 15: `pRedAdRem=0` explicitamente informado é preservado na geração.
+  A sequência de redução exige também `motRedAdRem`; pares incompletos são
+  rejeitados pela validação por XSD.
+- Conversão de leitura dos CSTs do ICMS: agora usa a posição do enum, em vez do
+  número fiscal, preservando também Part10/Part90/ST41/ST60. Antes a leitura podia
+  resultar em CST incorreto ou acesso inválido ao gerar novamente.
+- CST 41/50 passam a gerar o grupo compartilhado `ICMS40`, preservando o CST;
+  ICMSPart10/90 usam `ICMSPart` (a identificação do grupo agora precede o corte do CST).
+- Ato concessório 08 passa a ser escrito com dois dígitos; leitura aceita 08 e 8.
+- CSOSN 103, 300 e 400 passam a usar o grupo XML `ICMSSN102`, conservando o valor de
+  `CSOSN`. Antes eram gerados grupos inexistentes (`ICMSSN103`, `ICMSSN300` e `ICMSSN400`).
+- **XML de NF-e com DI inválido**: a tag `UFDesemb` era gerada duas vezes no grupo `DI`, e a SEFAZ rejeitava
+  notas de importação.
+- **XML duplicado ao gerar de novo**: `gerar()` numa nota importada, ou chamado mais de uma vez, produzia um XML
+  com duas raízes `<NFe>`. Agora o XML, a assinatura e o erro anteriores são limpos antes de gerar.
+- `gerar()` devolvia `false` quando havia um erro de uma etapa anterior (por exemplo, de `validar()`), mesmo gerando corretamente.
+- `gerar()` devolvia `true` quando a geração do XML falhava. Agora o erro é informado.
+- A mensagem "Erro ao assinar/gerar/validar N nota(s)" mostrava a contagem anterior (por exemplo, "0 nota(s)").
+- **Configuração sem valor inicial**: membros de `ConfigNFe`, `ArquivosNF` e `ConfWebServices` não eram
+  inicializados. Sem chamar os `set_...`, eles ficavam com lixo de memória, o que podia, por exemplo, quebrar a geração do QR Code da NFC-e.
+- Acesso fora dos limites da string ao montar a versão do QR Code (online e offline).
+- Valores padrão em `ConfigNFe`: `ModeloDF::NFe`, `VersaoNF::v400`, `VersaoQrCodeNF::v200`, `IndSinc::Nao` e `TpEmis::Normal`.
+
+#### `gerar()` valida a chave de acesso
+
+Se a chave de acesso montada (sem o dígito verificador) não tiver exatamente 43 dígitos numéricos, `gerar()`
+passa a devolver `false` com a mensagem `Chave de acesso invalida (...)`. Antes, a nota era gerada em silêncio
+com uma chave que a SEFAZ rejeitaria. A causa mais comum é o **CNPJ/CPF do emitente com máscara**
+(`12.345.678/0001-90`): informe somente os números.
+
+#### Eventos
+
+- Preservação do atributo `infEvento/@Id` na leitura do retorno de `WSEvento`.
+- `InfEvento::set_CPF()` gravava no membro CNPJ, impossibilitando informar corretamente
+  o CPF do autor nos eventos.
+- A associação de retorno e evento passa a conferir também `tpEvento`, além da chave e sequência.
+- `EnvEvento::enviarEvento()` passa a retornar a falha do web service corretamente; a geração
+  repetida limpa o XML do lote e o erro/assinatura anterior do evento.
+
+#### Serviços e consultas públicas
+
+- Endereços dos serviços NF-e/NFC-e e consultas públicas atualizados.
+  Corrigidos o uso de produção na homologação da
+  NFC-e de SP, os serviços de GO apontando para CE, o retorno de autorização de GO,
+  o roteamento da NFC-e de CE para SVRS e os endereços de cadastro e contingência.
+  Atualizadas também as URLs de QR Code/consulta, removidos espaços externos e
+  corrigida a base de SC para evitar duplicação de `?p=`. Recompilar a biblioteca
+  para incorporar os novos endereços ao recurso embarcado.
+- **`HttpOpenSSL`** (usado com `HttpType::HttpOpenSSL`; o padrão `HttpQt` não é afetado):
+
+  - a resposta vinha com lixo de memória depois do XML, e respostas grandes podiam vir cortadas. Agora a leitura
+    respeita o `Content-Length`, decodifica `Transfer-Encoding: chunked` e aceita servidor que fecha sem `close_notify`;
+  - não tinha timeout e podia travar a aplicação. Agora usa o timeout configurado (padrão de 15 s, como o `HttpQt`);
+  - XML com acentos podia ser corrompido no Windows (conversão para a codificação local) e o `Content-Length` ficava errado;
+  - linha do pedido HTTP inválida (espaço antes do fim de linha), SNI não enviado e `SSL_accept` indevido no cliente;
+  - socket, `SSL_CTX` e `SSL` vazavam nos retornos de erro.
+- `HttpQt`: o cabeçalho `Content-Type` era enviado com erro de digitação (`charst=utf-8`), e o charset era ignorado.
+- Falha ao abrir o `urlnfe.json` interno agora gera um aviso claro, em vez de um erro enganoso de parse do JSON.
+
+#### DANFE e chave de acesso
+
+- DANFE: o objeto do relatório tinha dois donos, e cada chamada de `print()` no mesmo objeto duplicava as conexões
+  (os campos eram preenchidos várias vezes).
+- DANFE: a lista de locais de retirada e entrega era global e compartilhada entre todas as instâncias. Duas impressões
+  ao mesmo tempo podiam misturar os dados. Agora cada DANFE tem a sua lista, e campos numéricos sem valor saem zerados
+  em vez de lixo de memória.
+- **Dígito verificador** (`CppUtility::dvModulo11`): sempre lia 43 posições, sem considerar o tamanho da string.
+  Na chave de contingência FS/FS-DA do DANFE (35 posições), lia além do fim da string, e o DV podia sair errado.
+  Agora o cálculo usa o tamanho real. Para chaves de 43 dígitos, o resultado não muda.
+- DANFE: a chave de contingência FS/FS-DA saía inválida para notas a partir de R$ 10.000,00, porque o valor
+  era formatado em notação científica (ex.: `1e+06`).
+
+#### XML e assinatura
+
+- A assinatura alterava configurações globais da libxml2, afetando todos os parses seguintes (validação por XSD e
+  retornos da SEFAZ). As opções agora valem só para a assinatura. A assinatura gerada não muda.
+- **Assinatura no Fedora/RHEL** (e derivados): falhava sempre com "Erro ao assinar documento", porque a lib ignorava
+  a configuração do OpenSSL e o SHA1 ficava bloqueado sem como liberar. Agora basta liberar o SHA1 (ver README).
+- **Crash na assinatura** (`CppLibXml2::c14n`): quando o nó a assinar não existia no XML, a lib liberava a raiz do documento
+  duas vezes (`double free`) e a aplicação fechava. Agora a assinatura falha com erro.
+- A assinatura chamava `xmlCleanupParser()`, que limpa o estado global da libxml2 e não deve ser chamada com a biblioteca em uso
+  (risco com threads ou com outras partes da aplicação que usam a libxml2).
+- Validação por XSD (`parseXML`): os erros da libxml2 eram impressos no stderr da aplicação e a mensagem de erro terminava com
+  quebra de linha. Agora os erros são capturados pela lib, e a mensagem informa o **primeiro** erro do XML (antes era o último).
+  Diretório de schemas inválido encerra a validação na hora.
+- `CppXML::setNode` (`CppLibXml2`): valor com `&` ou `<` era tratado como XML já escapado. Na libxml2 2.12 a tag ficava
+  vazia (e o erro saía no stderr); na 2.15 o `&` era descartado. Agora o valor é gravado como texto, escapado corretamente,
+  igual nas duas versões. A assinatura não é afetada.
+
+#### Containers e exemplos
+
+- `Container::add()` ficou seguro contra exceção.
+- Exemplo `consoleNFe`: usava `StatusServico::get_status()`, renomeado para `status()`.
+
+#### Ator interessado na NF-e — Transportador — NT 2020.007 v1.40
+
+- Evento Ator Interessado na NF-e — Transportador (110150), conforme NT 2020.007 v1.40:
+  reutiliza `EnvEvento`, `TEvento`, `DetEvento::autXML` e os enums existentes. Corrigida a tag
+  `tpAutorizacao` e a emissão dos opcionais; valida as combinações de autor/autorização e
+  restringe o evento à NF-e modelo 55. Preenche descrição, versão 1.00, órgão 91 e condição
+  de uso quando autorizada. Direciona ao Ambiente Nacional em lote separado, usa os XSDs
+  específicos de envio/retorno e gera XML processado para os status 135 e 136.
+
+##### Orientações de uso
+
+Use `cppnfe->eventos->envEvento`, com `TpEvento::AtorInteressadoNFeTransp` (110150).
+Preencha CNPJ **ou** CPF do autor, chave da NF-e modelo 55, data/hora e sequência de 1 a 20
+em `evento->obj->infEvento`. Em `infEvento->detEvento`, informe:
+
+- `set_cOrgaoAutor(...)`: código IBGE da UF do autor do evento;
+- `set_tpAutor(...)`: `EmpresaEmitente` (1), `EmpresaDestinataria` (2) ou
+  `EmpresaTerceiros` (3, transportador contratado);
+- `set_verAplic(...)`: versão do aplicativo;
+- `autXML->set_CNPJ(...)` **ou** `autXML->set_CPF(...)`: transportador autorizado;
+- `set_tpAutorizacao(...)`: emitente/destinatário devem escolher `NaoPermite` (0) ou
+  `PermiteTranspAutTransp` (1). Para transportador contratado, deixe `None`.
+
+A biblioteca preenche descrição, versão do detalhe 1.00 e órgão receptor 91. Com autorização 1,
+preenche também o texto oficial de `xCondUso` quando vazio. Nas demais opções, não informe esse texto.
+Confirme cada evento com `evento->add()` e envie com `envEvento->enviarEvento(idLote)`;
+o retorno fica em `envEvento->retorno`, incluindo `cOrgaoAutor`. Os status 135 e 136 geram
+o XML `procEventoNFe`.
+
+O envio usa exclusivamente o Ambiente Nacional, em lote separado dos demais tipos, com até
+20 eventos. Configure os schemas `envEventoAtorInteressado_v1.00.xsd`,
+`retEnvEventoAtorInteressado_v1.00.xsd` e suas dependências, incluindo
+`leiauteEventoAtorInteressado_v1.00.xsd`. Para validar o XML processado, use
+`procEventoAtorInteressado_v1.00.xsd`.
+A versão 1.40 da NT mantém o leiaute 1.00; a regra 4P24-10, sobre habilitação do autorizado
+como emitente de CT-e, depende do cadastro consultado pela SEFAZ. O serviço também verifica
+o prazo de seis meses e os demais requisitos fiscais do evento.
+
+### Segurança
+
+- **Assinatura com DOCTYPE** (`signXML`): um XML com `<!DOCTYPE>` e entidade externa fazia o conteúdo de arquivos locais
+  entrar no XML assinado (XXE), e podia acessar a rede. Agora XML com DOCTYPE é recusado na assinatura (o XML da NF-e
+  não tem DOCTYPE; a assinatura das notas não muda).
+
+[Não publicado]: https://github.com/cppbr/cppbrasil/commits/develop
