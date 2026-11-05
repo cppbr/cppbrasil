@@ -23,7 +23,7 @@ limitations under the License.
 
 EventoNotaFiscal::EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal) :
     statusServico(new StatusServico(confgNFe)), envEvento(new EnvEvento(confgNFe, notafiscal)),
-    consSitNFe(new ConsSitNFe(confgNFe, notafiscal)), CancNFe(new ::CancNFe(confgNFe))
+    consSitNFe(new ConsSitNFe(confgNFe, notafiscal)), cancNFe(new CancNFe(confgNFe))
 {
     connect(statusServico.get(), SIGNAL(wsChange(WebServicesNF)), this, SIGNAL(wsChange(WebServicesNF)));
     connect(statusServico.get(), SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
@@ -34,8 +34,8 @@ EventoNotaFiscal::EventoNotaFiscal(ConfigNFe* confgNFe, NotaFiscal* notafiscal) 
     connect(consSitNFe.get(), &ConsSitNFe::wsChange, this, &EventoNotaFiscal::wsChange);
     connect(consSitNFe.get(), &ConsSitNFe::errorOccurred, this, &EventoNotaFiscal::errorOccurred);
 
-    connect(CancNFe.get(), &::CancNFe::wsChange, this, &EventoNotaFiscal::wsChange);
-    connect(CancNFe.get(), &::CancNFe::errorOccurred, this, &EventoNotaFiscal::errorOccurred);
+    connect(cancNFe.get(), &CancNFe::wsChange, this, &EventoNotaFiscal::wsChange);
+    connect(cancNFe.get(), &CancNFe::errorOccurred, this, &EventoNotaFiscal::errorOccurred);
 
 }
 
@@ -48,5 +48,5 @@ void EventoNotaFiscal::clear()
     this->statusServico->clear();
     this->envEvento->clear();
     this->consSitNFe->clear();
-    this->CancNFe->clear();
+    this->cancNFe->clear();
 }

@@ -158,6 +158,12 @@ bool EnvEvento::gerarXML(const int &idLote)
     for (const TEvento *item : *evento)
     {
         const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
+        if (item->infEvento->get_tpEvento() == TpEvento::Cancelamento ||
+            item->infEvento->get_tpEvento() == TpEvento::CancelamentoSubstituicao)
+        {
+            m_error = "Eventos 110111 e 110112 devem ser enviados por EventoNotaFiscal::cancNFe.";
+            return false;
+        }
         if (tipo >= 411500 && tipo <= 411503)
         {
             m_error = "Eventos 411500 a 411503 são exclusivos do Fisco e não podem ser enviados pelo contribuinte.";

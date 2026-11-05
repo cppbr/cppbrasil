@@ -162,6 +162,7 @@ SOURCES += \
     retconssitnfe.cpp \
     retconsstatserv.cpp \
     retenvevento.cpp \
+    reteventocancnfe.cpp \
     retirada.cpp \
     retornonfe.cpp \
     rettransp.cpp \
@@ -266,6 +267,7 @@ HEADERS += \
     retconssitnfe.h \
     retconsstatserv.h \
     retenvevento.h \
+    reteventocancnfe.h \
     retirada.h \
     retornonfe.h \
     rettransp.h \

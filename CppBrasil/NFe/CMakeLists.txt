@@ -199,6 +199,8 @@ set(cppnfe_SRC
     retconsstatserv.cpp
     retenvevento.h
     retenvevento.cpp
+    reteventocancnfe.h
+    reteventocancnfe.cpp
     retirada.h
     retirada.cpp
     retornonfe.h
@@ -323,6 +325,7 @@ set(HEADER_NFE
     retconssitnfe.h
     retconsstatserv.h
     retenvevento.h
+    reteventocancnfe.h
     retirada.h
     retornonfe.h
     rettransp.h

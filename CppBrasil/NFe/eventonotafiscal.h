@@ -44,7 +44,7 @@ public:
     std::unique_ptr<StatusServico> statusServico;
     std::unique_ptr<EnvEvento> envEvento;
     std::unique_ptr<ConsSitNFe> consSitNFe;
-    std::unique_ptr<::CancNFe> CancNFe;
+    std::unique_ptr<CancNFe> cancNFe;
 
 signals:
     void errorOccurred(const QString &error);
