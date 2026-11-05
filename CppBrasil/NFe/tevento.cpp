@@ -1,4 +1,88 @@
 #include "tevento.h"
+#include <QRegularExpression>
+#include <QSet>
+#include <cmath>
+
+namespace {
+bool pedidoProrrogacao(TpEvento tipo)
+{
+    return tipo == TpEvento::PedidoProrrogacao1 || tipo == TpEvento::PedidoProrrogacao2;
+}
+
+bool cancelProrrogacao(TpEvento tipo)
+{
+    return tipo == TpEvento::CancelPedidoProrrogacao1 || tipo == TpEvento::CancelPedidoProrrogacao2;
+}
+
+bool fiscoProrrogacao(TpEvento tipo)
+{
+    return tipo == TpEvento::FiscoPedidoProrrogacao1 || tipo == TpEvento::FiscoPedidoProrrogacao2 ||
+           tipo == TpEvento::FiscoCancelPedidoProrrogacao1 || tipo == TpEvento::FiscoCancelPedidoProrrogacao2;
+}
+
+// Destaca o detalhe com seu namespace, inclusive quando herdado do envelope.
+QByteArray detalheProrrogacao(const QString &xml)
+{
+    QXmlStreamReader reader(xml);
+    QByteArray detalhe;
+    QXmlStreamWriter writer(&detalhe);
+    while (!reader.atEnd())
+    {
+        reader.readNext();
+        if (!reader.isStartElement() || reader.name() != QStringLiteral("detEvento"))
+            continue;
+        writer.writeStartElement("detEvento");
+        writer.writeDefaultNamespace(reader.namespaceUri().toString());
+        writer.writeAttributes(reader.attributes());
+        int nivel = 1;
+        while (nivel > 0 && !reader.atEnd())
+        {
+            reader.readNext();
+            if (reader.isStartElement()) ++nivel;
+            if (reader.isEndElement()) --nivel;
+            writer.writeCurrentToken(reader);
+        }
+        return reader.hasError() ? QByteArray() : detalhe;
+    }
+    return detalhe;
+}
+}
+
+ItemRespPedido::ItemRespPedido() { clear(); }
+void ItemRespPedido::clear()
+{
+    m_numItem = 0;
+    m_statPedido = 0;
+    m_justStatus = 0;
+    m_justStaOutra.clear();
+}
+int ItemRespPedido::get_numItem() const { return m_numItem; }
+void ItemRespPedido::set_numItem(const int &valor) { m_numItem = valor; }
+int ItemRespPedido::get_statPedido() const { return m_statPedido; }
+void ItemRespPedido::set_statPedido(const int &valor) { m_statPedido = valor; }
+int ItemRespPedido::get_justStatus() const { return m_justStatus; }
+void ItemRespPedido::set_justStatus(const int &valor) { m_justStatus = valor; }
+QString ItemRespPedido::get_justStaOutra() const { return m_justStaOutra; }
+void ItemRespPedido::set_justStaOutra(const QString &valor) { m_justStaOutra = valor; }
+
+RespPedido::RespPedido(): itemPedido(new Container<ItemRespPedido>), m_statPrazo(-1) {}
+void RespPedido::clear() { m_statPrazo = -1; itemPedido->clear(); }
+int RespPedido::get_statPrazo() const { return m_statPrazo; }
+void RespPedido::set_statPrazo(const int &valor) { m_statPrazo = valor; }
+
+RespCancPedido::RespCancPedido() { clear(); }
+void RespCancPedido::clear()
+{
+    m_statCancPedido = 0;
+    m_justStatus = 0;
+    m_justStaOutra.clear();
+}
+int RespCancPedido::get_statCancPedido() const { return m_statCancPedido; }
+void RespCancPedido::set_statCancPedido(const int &valor) { m_statCancPedido = valor; }
+int RespCancPedido::get_justStatus() const { return m_justStatus; }
+void RespCancPedido::set_justStatus(const int &valor) { m_justStatus = valor; }
+QString RespCancPedido::get_justStaOutra() const { return m_justStaOutra; }
+void RespCancPedido::set_justStaOutra(const QString &valor) { m_justStaOutra = valor; }
 
 
 //------------------------------------------------------------------------
@@ -160,7 +244,9 @@ void DestEPEC::set_IE(const QString &IE)
 //------------------------------------------------------------------------
 
 DetEvento::DetEvento(): dest(new DestEPEC()), itemPedido(new Container<ItemPedProrrog>),
-    autXML(new AutXMLAtor()), detPag(new Container<DetPag>), m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
+    autXML(new AutXMLAtor()), detPag(new Container<DetPag>),
+    respPedido(new RespPedido()), respCancPedido(new RespCancPedido()),
+    m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
     m_tpNF(TpNF::None), m_vNF(0.0), m_vICMS(0.0), m_vST(0.0), m_tpAutorizacao(TpAutorizacao::None),
     m_nTentativa(0), m_tpMotivo(TpMotivo::None)
 {
@@ -178,6 +264,10 @@ void DetEvento::clear()
     this->itemPedido->clear();
     this->autXML->clear();
     this->detPag->clear();
+    this->respPedido->clear();
+    this->respCancPedido->clear();
+    this->m_idPedidoCancelado.clear();
+    this->m_idPedido.clear();
     this->m_versao.clear();
     this->m_descEvento.clear();
     this->m_cOrgaoAutor = 0;
@@ -212,6 +302,67 @@ void DetEvento::clear()
     this->m_hashTentativaEntrega.clear();
     CppUtil::clearDateTime(this->m_dhHashTentativaEntrega);
 
+}
+
+QString DetEvento::get_idPedidoCancelado() const { return m_idPedidoCancelado; }
+void DetEvento::set_idPedidoCancelado(const QString &valor) { m_idPedidoCancelado = valor; }
+QString DetEvento::get_idPedido() const { return m_idPedido; }
+void DetEvento::set_idPedido(const QString &valor) { m_idPedido = valor; }
+
+bool DetEvento::lerProrrogacao(QXmlStreamReader &xml)
+{
+    if (!xml.isStartElement()) return false;
+    if (xml.name() == QStringLiteral("idPedidoCancelado"))
+        set_idPedidoCancelado(xml.readElementText());
+    else if (xml.name() == QStringLiteral("idPedido"))
+        set_idPedido(xml.readElementText());
+    else if (xml.name() == QStringLiteral("itemPedido"))
+    {
+        itemPedido->obj->set_numItem(xml.attributes().value("numItem").toInt());
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("qtdeItem"))
+                itemPedido->obj->set_qtdeItem(xml.readElementText().toDouble());
+            else xml.skipCurrentElement();
+        }
+        itemPedido->add();
+    }
+    else if (xml.name() == QStringLiteral("respPedido"))
+    {
+        respPedido->clear();
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("statPrazo"))
+                respPedido->set_statPrazo(xml.readElementText().toInt());
+            else if (xml.name() == QStringLiteral("itemPedido"))
+            {
+                auto *item = respPedido->itemPedido->obj;
+                item->set_numItem(xml.attributes().value("numItem").toInt());
+                while (xml.readNextStartElement())
+                {
+                    if (xml.name() == QStringLiteral("statPedido")) item->set_statPedido(xml.readElementText().toInt());
+                    else if (xml.name() == QStringLiteral("justStatus")) item->set_justStatus(xml.readElementText().toInt());
+                    else if (xml.name() == QStringLiteral("justStaOutra")) item->set_justStaOutra(xml.readElementText());
+                    else xml.skipCurrentElement();
+                }
+                respPedido->itemPedido->add();
+            }
+            else xml.skipCurrentElement();
+        }
+    }
+    else if (xml.name() == QStringLiteral("respCancPedido"))
+    {
+        respCancPedido->clear();
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("statCancPedido")) respCancPedido->set_statCancPedido(xml.readElementText().toInt());
+            else if (xml.name() == QStringLiteral("justStatus")) respCancPedido->set_justStatus(xml.readElementText().toInt());
+            else if (xml.name() == QStringLiteral("justStaOutra")) respCancPedido->set_justStaOutra(xml.readElementText());
+            else xml.skipCurrentElement();
+        }
+    }
+    else return false;
+    return true;
 }
 
 QString DetEvento::get_descEvento() const
@@ -728,6 +879,14 @@ void TEvento::gerarXML()
     this->m_error.clear();
     this->m_xml_assinado.clear();
     this->m_xml_original.clear();
+    const TpEvento tipo = infEvento->get_tpEvento();
+    if (fiscoProrrogacao(tipo))
+    {
+        m_error = "Eventos 411500 a 411503 são exclusivos do Fisco; use lerXMLProrrogacao para importar a resposta.";
+        return;
+    }
+    if ((pedidoProrrogacao(tipo) || cancelProrrogacao(tipo)) && !validarDadosProrrogacao())
+        return;
     if (infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp)
     {
         const auto autor = infEvento->detEvento->get_tpAutor();
@@ -787,6 +946,8 @@ void TEvento::gerarXML()
         _xmlw.writeTextElement("tpAutor", ConvNF::tpAutorToStr(this->infEvento->detEvento->get_tpAutor()));
     if (!this->infEvento->detEvento->get_verAplic().isEmpty())
         _xmlw.writeTextElement("verAplic", this->infEvento->detEvento->get_verAplic());
+    if (cancelProrrogacao(tipo))
+        _xmlw.writeTextElement("idPedidoCancelado", this->infEvento->detEvento->get_idPedidoCancelado());
     if (!this->infEvento->detEvento->get_nProt().isEmpty())
         _xmlw.writeTextElement("nProt", this->infEvento->detEvento->get_nProt());
     if (!this->infEvento->detEvento->get_xJust().isEmpty())
@@ -829,8 +990,7 @@ void TEvento::gerarXML()
         _xmlw.writeTextElement("vST", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->get_vST(), 2));
     }
     //Pedido de Prorrogação
-    if (this->infEvento->get_tpEvento() == TpEvento::CancelPedidoProrrogacao1 ||
-        this->infEvento->get_tpEvento() == TpEvento::CancelPedidoProrrogacao2)
+    if (pedidoProrrogacao(tipo))
     {
         for (int i = 0; i < this->infEvento->detEvento->itemPedido->count(); ++i) {
             _xmlw.writeStartElement("itemPedido"); //abertura do grupo itemPedido - agrupamento dos ítens
@@ -940,6 +1100,189 @@ void TEvento::gerarXML()
 
     this->m_xml_original.clear();
     this->m_xml_original.append(_strXML);
+}
+
+bool TEvento::validarDadosProrrogacao()
+{
+    const TpEvento tipo = infEvento->get_tpEvento();
+    static const QRegularExpression chave("^[0-9]{44}$");
+    auto *inf = infEvento.get();
+    auto *det = inf->detEvento.get();
+    if (!chave.match(inf->get_chNFe()).hasMatch() || inf->get_chNFe().mid(20, 2) != "55")
+        m_error = "Prorrogação exige uma chave de NF-e modelo 55 com 44 dígitos numéricos.";
+    else if (m_versao != "1.00" || inf->get_verEvento() != "1.00")
+        m_error = "Prorrogação exige a versão 1.00 do evento e do detalhe.";
+    else if (inf->get_cOrgao() != inf->get_chNFe().left(2).toInt())
+        m_error = "O órgão do evento de prorrogação deve ser a UF da chave da NF-e.";
+    else if (inf->get_nSeqEvento() < 1 || inf->get_nSeqEvento() > 99)
+        m_error = "Prorrogação exige nSeqEvento de 1 a 99, controlado pela aplicação.";
+    else if (cancelProrrogacao(tipo))
+    {
+        const QString referencia = det->get_idPedidoCancelado();
+        const QString prefixo = tipo == TpEvento::CancelPedidoProrrogacao1 ? "ID111500" : "ID111501";
+        static const QRegularExpression id("^ID[0-9]{52}$");
+        if (!id.match(referencia).hasMatch() || !referencia.startsWith(prefixo) ||
+            referencia.mid(8, 44) != inf->get_chNFe() || referencia.right(2) == "00")
+            m_error = "idPedidoCancelado deve identificar um pedido do mesmo prazo e da mesma NF-e.";
+        else if (!det->itemPedido->isEmpty())
+            m_error = "Cancelamento de pedido não permite itemPedido; informe idPedidoCancelado e o protocolo do pedido.";
+    }
+    else
+    {
+        if (!det->get_idPedidoCancelado().isEmpty())
+            m_error = "idPedidoCancelado é exclusivo do cancelamento de pedido de prorrogação.";
+        else if (det->itemPedido->count() < 1 || det->itemPedido->count() > 990)
+            m_error = "Pedido de prorrogação exige de 1 a 990 itens.";
+        QSet<int> numeros;
+        for (const ItemPedProrrog *item : *det->itemPedido)
+        {
+            const int numero = item->get_numItem();
+            if (numero < 1 || numero > 990 || numeros.contains(numero))
+                m_error = "Número de item de prorrogação deve ser único e estar entre 1 e 990.";
+            if (!std::isfinite(item->get_qtdeItem()) || item->get_qtdeItem() < 0 || item->get_qtdeItem() >= 100000000000.0)
+                m_error = "Quantidade do item de prorrogação inválida.";
+            numeros.insert(numero);
+        }
+    }
+    return m_error.isEmpty();
+}
+
+bool TEvento::validarProrrogacao(const ConfigNFe *config)
+{
+    m_error.clear();
+    const TpEvento tipo = infEvento->get_tpEvento();
+    if (!config || (!pedidoProrrogacao(tipo) && !cancelProrrogacao(tipo) && !fiscoProrrogacao(tipo)))
+    {
+        m_error = "Informe a configuração de schemas e um evento da NT 2015.001.";
+        return false;
+    }
+    if ((pedidoProrrogacao(tipo) || cancelProrrogacao(tipo)) && !validarDadosProrrogacao())
+        return false;
+    const QString xml = m_xml_assinado.isEmpty() ? m_xml_original : m_xml_assinado;
+    QXmlStreamReader reader(xml);
+    reader.readNextStartElement();
+    const QString raiz = reader.name().toString();
+    if (raiz != "evento" && raiz != "procEventoNFe")
+    {
+        m_error = "Informe um XML evento ou procEventoNFe.";
+        return false;
+    }
+    CppLibXml2 validador(config->certificado->get_cryptoLib(), config->arquivos->get_caminhoSchema().toUtf8());
+    const QByteArray detalhe = detalheProrrogacao(xml);
+    QXmlStreamReader leitorDetalhe(detalhe);
+    leitorDetalhe.readNextStartElement();
+    if (leitorDetalhe.attributes().value("versao") != QStringLiteral("1.00"))
+    {
+        m_error = "O detalhe de prorrogação exige versao igual a 1.00.";
+        return false;
+    }
+    QString envelope = xml;
+    if (raiz == "evento")
+    {
+        envelope.remove(QRegularExpression("^\\s*<\\?xml[^?]*\\?>"));
+        envelope = "<envEvento xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"1.00\"><idLote>0</idLote>" +
+                   envelope + "</envEvento>";
+    }
+    if (!validador.parseXML(envelope.toUtf8(),
+            raiz == "evento" ? QByteArray("envEvento_v1.00.xsd") : QByteArray("procEventoNFe_v1.00.xsd")) ||
+        !validador.parseXML(detalhe,
+            ("e" + ConvNF::tpEventoToStr(tipo) + "_v1.00.xsd").toUtf8()))
+    {
+        m_error = validador.get_error();
+        return false;
+    }
+    const auto *inf = infEvento.get();
+    const QString id = "ID" + ConvNF::tpEventoToStr(tipo) + inf->get_chNFe() +
+                       QString::number(inf->get_nSeqEvento()).rightJustified(2, '0');
+    if (m_versao != "1.00" || inf->get_verEvento() != "1.00" ||
+        inf->get_chNFe().mid(20, 2) != "55" || inf->get_nSeqEvento() < 1 ||
+        inf->get_nSeqEvento() > 99 || inf->get_Id() != id)
+    {
+        m_error = "Evento de prorrogação exige modelo 55, sequência de 1 a 99 e Id correspondente ao tipo, chave e sequência.";
+        return false;
+    }
+    if (fiscoProrrogacao(tipo))
+    {
+        const QString pedido = inf->detEvento->get_idPedido();
+        const QString prefixo = "ID" + QString::number(static_cast<int>(tipo) - 300000);
+        if (pedido.left(8) != prefixo || pedido.mid(8, 44) != inf->get_chNFe() || pedido.right(2) == "00")
+        {
+            m_error = "idPedido da resposta do Fisco deve corresponder ao tipo e à NF-e do pedido original.";
+            return false;
+        }
+        QSet<int> numeros;
+        for (const ItemRespPedido *item : *inf->detEvento->respPedido->itemPedido)
+        {
+            if (item->get_numItem() < 1 || item->get_numItem() > 990 || numeros.contains(item->get_numItem()))
+            {
+                m_error = "Resposta do Fisco exige número de item único de 1 a 990.";
+                return false;
+            }
+            numeros.insert(item->get_numItem());
+        }
+    }
+    return true;
+}
+
+bool TEvento::lerXMLProrrogacao(const QString &xml, const ConfigNFe *config)
+{
+    clear();
+    QXmlStreamReader reader(xml);
+    bool encontrou = false;
+    while (!reader.atEnd())
+    {
+        reader.readNext();
+        if (!reader.isStartElement() || reader.name() != QStringLiteral("evento")) continue;
+        if (encontrou)
+        {
+            reader.raiseError("Informe somente um evento ou procEventoNFe por importação.");
+            break;
+        }
+        encontrou = true;
+        set_versao(reader.attributes().value("versao").toString());
+        while (reader.readNextStartElement())
+        {
+            if (reader.name() != QStringLiteral("infEvento")) { reader.skipCurrentElement(); continue; }
+            infEvento->set_Id(reader.attributes().value("Id").toString());
+            while (reader.readNextStartElement())
+            {
+                if (reader.name() == QStringLiteral("detEvento"))
+                {
+                    while (reader.readNextStartElement())
+                    {
+                        if (infEvento->detEvento->lerProrrogacao(reader)) continue;
+                        if (reader.name() == QStringLiteral("descEvento")) infEvento->detEvento->set_descEvento(reader.readElementText());
+                        else if (reader.name() == QStringLiteral("nProt")) infEvento->detEvento->set_nProt(reader.readElementText());
+                        else reader.skipCurrentElement();
+                    }
+                }
+                else
+                {
+                    const QString nome = reader.name().toString();
+                    const QString valor = reader.readElementText();
+                    if (nome == "cOrgao") infEvento->set_cOrgao(valor.toInt());
+                    else if (nome == "tpAmb") infEvento->set_tpAmb(ConvNF::strToTpAmb(valor));
+                    else if (nome == "CNPJ") infEvento->set_CNPJ(valor);
+                    else if (nome == "CPF") infEvento->set_CPF(valor);
+                    else if (nome == "chNFe") infEvento->set_chNFe(valor);
+                    else if (nome == "dhEvento") infEvento->set_dhEvento(QDateTime::fromString(valor, Qt::ISODate));
+                    else if (nome == "tpEvento") infEvento->set_tpEvento(ConvNF::strToTpEvento(valor));
+                    else if (nome == "nSeqEvento") infEvento->set_nSeqEvento(valor.toInt());
+                    else if (nome == "verEvento") infEvento->set_verEvento(valor);
+                }
+            }
+        }
+    }
+    m_xml_original = xml; // Preserva integralmente o documento recebido, inclusive a assinatura.
+    if (!encontrou || reader.hasError() || !validarProrrogacao(config))
+    {
+        const QString erro = reader.hasError() ? reader.errorString() :
+            (m_error.isEmpty() ? "XML sem evento de prorrogação." : m_error);
+        clear();
+        m_error = erro;
+        return false;
+    }
+    return true;
 }
 
 QString TEvento::get_error() const

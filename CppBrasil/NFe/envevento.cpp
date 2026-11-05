@@ -41,6 +41,8 @@ void EnvEvento::clear()
 
 bool EnvEvento::enviarEvento(const int &idLote)
 {
+    retorno->clear();
+    m_error.clear();
 //salvarNotaVinculada serve para salvar notas onde a nota em questão foi emitida pelo próprio
 //transmissor do evento.
     bool _ret = true;
@@ -70,7 +72,14 @@ bool EnvEvento::enviarEvento(const int &idLote)
                                   _servidor);
 
             if (_ret)
+            {
               tratarRetorno();
+              if (!m_error.isEmpty())
+              {
+                  emit errorOccurred(m_error);
+                  _ret = false;
+              }
+            }
         }
         else
         {
@@ -145,6 +154,43 @@ bool EnvEvento::gerarXML(const int &idLote)
     QString _evento;
     this->m_error.clear();
     this->m_xml.clear();
+    bool prorrogacao = false;
+    for (const TEvento *item : *evento)
+    {
+        const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
+        if (tipo >= 411500 && tipo <= 411503)
+        {
+            m_error = "Eventos 411500 a 411503 são exclusivos do Fisco e não podem ser enviados pelo contribuinte.";
+            return false;
+        }
+        prorrogacao = prorrogacao || (tipo >= 111500 && tipo <= 111503);
+    }
+    if (prorrogacao)
+    {
+        if (config->get_ModeloDF() != ModeloDF::NFe || idLote < 0 || evento->count() > 20 ||
+            (!m_versao.isEmpty() && m_versao != "1.00"))
+        {
+            m_error = "Prorrogação exige modelo 55, versão 1.00, idLote não negativo e até 20 eventos por lote.";
+            return false;
+        }
+        for (const TEvento *item : *evento)
+        {
+            const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
+            if (tipo < 111500 || tipo > 111503 ||
+                item->infEvento->get_chNFe().left(2).toInt() != ConvNF::ufToInt(config->webservices->get_uf()) ||
+                (item->infEvento->get_tpAmb() != TpAmb::None &&
+                 item->infEvento->get_tpAmb() != config->webservices->get_tpAmb()))
+            {
+                m_error = "Envie prorrogação em lote separado, com UF e ambiente iguais aos configurados.";
+                return false;
+            }
+        }
+    }
+    if (!config->certificado->get_cryptoLib())
+    {
+        m_error = "Carregue o certificado digital antes de enviar eventos.";
+        return false;
+    }
 
     //versão - Caso não seja informado, será 1.00 que é a versão do momento.
     if (this->m_versao.isEmpty())
@@ -187,6 +233,16 @@ bool EnvEvento::gerarXML(const int &idLote)
 void EnvEvento::updateEvento(int &index)
 {
     const TpEvento tipo = evento->value(index)->infEvento->get_tpEvento();
+    if (tipo == TpEvento::PedidoProrrogacao1 || tipo == TpEvento::PedidoProrrogacao2 ||
+        tipo == TpEvento::CancelPedidoProrrogacao1 || tipo == TpEvento::CancelPedidoProrrogacao2)
+    {
+        auto *inf = evento->value(index)->infEvento.get();
+        inf->set_cOrgao(ConvNF::ufToInt(config->webservices->get_uf()));
+        inf->set_verEvento("1.00");
+        inf->detEvento->set_descEvento(
+            tipo == TpEvento::PedidoProrrogacao1 || tipo == TpEvento::PedidoProrrogacao2
+            ? "Pedido de Prorrogacao" : "Cancelamento de Pedido de Prorrogacao");
+    }
     if (tipo == TpEvento::AtorInteressadoNFeTransp)
     {
         auto *inf = evento->value(index)->infEvento.get();
@@ -338,11 +394,31 @@ bool EnvEvento::validarEvento()
         _ret = false;
     }
 
+    if (_ret)
+        for (TEvento *item : *evento)
+        {
+            const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
+            if (tipo >= 111500 && tipo <= 111503 && !item->validarProrrogacao(config))
+            {
+                m_error = item->get_error();
+                return false;
+            }
+        }
+
     return _ret;
 }
 
 void EnvEvento::tratarRetorno()
 {
+    if (!evento->isEmpty())
+    {
+        const int tipo = static_cast<int>(evento->value(0)->infEvento->get_tpEvento());
+        if (tipo >= 111500 && tipo <= 111503)
+        {
+            tratarRetornoProrrogacao();
+            return;
+        }
+    }
     //atualiza e salva o xml do evento
     QByteArray _schema = this->config->arquivos->get_caminhoSchema().toLocal8Bit();
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(this->config->certificado->get_cryptoLib(), _schema));
@@ -404,5 +480,53 @@ void EnvEvento::tratarRetorno()
             }
         }
     }
+}
+
+bool EnvEvento::tratarRetornoProrrogacao()
+{
+    m_error.clear();
+    // 135 registra a solicitação; o deferimento vem em outro evento, emitido pelo Fisco.
+    if (retorno->get_cStat() != 128) return true;
+    CppLibXml2 xml(config->certificado->get_cryptoLib(), config->arquivos->get_caminhoSchema().toUtf8());
+    for (RetEvento *ret : *retorno->retEvento)
+    {
+        if (ret->infEvento->get_cStat() != 135) continue;
+        TEvento *enviado = nullptr;
+        for (TEvento *item : *evento)
+        {
+            if (ret->infEvento->get_chNFe() == item->infEvento->get_chNFe() &&
+                ret->infEvento->get_tpEvento() == item->infEvento->get_tpEvento() &&
+                ret->infEvento->get_nSeqEvento() == item->infEvento->get_nSeqEvento() &&
+                ret->infEvento->get_tpAmb() == item->infEvento->get_tpAmb())
+            {
+                enviado = item;
+                break;
+            }
+        }
+        if (!enviado)
+        {
+            m_error = "O retorno de prorrogação não corresponde ao evento enviado.";
+            return false;
+        }
+        QByteArray processado = "<procEventoNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"1.00\"></procEventoNFe>";
+        const QByteArray original = ("<a>" + CppUtility::extractStr(enviado->get_XMLAssinado(), "<evento", "/evento>") + "</a>").toUtf8();
+        const QByteArray resposta = ("<a>" + CppUtility::extractStr(ret->get_XML(), "<retEvento", "/retEvento>") + "</a>").toUtf8();
+        if (!enviado->validarProrrogacao(config))
+        {
+            m_error = enviado->get_error();
+            return false;
+        }
+        if (!xml.addChildXML(processado, original, "procEventoNFe") ||
+            !xml.addChildXML(processado, resposta, "procEventoNFe") ||
+            !xml.parseXML(processado, "procEventoNFe_v1.00.xsd"))
+        {
+            m_error = xml.get_error();
+            return false;
+        }
+        ret->set_XML(QString::fromUtf8(processado));
+        if (config->arquivos->get_salvar())
+            ret->salvarXML(config->arquivos->get_caminhoEvento(), enviado->infEvento->get_Id().mid(2) + "-procEventoNFe");
+    }
+    return true;
 }
 

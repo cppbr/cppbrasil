@@ -77,6 +77,61 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- NT 2015.001 v1.30: pedidos de prorrogação da suspensão do ICMS para o primeiro
+  e segundo prazos (`111500`/`111501`) e seus cancelamentos (`111502`/`111503`)
+  em `EventoNotaFiscal::envEvento`, exclusivos da NF-e modelo 55. Versão 1.00,
+  descrição, órgão da UF e ID são preparados pela biblioteca; informar CNPJ/CPF
+  do autor, chave, data do evento e sequência de 1 a 99, controlada pela aplicação.
+  Enviar em lote separado de outras famílias, com até 20 eventos e UF/ambiente
+  correspondentes à configuração. Recompilar a biblioteca e as aplicações pela
+  ampliação de `DetEvento`.
+- Nos pedidos, preencher `detEvento->nProt` com o protocolo de autorização da NF-e
+  e adicionar de 1 a 990 elementos em `detEvento->itemPedido`, com `numItem`
+  único de 1 a 990 e `qtdeItem` decimal, gravada com quatro casas. Nos cancelamentos,
+  preencher `set_idPedidoCancelado()` com o ID completo do pedido do mesmo prazo
+  e da mesma NF-e (`ID` + tipo + chave + sequência de dois dígitos), e `set_nProt()`
+  com o protocolo de registro desse pedido. Cancelamentos não contêm itens.
+- Validação do envelope e do detalhe pelos XSDs `e111500_v1.00.xsd` a
+  `e111503_v1.00.xsd`. O registro com `cStat=135` gera `procEventoNFe`, associado
+  por chave, tipo, sequência e ambiente. `enviarEvento()` retornar `true` não
+  significa deferimento: consultar os códigos do lote e do evento, e acompanhar
+  a decisão posterior do Fisco.
+- Leitura das respostas do Fisco `411500`–`411503`, com os tipos
+  `FiscoPedidoProrrogacao1`, `FiscoPedidoProrrogacao2`,
+  `FiscoCancelPedidoProrrogacao1` e `FiscoCancelPedidoProrrogacao2`.
+  `DetEvento::idPedido` identifica a solicitação original;
+  `respPedido` contém `statPrazo` e `itemPedido` com `numItem`, `statPedido`,
+  `justStatus` e `justStaOutra`; `respCancPedido` contém `statCancPedido`,
+  `justStatus` e `justStaOutra`. `statPrazo=0` significa após o prazo e `1` dentro
+  do prazo; o valor inicial `-1` indica ausência. Decisões `1`/`2` significam
+  deferido/indeferido. Respostas sucessivas devem ser relacionadas por `idPedido`
+  e pelos itens; o sequencial do Fisco é independente do sequencial do pedido.
+- `TEvento::lerXMLProrrogacao(xml, configuracoes)` importa um `evento` ou
+  `procEventoNFe` da NT, validando envelope, detalhe específico e vínculo do pedido.
+  Limpa os dados anteriores, inclusive em caso de erro, e preserva o documento
+  recebido em `get_XMLOriginal()`. Exemplo com XML obtido pela aplicação:
+
+  ```cpp
+  TEvento resposta;
+  if (resposta.lerXMLProrrogacao(xmlRecebido, cppnfe->configuracoes.get())) {
+      const auto &det = *resposta.infEvento->detEvento;
+      QString pedido = det.get_idPedido();
+      // Consultar respPedido ou respCancPedido conforme o tipo do evento.
+  }
+  ```
+
+  A importação não consulta `NFeDistribuicaoDFe` nem verifica criptograficamente
+  a assinatura recebida. A aplicação deve obter o XML e verificar sua autenticidade.
+  A geração e o envio de eventos exclusivos do Fisco são bloqueados. A consulta de
+  protocolo também lê os novos grupos quando presentes no retorno.
+- Orientações da v1.30: a solicitação completa adotada por MG exige todos os itens
+  e quantidades da NF-e, inclusive no segundo prazo; a solicitação parcial de SP
+  permite selecionar itens e quantidades. A aplicação deve preparar o pedido
+  conforme a UF e acompanhar os saldos, prazos e decisões. Os limites de pedidos
+  pendentes são definidos pela UF, e `justStatus=7` não se aplica à solicitação
+  completa. O cancelamento do primeiro prazo pode depender do cancelamento prévio
+  do segundo; pedidos vigentes podem impedir o cancelamento da NF-e (rejeição 811).
+  Essas condições dependem do estado fiscal mantido pela SEFAZ.
 - `CancNFe`, em `cancnfe.h`/`cancnfe.cpp`, disponível em `EventoNotaFiscal::CancNFe`,
   com envio independente de `EnvEvento`. Suporta cancelamento de NF-e/NFC-e
   (`TpEvento::Cancelamento`, 110111) e cancelamento por substituição exclusivo da NFC-e
