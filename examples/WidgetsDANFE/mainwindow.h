@@ -4,8 +4,8 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include "nota.h"
-#include <CppBrasil/NFe/CppNFe>
-#include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
+#include <CppNFe/CppNFe>
+#include <DanfeQtRPT/CppDanfeQtRPT>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

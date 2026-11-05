@@ -58,7 +58,13 @@ Windows, Debian e Ubuntu não têm esse bloqueio.
   contra a versão nova; os binários compilados com a antiga não carregam a nova.
 - A lib funciona com a libxml2 compilada sem a interface antiga SAX1 (`--without-sax1`).
 
+### Migração para a nova estrutura de módulos
+Os includes mudaram (`<CppNFe/...>`, `<CppBase/...>`, `<CppDanfe/...>` e `<DanfeQtRPT/...>`) e a `libCppBase` agora é
+obrigatória: ligue `-lCppNFe -lCppBase`. Para o DANFE, use `-lCppDanfeQtRPT -lCppDanfe -lCppNFe -lCppBase -lQtRPT`.
+
 ## Compilação
+Compile a partir do `CMakeLists.txt` da raiz do projeto. Para compilar sem o DANFE e sem o QtRPT, use `-DCPPBRASIL_BUILD_DANFE=OFF`.
+
 ### Linux
 A compilação no Linux pode ser feita via cmake ou utilizando o script MakeLinux.sh. O script utiliza o cmake e o ninja e será instalado dentro do diretório /usr.
 

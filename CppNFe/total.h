@@ -22,10 +22,10 @@ limitations under the License.
 #define TOTAL_H
 
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/icmstot.h>
-#include <CppBrasil/NFe/issqntot.h>
-#include <CppBrasil/NFe/rettrib.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/icmstot.h>
+#include <CppNFe/issqntot.h>
+#include <CppNFe/rettrib.h>
 
 class CPPNFE_EXPORT Total
 {

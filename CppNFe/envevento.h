@@ -26,15 +26,15 @@ limitations under the License.
 #include <QString>
 #include <QDateTime>
 #include <QXmlStreamWriter>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/notafiscal.h>
-#include <CppBrasil/NFe/wsnfe.h>
-#include <CppBrasil/NFe/retenvevento.h>
-#include <CppBrasil/NFe/tevento.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/container.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/notafiscal.h>
+#include <CppNFe/wsnfe.h>
+#include <CppNFe/retenvevento.h>
+#include <CppNFe/tevento.h>
 
 
 class CPPNFE_EXPORT EnvEvento : public QObject

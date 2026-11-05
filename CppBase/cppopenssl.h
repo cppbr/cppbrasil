@@ -38,10 +38,10 @@ limitations under the License.
 #include <openssl/x509.h>
 #include <openssl/ssl.h>
 
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppcrypto.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cppcrypto.h>
 
-class CPPNFE_EXPORT CppOpenSSL: public CppCrypto
+class CPPBASE_EXPORT CppOpenSSL: public CppCrypto
 {
 public:
     CppOpenSSL(const QByteArray &p12path, const QByteArray &pass);

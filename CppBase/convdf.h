@@ -24,7 +24,7 @@ limitations under the License.
 #include <QString>
 #include <QList>
 #include <QSsl>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 //TIPOS GERAIS PARA TODOS OS PROJETOS CppBrasil
 //UF
@@ -42,7 +42,7 @@ enum class TpAmb {None = -1, Producao = 1, Homologacao = 2};
 //tipo de log
 enum class TipoMsgLog{MsgErro, MsgEnvio, MsgRetorno};
 
-class CPPNFE_EXPORT ConvDF
+class CPPBASE_EXPORT ConvDF
 {
 public:
     ConvDF();

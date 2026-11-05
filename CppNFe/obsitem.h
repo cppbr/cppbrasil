@@ -23,9 +23,9 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/obscont.h>
-#include <CppBrasil/NFe/obsfisco.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/obscont.h>
+#include <CppNFe/obsfisco.h>
 
 class CPPNFE_EXPORT ObsItem
 {

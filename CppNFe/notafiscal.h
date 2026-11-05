@@ -23,13 +23,13 @@ limitations under the License.
 
 #include <memory>
 #include <QObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/nfe.h>
-#include <CppBrasil/NFe/xmlwrite.h>
-#include <CppBrasil/NFe/retornonfe.h>
-#include <CppBrasil/NFe/wsnfe.h>
-#include <CppBrasil/NFe/xmlread.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/nfe.h>
+#include <CppNFe/xmlwrite.h>
+#include <CppNFe/retornonfe.h>
+#include <CppNFe/wsnfe.h>
+#include <CppNFe/xmlread.h>
 
 class CPPNFE_EXPORT NotaFiscal : public QObject
 {

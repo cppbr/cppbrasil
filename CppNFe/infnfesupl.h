@@ -22,8 +22,8 @@ limitations under the License.
 #define INFNFESUPL_H
 
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
 
 class CPPNFE_EXPORT InfNFeSupl
 {

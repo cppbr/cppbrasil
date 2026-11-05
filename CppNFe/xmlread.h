@@ -22,9 +22,9 @@ limitations under the License.
 
 #include <QXmlStreamReader>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/nfe.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/nfe.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT XmlRead
 {

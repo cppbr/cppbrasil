@@ -23,14 +23,14 @@ limitations under the License.
 
 #include <memory>
 #include <QObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/wsnfe.h>
-#include <CppBrasil/NFe/statusservico.h>
-#include <CppBrasil/NFe/notafiscal.h>
-#include <CppBrasil/NFe/envevento.h>
-#include <CppBrasil/NFe/conssitnfe.h>
-#include <CppBrasil/NFe/cancnfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/wsnfe.h>
+#include <CppNFe/statusservico.h>
+#include <CppNFe/notafiscal.h>
+#include <CppNFe/envevento.h>
+#include <CppNFe/conssitnfe.h>
+#include <CppNFe/cancnfe.h>
 
 
 class CPPNFE_EXPORT EventoNotaFiscal : public QObject

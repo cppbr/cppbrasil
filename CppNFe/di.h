@@ -24,11 +24,11 @@ limitations under the License.
 #include <memory>
 #include <QString>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/adi.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/container.h>
+#include <CppNFe/adi.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT Di
 {

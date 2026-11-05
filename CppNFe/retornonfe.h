@@ -24,11 +24,11 @@ limitations under the License.
 #include <QString>
 #include <QDateTime>
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppBase/cpputility.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/convnf.h>
 
 
 /* As classes retEnviNFe e retConsReciNFe estão representadas no projeto somente pela classe

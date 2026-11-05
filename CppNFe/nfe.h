@@ -23,14 +23,14 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/NFe/infnfe.h>
-#include <CppBrasil/NFe/xmlwrite.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/retornonfe.h>
-#include <CppBrasil/NFe/infnfesupl.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppNFe/infnfe.h>
+#include <CppNFe/xmlwrite.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/retornonfe.h>
+#include <CppNFe/infnfesupl.h>
 
 
 class CPPNFE_EXPORT Nfe

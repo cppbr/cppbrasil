@@ -23,11 +23,11 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/obscont.h>
-#include <CppBrasil/NFe/obsfisco.h>
-#include <CppBrasil/NFe/procref.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/obscont.h>
+#include <CppNFe/obsfisco.h>
+#include <CppNFe/procref.h>
 
 class CPPNFE_EXPORT InfAdic
 {

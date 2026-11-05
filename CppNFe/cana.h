@@ -23,10 +23,10 @@ limitations under the License.
 
 #include <QString>
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/fordia.h>
-#include <CppBrasil/NFe/deduc.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/fordia.h>
+#include <CppNFe/deduc.h>
 
 class CPPNFE_EXPORT Cana
 {

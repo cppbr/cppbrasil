@@ -30,12 +30,12 @@ limitations under the License.
 #include <QNetworkProxy>
 #include <QSslKey>
 #include <QEventLoop>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppcrypto.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cppcrypto.h>
 
 enum class HttpType{None = -1, HttpQt, HttpOpenSSL};
 
-class CPPNFE_EXPORT HttpClient : public QObject
+class CPPBASE_EXPORT HttpClient : public QObject
 
 {
     Q_OBJECT

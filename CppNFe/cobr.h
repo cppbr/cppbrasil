@@ -22,10 +22,10 @@ limitations under the License.
 #define COBR_H
 
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/fat.h>
-#include <CppBrasil/NFe/dup.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/fat.h>
+#include <CppNFe/dup.h>
 
 class CPPNFE_EXPORT Cobr
 {

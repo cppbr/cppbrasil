@@ -27,7 +27,7 @@ limitations under the License.
 #include <QFileInfo>
 #include <QRandomGenerator>
 #include <QRegularExpression>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 enum class DtH{Date,           //yyyy-MM-dd
                DateTime,       //yyyy-MM-dd hh:mm:ss
@@ -39,7 +39,7 @@ enum class DtH{Date,           //yyyy-MM-dd
 
 enum class TipoArquivo{HTML, TXT, XML};
 
-class CPPNFE_EXPORT CppUtility
+class CPPBASE_EXPORT CppUtility
 {
 public:
     CppUtility();

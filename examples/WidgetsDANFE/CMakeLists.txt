@@ -88,7 +88,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(WidgetsDANFE  PRIVATE -lCppNFe -lQtRPT -lCppDanfeQtRPT -lcrypto -lssl -lxml2 -lz)
+    target_link_libraries(WidgetsDANFE  PRIVATE -lCppDanfeQtRPT -lCppDanfe -lCppNFe -lCppBase -lQtRPT -lcrypto -lssl -lxml2 -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(WidgetsDANFE
         PRIVATE ../../lib
@@ -98,7 +98,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         PRIVATE ../../third-party/windows/zlib-1.2.12/lib
         PRIVATE ../../third-party/windows/QtRptProject3.0/lib/debug/lib
     )
-    target_link_libraries(WidgetsDANFE  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libiconv libxml2 zdll)
+    target_link_libraries(WidgetsDANFE  PRIVATE CppDanfeQtRPT CppDanfe CppNFe CppBase QtRPT libcrypto libssl libiconv libxml2 zdll)
 
 endif()
 

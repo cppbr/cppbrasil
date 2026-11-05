@@ -23,11 +23,11 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/cide.h>
-#include <CppBrasil/NFe/encerrante.h>
-#include <CppBrasil/NFe/origcomb.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/cide.h>
+#include <CppNFe/encerrante.h>
+#include <CppNFe/origcomb.h>
 
 class CPPNFE_EXPORT Comb
 {

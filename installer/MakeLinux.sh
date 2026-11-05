@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CPPBRASIL_PATH="../.."
-XML2_PATH="/usr/include/libxml2"
 QTRPT_HEADER="../../third-party/linux/QtRptProject3.0/include/QtRPT"
 
 echo "Informe o Diretorio do Qt onde se encontra o gcc_64: "
@@ -44,13 +43,7 @@ rm -fr build
 mkdir build
 cd build
 
-
-#CPLUS_INCLUDE_PATH include para C++. Se for C é C_INCLUDE_PATH
-CPLUS_INCLUDE_PATH=$XML2_PATH:$QTRPT_HEADER:$CPLUS_INCLUDE_PATH
-export CPLUS_INCLUDE_PATH
-
-CPPNFE=$CPPBRASIL_PATH"/CppBrasil/NFe"
-cmake -GNinja $CPPNFE $CMD_BUILD_TYPE $CMD_PREFIX_PATH $CMD_INSTALL
+cmake -GNinja $CPPBRASIL_PATH $CMD_BUILD_TYPE $CMD_PREFIX_PATH $CMD_INSTALL
 #se a instalação for no /usr/ pede senha do sudo
 if [ -z $CMD_INSTALL ]; then
     ninja && sudo ninja install
@@ -58,32 +51,13 @@ else
     ninja && ninja install
 fi
 
-rm -fr CMakeFiles CppNFe_autogen build.ninja CMakeCache.txt cmake_install.cmake install_manifest.txt
-
-#CPPDANFEQTRPT------------------------------
-
-#caso a instação seja em /usr/lib não haverá nenhuma flag para link das libs CppNFe e QtRPt, apenas copiará a libQtRPT para /usr/lib
+#copia a libQtRPT e seus headers para o mesmo destino das libs da CppBrasil
 if [ -z $CMD_INSTALL ]; then
     sudo cp -R $QTRPT_HEADER /usr/include
-    CPLIB="$QTRPT_LIB/libQtRPT.so"
-    sudo cp $CPLIB /usr/lib
-    LINKER_FLAG=""
+    sudo cp "$QTRPT_LIB/libQtRPT.so" /usr/lib
 else
-#caso informe outro caminho para instação, haverá as flags para link das libs CppNFe e QtRPt. Também copiará a libQtRPT para o diretório informado
     cp -R $QTRPT_HEADER "$INSTALL_PATH/include"
-    CPLIB="$QTRPT_LIB/libQtRPT.so"
-    cp $CPLIB "$INSTALL_PATH/lib"
-    LINKER_FLAG="-DCMAKE_SHARED_LINKER_FLAGS=-L$INSTALL_PATH/lib  "
-fi
-
-
-CPPDANFEQTRPT=$CPPBRASIL_PATH"/CppBrasil/DanfeQtRPT"
-
-cmake -GNinja $CPPDANFEQTRPT $CMD_BUILD_TYPE $CMD_PREFIX_PATH $LINKER_FLAG $CMD_INSTALL
-if [ -z $CMD_INSTALL ]; then
-    ninja && sudo ninja install
-else
-    ninja && ninja install
+    cp "$QTRPT_LIB/libQtRPT.so" "$INSTALL_PATH/lib"
 fi
 
 cd ..

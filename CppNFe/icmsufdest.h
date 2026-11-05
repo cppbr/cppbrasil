@@ -21,7 +21,7 @@ limitations under the License.
 #ifndef ICMSUFDEST_H
 #define ICMSUFDEST_H
 
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 class CPPNFE_EXPORT IcmsUFDest
 {

@@ -21,8 +21,8 @@ limitations under the License.
 #ifndef COFINSST_H
 #define COFINSST_H
 
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT CofinsST
 {

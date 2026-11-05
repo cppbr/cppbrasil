@@ -24,8 +24,8 @@ limitations under the License.
 #include <QString>
 #include <QByteArray>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
 
 enum class CertType{None = -1, A1, A3};
 enum class CryptoType{None = -1, OpenSSL};
@@ -33,7 +33,7 @@ enum class HashType{sha = 0, sha1, mdc2, ripemd160, sha224, sha256, sha384,
                     sha512, md2, md4, md5};
 
 
-class CPPNFE_EXPORT CppCrypto
+class CPPBASE_EXPORT CppCrypto
 {
 public:
     CppCrypto();

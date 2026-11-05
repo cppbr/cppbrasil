@@ -25,12 +25,12 @@ limitations under the License.
 #include <QString>
 #include <QByteArray>
 #include <QDebug>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppcrypto.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cppcrypto.h>
 
 enum class XMLReturnType {XMLSign, SignNode};
 
-class CPPNFE_EXPORT CppXML : public QObject
+class CPPBASE_EXPORT CppXML : public QObject
 {
     Q_OBJECT
 

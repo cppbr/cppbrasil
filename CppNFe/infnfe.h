@@ -23,26 +23,26 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/ide.h>
-#include <CppBrasil/NFe/emit.h>
-#include <CppBrasil/NFe/avulsa.h>
-#include <CppBrasil/NFe/dest.h>
-#include <CppBrasil/NFe/retirada.h>
-#include <CppBrasil/NFe/entrega.h>
-#include <CppBrasil/NFe/autxml.h>
-#include <CppBrasil/NFe/det.h>
-#include <CppBrasil/NFe/total.h>
-#include <CppBrasil/NFe/transp.h>
-#include <CppBrasil/NFe/cobr.h>
-#include <CppBrasil/NFe/pag.h>
-#include <CppBrasil/NFe/infadic.h>
-#include <CppBrasil/NFe/exporta.h>
-#include <CppBrasil/NFe/compra.h>
-#include <CppBrasil/NFe/cana.h>
-#include <CppBrasil/NFe/infresptec.h>
-#include <CppBrasil/NFe/infintermed.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/ide.h>
+#include <CppNFe/emit.h>
+#include <CppNFe/avulsa.h>
+#include <CppNFe/dest.h>
+#include <CppNFe/retirada.h>
+#include <CppNFe/entrega.h>
+#include <CppNFe/autxml.h>
+#include <CppNFe/det.h>
+#include <CppNFe/total.h>
+#include <CppNFe/transp.h>
+#include <CppNFe/cobr.h>
+#include <CppNFe/pag.h>
+#include <CppNFe/infadic.h>
+#include <CppNFe/exporta.h>
+#include <CppNFe/compra.h>
+#include <CppNFe/cana.h>
+#include <CppNFe/infresptec.h>
+#include <CppNFe/infintermed.h>
 
 class CPPNFE_EXPORT InfNFe
 {

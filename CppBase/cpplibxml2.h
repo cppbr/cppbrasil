@@ -26,13 +26,13 @@ limitations under the License.
 #include <libxml/tree.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/c14n.h>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppxml.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/cppcrypto.h>
-#include <CppBrasil/cppopenssl.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cppxml.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/cppcrypto.h>
+#include <CppBase/cppopenssl.h>
 
-class CPPNFE_EXPORT CppLibXml2: public CppXML
+class CPPBASE_EXPORT CppLibXml2: public CppXML
 {
 public:
     CppLibXml2(CppCrypto *cppcrypto, const QByteArray &schemapath);

@@ -22,7 +22,7 @@ limitations under the License.
 #define VEICTRANSP_H
 
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 class CPPNFE_EXPORT VeicTransp
 {

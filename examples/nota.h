@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QString>
 #include <QDebug>
-#include <CppBrasil/CppUtil>
-#include <CppBrasil/NFe/CppNFe>
-#include <CppBrasil/NFe/ConvNF>
+#include <CppBase/CppUtil>
+#include <CppNFe/CppNFe>
+#include <CppNFe/ConvNF>
 
 class Nota : public QObject
 {

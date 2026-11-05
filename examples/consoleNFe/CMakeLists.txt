@@ -41,7 +41,7 @@ target_link_libraries(consoleNFe
 )
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(consoleNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)
+    target_link_libraries(consoleNFe  PRIVATE -lCppNFe -lCppBase -lcrypto -lssl -lxml2 -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(consoleNFe
         PRIVATE ../../lib
@@ -50,5 +50,5 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
         PRIVATE ../../third-party/windows/zlib-1.2.12/lib
     )
-    target_link_libraries(consoleNFe PRIVATE CppNFe libcrypto libssl libiconv libxml2 zdll)
+    target_link_libraries(consoleNFe PRIVATE CppNFe CppBase libcrypto libssl libiconv libxml2 zdll)
 endif()

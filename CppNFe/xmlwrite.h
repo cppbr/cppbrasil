@@ -29,14 +29,14 @@ limitations under the License.
 #endif
 #include <QFile>
 #include <QDebug>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/cppcrypto.h>
-#include <CppBrasil/cpplibxml2.h>
-#include <CppBrasil/NFe/infnfe.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/urlnfe.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/cppcrypto.h>
+#include <CppBase/cpplibxml2.h>
+#include <CppNFe/infnfe.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/urlnfe.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT XmlWrite
 {

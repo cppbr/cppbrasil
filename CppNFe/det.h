@@ -23,11 +23,11 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/prod.h>
-#include <CppBrasil/NFe/imposto.h>
-#include <CppBrasil/NFe/impostodevol.h>
-#include <CppBrasil/NFe/obsitem.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/prod.h>
+#include <CppNFe/imposto.h>
+#include <CppNFe/impostodevol.h>
+#include <CppNFe/obsitem.h>
 
 class CPPNFE_EXPORT Det
 {

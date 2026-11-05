@@ -81,7 +81,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(WidgetsNFe  PRIVATE -lCppNFe -lcrypto -lssl -lxml2 -lz)
+    target_link_libraries(WidgetsNFe  PRIVATE -lCppNFe -lCppBase -lcrypto -lssl -lxml2 -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(WidgetsNFe
         PRIVATE ../../lib
@@ -90,5 +90,5 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
         PRIVATE ../../third-party/windows/zlib-1.2.12/lib
     )
-    target_link_libraries(WidgetsNFe PRIVATE CppNFe libcrypto libssl libiconv libxml2 zdll)
+    target_link_libraries(WidgetsNFe PRIVATE CppNFe CppBase libcrypto libssl libiconv libxml2 zdll)
 endif()
