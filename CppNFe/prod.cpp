@@ -22,7 +22,7 @@ limitations under the License.
 
 Prod::Prod(): DI(new Container<Di>), detExport(new Container<DetExport>),
     rastro(new Container<Rastro>), veicProd(new VeicProd), med(new Med),
-    arma(new Container<Arma>), comb(new Comb),
+    arma(new Container<Arma>), comb(new Comb), gCred(new Container<GCred>),
     m_nItem(0), m_qCom(0.0), m_vUnCom(0.0), m_vProd(0.0), m_qTrib(0.0),
     m_vUnTrib(0.0), m_vFrete(0.0), m_vSeg(0.0), m_vDesc(0.0), m_vOutro(0.0),
     m_indTot(IndTot::None), m_indEscala(IndEscala::None),
@@ -74,6 +74,7 @@ void Prod::clear()
     this->med->clear();
     this->arma->clear();
     this->comb->clear();
+    this->gCred->clear();
 }
 
 int Prod::get_nItem() const

@@ -1213,6 +1213,9 @@ void XmlRead::set_prod(QXmlStreamReader &xml) const
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->prod->set_cBenef(_valor);
         }
+        if (xml.isStartElement() && xml.name() == QStringLiteral("gCred")) //I05g
+            set_prod_gCred(xml);
+
         if (xml.name() == QStringLiteral("EXTIPI")) //I06
         {
             _valor = xml.readElementText();
@@ -1371,6 +1374,23 @@ void XmlRead::set_prod(QXmlStreamReader &xml) const
         xml.readNext();
     }
 
+}
+
+void XmlRead::set_prod_gCred(QXmlStreamReader &xml) const
+{
+    auto *creditos = nota->infNFe->det->obj->prod->gCred.get();
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("cCredPresumido"))
+            creditos->obj->set_cCredPresumido(xml.readElementText());
+        else if (xml.name() == QStringLiteral("pCredPresumido"))
+            creditos->obj->set_pCredPresumido(xml.readElementText().toDouble());
+        else if (xml.name() == QStringLiteral("vCredPresumido"))
+            creditos->obj->set_vCredPresumido(xml.readElementText().toDouble());
+        else
+            xml.skipCurrentElement();
+    }
+    creditos->add();
 }
 
 void XmlRead::set_DI(QXmlStreamReader &xml) const
@@ -2333,6 +2353,11 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->imposto->ICMS->set_UFST(_valor);
+        }
+        if (xml.name() == QStringLiteral("cBenefRBC") &&
+            nota->infNFe->det->obj->imposto->ICMS->get_CST() == CstICMS::ICMS51)
+        {
+            nota->infNFe->det->obj->imposto->ICMS->set_cBenefRBC(xml.readElementText());
         }
         if (xml.name() == QStringLiteral("pRedBC"))
         {

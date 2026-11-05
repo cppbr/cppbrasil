@@ -53,8 +53,11 @@ void Icms::clear()
     this->m_CST = CstICMS::None;
     this->m_CSOSN = CsosnICMS::None;
     this->m_modBC = ModBC::None;
+    this->m_vBCInformado = false;
     this->m_vBC = 0.0;
+    this->m_pICMSInformado = false;
     this->m_pICMS = 0.0;
+    this->m_vICMSInformado = false;
     this->m_vICMS = 0.0;
     this->m_pFCP = 0.0;
     this->m_vFCP = 0.0;
@@ -70,8 +73,10 @@ void Icms::clear()
     this->m_vFCPST = 0.0;
     this->m_vICMSDeson = 0.0;
     this->m_motDesICMS = MotDesICMS::None;
+    this->m_vICMSOpInformado = false;
     this->m_vICMSOp = 0.0;
     this->m_pDif = 0.0;
+    this->m_vICMSDifInformado = false;
     this->m_vICMSDif = 0.0;
     this->m_ICMSSTRetInformado = false;
     this->m_pSTInformado = false;
@@ -93,7 +98,9 @@ void Icms::clear()
     this->m_vICMSEfet = 0.0;
     this->m_pBCOp = 0.0;
     this->m_UFST.clear();
+    this->m_pRedBCInformado = false;
     this->m_pRedBC = 0.0;
+    this->m_cBenefRBC.clear();
     this->m_pCredSN = 0.0;
     this->m_vCredICMSSN = 0.0;
     this->m_vICMSSTDeson = 0.0;
@@ -159,6 +166,11 @@ void Icms::set_modBC(const ModBC &modBC)
     this->m_modBC = modBC;
 }
 
+bool Icms::has_vBC() const
+{
+    return this->m_vBCInformado;
+}
+
 double Icms::get_vBC() const
 {
     return this->m_vBC;
@@ -167,6 +179,12 @@ double Icms::get_vBC() const
 void Icms::set_vBC(const double &vBC)
 {
     this->m_vBC = vBC;
+    this->m_vBCInformado = true;
+}
+
+bool Icms::has_pICMS() const
+{
+    return this->m_pICMSInformado;
 }
 
 double Icms::get_pICMS() const
@@ -177,6 +195,12 @@ double Icms::get_pICMS() const
 void Icms::set_pICMS(const double &pICMS)
 {
     this->m_pICMS = pICMS;
+    this->m_pICMSInformado = true;
+}
+
+bool Icms::has_vICMS() const
+{
+    return this->m_vICMSInformado;
 }
 
 double Icms::get_vICMS() const
@@ -187,6 +211,7 @@ double Icms::get_vICMS() const
 void Icms::set_vICMS(const double &vICMS)
 {
     this->m_vICMS = vICMS;
+    this->m_vICMSInformado = true;
 }
 
 double Icms::get_pFCP() const
@@ -329,6 +354,11 @@ void Icms::set_motDesICMS(const MotDesICMS &motDesICMS)
     this->m_motDesICMS = motDesICMS;
 }
 
+bool Icms::has_vICMSOp() const
+{
+    return this->m_vICMSOpInformado;
+}
+
 double Icms::get_vICMSOp() const
 {
     return this->m_vICMSOp;
@@ -337,6 +367,7 @@ double Icms::get_vICMSOp() const
 void Icms::set_vICMSOp(const double &vICMSOp)
 {
     this->m_vICMSOp = vICMSOp;
+    this->m_vICMSOpInformado = true;
 }
 
 double Icms::get_pDif() const
@@ -350,6 +381,11 @@ void Icms::set_pDif(const double &pDif)
     this->m_pDifInformado = true;
 }
 
+bool Icms::has_vICMSDif() const
+{
+    return this->m_vICMSDifInformado;
+}
+
 double Icms::get_vICMSDif() const
 {
     return this->m_vICMSDif;
@@ -358,6 +394,7 @@ double Icms::get_vICMSDif() const
 void Icms::set_vICMSDif(const double &vICMSDif)
 {
     this->m_vICMSDif = vICMSDif;
+    this->m_vICMSDifInformado = true;
 }
 
 bool Icms::has_ICMSSTRet() const
@@ -546,6 +583,11 @@ void Icms::set_UFST(const QString &UFST)
     this->m_UFST = UFST;
 }
 
+bool Icms::has_pRedBC() const
+{
+    return this->m_pRedBCInformado;
+}
+
 double Icms::get_pRedBC() const
 {
     return this->m_pRedBC;
@@ -554,6 +596,17 @@ double Icms::get_pRedBC() const
 void Icms::set_pRedBC(const double &pRedBC)
 {
     this->m_pRedBC = pRedBC;
+    this->m_pRedBCInformado = true;
+}
+
+QString Icms::get_cBenefRBC() const
+{
+    return this->m_cBenefRBC;
+}
+
+void Icms::set_cBenefRBC(const QString &cBenefRBC)
+{
+    this->m_cBenefRBC = cBenefRBC;
 }
 
 double Icms::get_pCredSN() const
