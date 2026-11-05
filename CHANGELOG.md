@@ -77,6 +77,13 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- Endereços dos serviços NF-e/NFC-e e consultas públicas atualizados.
+  Corrigidos o uso de produção na homologação da
+  NFC-e de SP, os serviços de GO apontando para CE, o retorno de autorização de GO,
+  o roteamento da NFC-e de CE para SVRS e os endereços de cadastro e contingência.
+  Atualizadas também as URLs de QR Code/consulta, removidos espaços externos e
+  corrigida a base de SC para evitar duplicação de `?p=`. Recompilar a biblioteca
+  para incorporar os novos endereços ao recurso embarcado.
 - NT 2015.001 v1.30: pedidos de prorrogação da suspensão do ICMS para o primeiro
   e segundo prazos (`111500`/`111501`) e seus cancelamentos (`111502`/`111503`)
   em `EventoNotaFiscal::envEvento`, exclusivos da NF-e modelo 55. Versão 1.00,
