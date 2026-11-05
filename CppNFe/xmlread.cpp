@@ -80,65 +80,7 @@ bool XmlRead::nfe() const
             //atualiza o xmlAutorizado
             nota->set_XMLAutorizado(this->m_xml);
 
-            while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("protNFe")))
-            {
-                attributes = _xml.attributes();
-                if (attributes.hasAttribute("versao"))
-                {
-                    _valor = attributes.value("versao").toString();
-                    if (!_valor.isEmpty())
-                       nota->protNFe->set_versao(_valor);
-                }
-                if (_xml.name() == QStringLiteral("tpAmb"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_tpAmb(ConvNF::strToTpAmb(_valor));
-                }
-                if (_xml.name() == QStringLiteral("verAplic"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_verAplic(_valor);
-                }
-                if (_xml.name() == QStringLiteral("chNFe"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_chNFe(_valor);
-                }
-                if (_xml.name() == QStringLiteral("dhRecbto"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_dhRecbto(QDateTime::fromString(_valor, Qt::ISODate));
-                }
-                if (_xml.name() == QStringLiteral("nProt"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_nProt(_valor);
-                }
-                if (_xml.name() == QStringLiteral("digVal"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_digVal(_valor);
-                }
-                if (_xml.name() == QStringLiteral("cStat"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_cStat(_valor.toInt());
-                }
-                if (_xml.name() == QStringLiteral("xMotivo"))
-                {
-                    _valor = _xml.readElementText();
-                     if (!_valor.isEmpty())
-                        nota->protNFe->set_xMotivo(_valor);
-                }
-                _xml.readNext();
-            }
+            nota->protNFe->lerXML(_xml);
         }
          _xml.readNext();
      }
@@ -956,7 +898,7 @@ void XmlRead::set_retirada(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->retirada->set_nro(_valor.toInt());
+               nota->infNFe->retirada->set_nroTexto(_valor);
         }
         if (xml.name() == QStringLiteral("xCpl")) //F05
         {
@@ -1064,7 +1006,7 @@ void XmlRead::set_entrega(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->entrega->set_nro(_valor.toInt());
+               nota->infNFe->entrega->set_nroTexto(_valor);
         }
         if (xml.name() == QStringLiteral("xCpl")) //G05
         {
@@ -4245,7 +4187,7 @@ void XmlRead::set_infRespTec(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->infRespTec->set_CNPJ(_valor);
+               nota->infNFe->infRespTec->set_idCSRT(_valor.toInt());
         }
         if (xml.name() == QStringLiteral("hashCSRT")) //ZD09
         {

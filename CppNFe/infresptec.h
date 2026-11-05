@@ -42,14 +42,19 @@ public:
     void set_idCSRT(const int &idCSRT);
     QString get_hashCSRT() const;
     void set_hashCSRT(const QString &hashCSRT);
+    void set_CSRT(const QString &CSRT);
 
 private:
+    friend class XmlWrite;
+    QString hashCSRTParaChave(const QString &chNFe) const;
+
     QString m_CNPJ;
     QString m_xContato;
     QString m_email;
     QString m_fone;
     int m_idCSRT;
     QString m_hashCSRT;
+    QString m_CSRT;
 
 };
 

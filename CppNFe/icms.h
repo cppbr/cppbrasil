@@ -80,6 +80,11 @@ public:
     void set_pDif(const double &pDif);
     double get_vICMSDif() const;
     void set_vICMSDif(const double &vICMSDif);
+    bool has_ICMSSTRet() const;
+    bool has_pST() const;
+    bool has_vICMSSubstituto() const;
+    bool has_FCPSTRet() const;
+    bool has_ICMSEfet() const;
     double get_vBCSTRet() const;
     void set_vBCSTRet(const double &vBCSTRet);
     double get_pST() const;
@@ -191,6 +196,11 @@ private:
     bool m_pDifInformado = false;
     double m_pDif;
     double m_vICMSDif;
+    bool m_ICMSSTRetInformado = false;
+    bool m_pSTInformado = false;
+    bool m_vICMSSubstitutoInformado = false;
+    bool m_FCPSTRetInformado = false;
+    bool m_ICMSEfetInformado = false;
     double m_vBCSTRet;
     double m_pST;
     double m_vICMSSubstituto;

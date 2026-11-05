@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "retirada.h"
 
-Retirada::Retirada(): m_nro(0), m_cMun(0), m_CEP(0), m_cPais(0)
+Retirada::Retirada(): m_nro(QStringLiteral("0")), m_cMun(0), m_CEP(0), m_cPais(0)
 {
 }
 
@@ -34,7 +34,7 @@ void Retirada::clear()
     this->m_CPF.clear();
     this->m_xNome.clear();
     this->m_xLgr.clear();
-    this->m_nro = 0;
+    this->m_nro = QStringLiteral("0");
     this->m_xCpl.clear();
     this->m_xBairro.clear();
     this->m_cMun = 0;
@@ -90,10 +90,20 @@ void Retirada::set_xLgr(const QString &xLgr)
 
 int Retirada::get_nro() const
 {
-    return this->m_nro;
+    return this->m_nro.toInt();
 }
 
 void Retirada::set_nro(const int &nro)
+{
+    this->m_nro = QString::number(nro);
+}
+
+QString Retirada::get_nroTexto() const
+{
+    return this->m_nro;
+}
+
+void Retirada::set_nroTexto(const QString &nro)
 {
     this->m_nro = nro;
 }

@@ -22,7 +22,7 @@ limitations under the License.
 
 //class ProtNFe------------------------------------------------
 
-ProtNFe::ProtNFe() : m_tpAmb(TpAmb::None), m_cStat(0), m_cMsg(0)
+ProtNFe::ProtNFe() : m_tpAmb(TpAmb::None), m_cStat(0)
 {
 }
 
@@ -42,8 +42,53 @@ void ProtNFe::clear()
     this->m_digVal.clear();
     this->m_cStat = 0;
     this->m_xMotivo.clear();
-    this->m_cMsg = 0;
-    this->m_xMsg.clear();
+    this->m_mensagens.clear();
+    this->m_xml.clear();
+}
+
+void ProtNFe::lerXML(QXmlStreamReader &xml)
+{
+    clear();
+    set_versao(xml.attributes().value(QStringLiteral("versao")).toString());
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() != QStringLiteral("infProt"))
+        {
+            xml.skipCurrentElement();
+            continue;
+        }
+
+        set_Id(xml.attributes().value(QStringLiteral("Id")).toString());
+        QString codigoMsg;
+        while (xml.readNextStartElement())
+        {
+            const QString campo = xml.name().toString();
+            const QString valor = xml.readElementText(QXmlStreamReader::SkipChildElements);
+            if (campo == QStringLiteral("tpAmb"))
+                set_tpAmb(ConvNF::strToTpAmb(valor));
+            else if (campo == QStringLiteral("verAplic"))
+                set_verAplic(valor);
+            else if (campo == QStringLiteral("chNFe"))
+                set_chNFe(valor);
+            else if (campo == QStringLiteral("dhRecbto"))
+                set_dhRecbto(QDateTime::fromString(valor, Qt::ISODate));
+            else if (campo == QStringLiteral("nProt"))
+                set_nProt(valor);
+            else if (campo == QStringLiteral("digVal"))
+                set_digVal(valor);
+            else if (campo == QStringLiteral("cStat"))
+                set_cStat(valor.toInt());
+            else if (campo == QStringLiteral("xMotivo"))
+                set_xMotivo(valor);
+            else if (campo == QStringLiteral("cMsg"))
+                codigoMsg = valor;
+            else if (campo == QStringLiteral("xMsg"))
+            {
+                m_mensagens.append(MensagemSefaz{codigoMsg, valor});
+                codigoMsg.clear();
+            }
+        }
+    }
 }
 
 QString ProtNFe::get_versao() const
@@ -146,24 +191,33 @@ void ProtNFe::set_xMotivo(const QString &xMotivo)
     this->m_xMotivo = xMotivo;
 }
 
+QList<ProtNFe::MensagemSefaz> ProtNFe::get_mensagens() const
+{
+    return this->m_mensagens;
+}
+
 int ProtNFe::get_cMsg() const
 {
-    return this->m_cMsg;
+    return this->m_mensagens.isEmpty() ? 0 : this->m_mensagens.constLast().codigo.toInt();
 }
 
 void ProtNFe::set_cMsg(const int &cMsg)
 {
-    this->m_cMsg = cMsg;
+    if (this->m_mensagens.isEmpty())
+        this->m_mensagens.append(MensagemSefaz{});
+    this->m_mensagens.last().codigo = cMsg == 0 ? QString() : QString::number(cMsg);
 }
 
 QString ProtNFe::get_xMsg() const
 {
-    return this->m_xMsg;
+    return this->m_mensagens.isEmpty() ? QString() : this->m_mensagens.constLast().texto;
 }
 
 void ProtNFe::set_xMsg(const QString &xMsg)
 {
-    this->m_xMsg = xMsg;
+    if (this->m_mensagens.isEmpty())
+        this->m_mensagens.append(MensagemSefaz{});
+    this->m_mensagens.last().texto = xMsg;
 }
 
 QString ProtNFe::get_xml() const

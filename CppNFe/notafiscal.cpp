@@ -192,6 +192,7 @@ void NotaFiscal::tratarRetorno()
             _xmlOriginal.clear();
             _chNFe.clear();
             _protNFe.clear();
+            _nfeProc.clear();
             int _cStat = this->retorno->protNFe->value(i)->get_cStat();
             _chNFe = this->retorno->protNFe->value(i)->get_chNFe();
 
@@ -211,18 +212,7 @@ void NotaFiscal::tratarRetorno()
                         //montando xml
                         _nfeProc = XmlWrite::get_nfeProc(this->retorno->protNFe->value(i)->get_versao());
 
-                        _protNFe = XmlWrite::get_protNFe(this->retorno->protNFe->value(i)->get_versao(),
-                                                         this->retorno->protNFe->value(i)->get_Id(),
-                                                         this->retorno->protNFe->value(i)->get_tpAmb(),
-                                                         this->retorno->protNFe->value(i)->get_verAplic(),
-                                                         this->retorno->protNFe->value(i)->get_chNFe(),
-                                                         this->retorno->protNFe->value(i)->get_dhRecbto(),
-                                                         this->retorno->protNFe->value(i)->get_nProt(),
-                                                         this->retorno->protNFe->value(i)->get_digVal(),
-                                                         this->retorno->protNFe->value(i)->get_cStat(),
-                                                         this->retorno->protNFe->value(i)->get_xMotivo(),
-                                                         this->retorno->protNFe->value(i)->get_cMsg(),
-                                                         this->retorno->protNFe->value(i)->get_xMsg());
+                        _protNFe = XmlWrite::get_protNFe(*this->retorno->protNFe->value(i));
 
                         //primeiro o xml original dentro de nfeProc
                         if (_libxml->addChildXML(_nfeProc, _xmlOriginal, QByteArray("nfeProc")))
@@ -242,18 +232,7 @@ void NotaFiscal::tratarRetorno()
                     }
 
                     //atualizando protNFe da classe NFe
-                    this->NFe->value(j)->protNFe->set_versao(this->retorno->protNFe->value(i)->get_versao());
-                    this->NFe->value(j)->protNFe->set_Id(this->retorno->protNFe->value(i)->get_Id());
-                    this->NFe->value(j)->protNFe->set_tpAmb(this->retorno->protNFe->value(i)->get_tpAmb());
-                    this->NFe->value(j)->protNFe->set_verAplic(this->retorno->protNFe->value(i)->get_verAplic());
-                    this->NFe->value(j)->protNFe->set_chNFe(this->retorno->protNFe->value(i)->get_chNFe());
-                    this->NFe->value(j)->protNFe->set_dhRecbto(this->retorno->protNFe->value(i)->get_dhRecbto());
-                    this->NFe->value(j)->protNFe->set_nProt(this->retorno->protNFe->value(i)->get_nProt());
-                    this->NFe->value(j)->protNFe->set_digVal(this->retorno->protNFe->value(i)->get_digVal());
-                    this->NFe->value(j)->protNFe->set_cStat(this->retorno->protNFe->value(i)->get_cStat());
-                    this->NFe->value(j)->protNFe->set_xMotivo(this->retorno->protNFe->value(i)->get_xMotivo());
-                    this->NFe->value(j)->protNFe->set_cMsg(this->retorno->protNFe->value(i)->get_cMsg());
-                    this->NFe->value(j)->protNFe->set_xMsg(this->retorno->protNFe->value(i)->get_xMsg());
+                    *this->NFe->value(j)->protNFe = *this->retorno->protNFe->value(i);
                     this->NFe->value(j)->protNFe->set_xml(_nfeProc);
 
                     break;

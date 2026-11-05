@@ -40,6 +40,8 @@ public:
     void set_xLgr(const QString &xLgr);
     int get_nro() const;
     void set_nro(const int &nro);
+    QString get_nroTexto() const;
+    void set_nroTexto(const QString &nro);
     QString get_xCpl() const;
     void set_xCpl(const QString &xCpl);
     QString get_xBairro() const;
@@ -67,7 +69,7 @@ private:
     QString m_CPF;
     QString m_xNome;
     QString m_xLgr;
-    int m_nro;
+    QString m_nro;
     QString m_xCpl;
     QString m_xBairro;
     int m_cMun;

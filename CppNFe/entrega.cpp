@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "entrega.h"
 
-Entrega::Entrega(): m_nro(0), m_cMun(0), m_CEP(0), m_cPais(0)
+Entrega::Entrega(): m_nro(QStringLiteral("0")), m_cMun(0), m_CEP(0), m_cPais(0)
 {
 }
 
@@ -34,7 +34,7 @@ void Entrega::clear()
     this->m_CPF.clear();
     this->m_xNome.clear();
     this->m_xLgr.clear();
-    this->m_nro = 0;
+    this->m_nro = QStringLiteral("0");
     this->m_xCpl.clear();
     this->m_xBairro.clear();
     this->m_cMun = 0;
@@ -91,10 +91,20 @@ void Entrega::set_xLgr(const QString &xLgr)
 
 int Entrega::get_nro() const
 {
-    return this->m_nro;
+    return this->m_nro.toInt();
 }
 
 void Entrega::set_nro(const int &nro)
+{
+    this->m_nro = QString::number(nro);
+}
+
+QString Entrega::get_nroTexto() const
+{
+    return this->m_nro;
+}
+
+void Entrega::set_nroTexto(const QString &nro)
 {
     this->m_nro = nro;
 }
