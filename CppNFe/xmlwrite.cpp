@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "xmlwrite.h"
+#include "retornonfe.h"
 
 XmlWrite::XmlWrite(const InfNFe *infNFe, const ConfigNFe *confgNFe): m_infNFe(infNFe),
     m_confgNFe(confgNFe), m_xmlw(new QXmlStreamWriter(&this->m_strXML))
@@ -98,32 +99,54 @@ QByteArray XmlWrite::get_protNFe(const QString &versao, const QString &Id,
                                  const int &cStat, const QString &xMotivo,
                                  const int &cMsg, const QString &xMsg)
 {
-    QByteArray _strXML;
-    std::unique_ptr<QXmlStreamWriter> _xmlw(new QXmlStreamWriter(&_strXML));
+    ProtNFe protocolo;
+    protocolo.set_versao(versao);
+    protocolo.set_Id(Id);
+    protocolo.set_tpAmb(tpAmb);
+    protocolo.set_verAplic(verAplic);
+    protocolo.set_chNFe(chNFe);
+    protocolo.set_dhRecbto(dhRecbto);
+    protocolo.set_nProt(nProt);
+    protocolo.set_digVal(digVal);
+    protocolo.set_cStat(cStat);
+    protocolo.set_xMotivo(xMotivo);
+    protocolo.set_cMsg(cMsg);
+    protocolo.set_xMsg(xMsg);
+    return get_protNFe(protocolo);
+}
 
-    _xmlw->writeStartElement("a");
-    _xmlw->writeStartElement("protNFe");
-    _xmlw->writeAttribute("versao", versao);
-    _xmlw->writeStartElement("infProt");
-    if (!Id.isEmpty())
-       _xmlw->writeTextElement("Id", Id);
-    _xmlw->writeTextElement("tpAmb", ConvNF::tpAmbToStr(tpAmb));
-    _xmlw->writeTextElement("verAplic", verAplic);
-    _xmlw->writeTextElement("chNFe", chNFe);
-    _xmlw->writeTextElement("dhRecbto", CppUtility::dateTimeToStr(dhRecbto, DtH::DateTimeUTC));
-    _xmlw->writeTextElement("nProt", nProt);
-    _xmlw->writeTextElement("digVal", digVal);
-    _xmlw->writeTextElement("cStat", QString::number(cStat));
-    _xmlw->writeTextElement("xMotivo", xMotivo);
-    if (cMsg != 0)
-       _xmlw->writeTextElement("cMsg", QString::number(cMsg));
-    if (!xMsg.isEmpty())
-       _xmlw->writeTextElement("xMsg", xMsg);
-    _xmlw->writeEndElement(); //fechamento infProt
-    _xmlw->writeEndElement(); //fechamento protNFe
-    _xmlw->writeEndElement(); //fechamento a
-
-    return _strXML;
+QByteArray XmlWrite::get_protNFe(const ProtNFe &protocolo)
+{
+    QByteArray xml;
+    QXmlStreamWriter writer(&xml);
+    writer.writeStartElement("a");
+    writer.writeStartElement("protNFe");
+    writer.writeAttribute("versao", protocolo.get_versao());
+    writer.writeStartElement("infProt");
+    if (!protocolo.get_Id().isEmpty())
+        writer.writeAttribute("Id", protocolo.get_Id());
+    writer.writeTextElement("tpAmb", ConvNF::tpAmbToStr(protocolo.get_tpAmb()));
+    writer.writeTextElement("verAplic", protocolo.get_verAplic());
+    writer.writeTextElement("chNFe", protocolo.get_chNFe());
+    writer.writeTextElement("dhRecbto", CppUtility::dateTimeToStr(protocolo.get_dhRecbto(), DtH::DateTimeUTC));
+    if (!protocolo.get_nProt().isEmpty())
+        writer.writeTextElement("nProt", protocolo.get_nProt());
+    if (!protocolo.get_digVal().isEmpty())
+        writer.writeTextElement("digVal", protocolo.get_digVal());
+    writer.writeTextElement("cStat", QString::number(protocolo.get_cStat()));
+    writer.writeTextElement("xMotivo", protocolo.get_xMotivo());
+    for (const auto &mensagem : protocolo.get_mensagens())
+    {
+        if (mensagem.texto.isEmpty())
+            continue;
+        if (!mensagem.codigo.isEmpty())
+            writer.writeTextElement("cMsg", mensagem.codigo);
+        writer.writeTextElement("xMsg", mensagem.texto);
+    }
+    writer.writeEndElement(); // infProt
+    writer.writeEndElement(); // protNFe
+    writer.writeEndElement(); // a
+    return xml;
 }
 
 QByteArray XmlWrite::get_nfeProc(const QString &versao)
@@ -431,19 +454,22 @@ void XmlWrite::get_retirada()
     Retirada *_retirada = this->m_infNFe->retirada.get();
     if (!_retirada->get_CNPJ().isEmpty() ||
         !_retirada->get_CPF().isEmpty()  ||
-        !_retirada->get_xNome().isEmpty())
+        !_retirada->get_xNome().isEmpty() ||
+        !_retirada->get_xLgr().isEmpty())
     {
         this->m_xmlw->writeStartElement("retirada");//abertura grupo retirada
         //ou cnpj ou cpf não os dois
         if (!_retirada->get_CNPJ().isEmpty())
             this->m_xmlw->writeTextElement("CNPJ", _retirada->get_CNPJ());
-        else
+        else if (!_retirada->get_CPF().isEmpty())
             this->m_xmlw->writeTextElement("CPF", _retirada->get_CPF());
+        else
+            this->m_xmlw->writeTextElement("CNPJ", QString());
 
         if (!_retirada->get_xNome().isEmpty())
             this->m_xmlw->writeTextElement("xNome", _retirada->get_xNome());
         this->m_xmlw->writeTextElement("xLgr", _retirada->get_xLgr());
-        this->m_xmlw->writeTextElement("nro", QString::number(_retirada->get_nro()));
+        this->m_xmlw->writeTextElement("nro", _retirada->get_nroTexto());
         if (!_retirada->get_xCpl().isEmpty())
             this->m_xmlw->writeTextElement("xCpl", _retirada->get_xCpl());
         this->m_xmlw->writeTextElement("xBairro", _retirada->get_xBairro());
@@ -451,7 +477,7 @@ void XmlWrite::get_retirada()
         this->m_xmlw->writeTextElement("xMun", _retirada->get_xMun());
         this->m_xmlw->writeTextElement("UF", _retirada->get_UF());
         if (_retirada->get_CEP() > 0)
-            this->m_xmlw->writeTextElement("CEP", QString::number(_retirada->get_CEP()));
+            this->m_xmlw->writeTextElement("CEP", QStringLiteral("%1").arg(_retirada->get_CEP(), 8, 10, QLatin1Char('0')));
         if (_retirada->get_cPais() > 0)
             this->m_xmlw->writeTextElement("cPais", QString::number(_retirada->get_cPais()));
         if (!_retirada->get_xPais().isEmpty())
@@ -471,19 +497,22 @@ void XmlWrite::get_entrega()
     Entrega *_entrega = this->m_infNFe->entrega.get();
     if (!_entrega->get_CNPJ().isEmpty() ||
         !_entrega->get_CPF().isEmpty()  ||
-        !_entrega->get_xNome().isEmpty())
+        !_entrega->get_xNome().isEmpty() ||
+        !_entrega->get_xLgr().isEmpty())
     {
         this->m_xmlw->writeStartElement("entrega");//abertura grupo entrega
         //ou cnpj ou cpf não os dois
         if (!_entrega->get_CNPJ().isEmpty())
             this->m_xmlw->writeTextElement("CNPJ", _entrega->get_CNPJ());
-        else
+        else if (!_entrega->get_CPF().isEmpty())
             this->m_xmlw->writeTextElement("CPF", _entrega->get_CPF());
+        else
+            this->m_xmlw->writeTextElement("CNPJ", QString());
 
         if (!_entrega->get_xNome().isEmpty())
             this->m_xmlw->writeTextElement("xNome", _entrega->get_xNome());
         this->m_xmlw->writeTextElement("xLgr", _entrega->get_xLgr());
-        this->m_xmlw->writeTextElement("nro", QString::number(_entrega->get_nro()));
+        this->m_xmlw->writeTextElement("nro", _entrega->get_nroTexto());
         if (!_entrega->get_xCpl().isEmpty())
             this->m_xmlw->writeTextElement("xCpl", _entrega->get_xCpl());
         this->m_xmlw->writeTextElement("xBairro", _entrega->get_xBairro());
@@ -491,7 +520,7 @@ void XmlWrite::get_entrega()
         this->m_xmlw->writeTextElement("xMun", _entrega->get_xMun());
         this->m_xmlw->writeTextElement("UF", _entrega->get_UF());
         if (_entrega->get_CEP() > 0)
-            this->m_xmlw->writeTextElement("CEP", QString::number(_entrega->get_CEP()));
+            this->m_xmlw->writeTextElement("CEP", QStringLiteral("%1").arg(_entrega->get_CEP(), 8, 10, QLatin1Char('0')));
         if (_entrega->get_cPais() > 0)
             this->m_xmlw->writeTextElement("cPais", QString::number(_entrega->get_cPais()));
         if (!_entrega->get_xPais().isEmpty())
@@ -1087,31 +1116,27 @@ void XmlWrite::get_ICMS(const int &i)
             //ICMS60 - N08
             if (_icms->get_CST() == CstICMS::ICMS60)
             {
-                //Nota Técnica 2018->005 - v 1->30 - Rejeicao 938
-                if (this->m_infNFe->ide->get_indFinal() == IndFinal::Normal         ||
-                    _icms->get_vBCSTRet() > 0 ||
-                    _icms->get_pST() > 0      ||
-                    _icms->get_vICMSSTRet() > 0)
+                // Regras N12-81 e N12a-50 da NT 2018.005 para o modelo 55.
+                const bool emitirICMSSTRet = this->m_infNFe->ide->get_mod() == ModeloDF::NFe &&
+                                            this->m_infNFe->ide->get_indFinal() == IndFinal::Normal;
+                if (emitirICMSSTRet || _icms->has_ICMSSTRet() ||
+                    _icms->has_pST() || _icms->has_vICMSSubstituto())
                 {
                     this->m_xmlw->writeTextElement("vBCSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCSTRet(), 2));
                     this->m_xmlw->writeTextElement("pST", CppUtility::doubleToStrDecimal(_icms->get_pST(), 4));
-                    this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
+                    if (emitirICMSSTRet || _icms->has_vICMSSubstituto())
+                        this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
                     this->m_xmlw->writeTextElement("vICMSSTRet", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTRet(), 2));
                 }
 
-                if (_icms->get_vBCFCPSTRet() > 0 ||
-                    _icms->get_pFCPSTRet() > 0   ||
-                    _icms->get_vFCPSTRet() > 0)
+                if (_icms->has_FCPSTRet())
                 {
                     this->m_xmlw->writeTextElement("vBCFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCFCPSTRet(), 2));
                     this->m_xmlw->writeTextElement("pFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_pFCPSTRet(), 4));
                     this->m_xmlw->writeTextElement("vFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vFCPSTRet(), 2));
                 }
 
-                if (_icms->get_pRedBCEfet() > 0 ||
-                    _icms->get_vBCEfet() > 0    ||
-                    _icms->get_pICMSEfet() > 0  ||
-                    _icms->get_vICMSEfet() > 0)
+                if (_icms->has_ICMSEfet())
                 {
                     this->m_xmlw->writeTextElement("pRedBCEfet", CppUtility::doubleToStrDecimal(_icms->get_pRedBCEfet(), 4));
                     this->m_xmlw->writeTextElement("vBCEfet", CppUtility::doubleToStrDecimal(_icms->get_vBCEfet(), 2));
@@ -1284,38 +1309,27 @@ void XmlWrite::get_ICMS(const int &i)
                _icms->get_CST() == CstICMS::ICMSST60)
             {
                 this->m_xmlw->writeTextElement("vBCSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCSTRet(), 2));
-                //so deve exibir caso seja maior que zero ou cst 60 e consumidor não final
-                //Nota Técnica 2018->005 - v 1->30 - Rejeicao 938
-                if ((_icms->get_pST() > 0) ||
-                    (_icms->get_CST() == CstICMS::ICMSST60 &&
-                     this->m_infNFe->ide->get_indFinal() == IndFinal::Normal))
-                        this->m_xmlw->writeTextElement("pST", CppUtility::doubleToStrDecimal(_icms->get_pST(), 4));
-                //so deve exibir caso seja maior que zero ou cst 60 e consumidor não final
-                //Nota Técnica 2018->005 - v 1->30 - Rejeicao 938
-                if ((_icms->get_vICMSSubstituto() > 0) ||
-                    (_icms->get_CST() == CstICMS::ICMSST60 &&
-                     this->m_infNFe->ide->get_indFinal() == IndFinal::Normal))
-                        this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
+                const bool emitirICMSSTRet = _icms->get_CST() == CstICMS::ICMSST60 &&
+                                            this->m_infNFe->ide->get_mod() == ModeloDF::NFe &&
+                                            this->m_infNFe->ide->get_indFinal() == IndFinal::Normal;
+                if (emitirICMSSTRet || _icms->has_pST())
+                    this->m_xmlw->writeTextElement("pST", CppUtility::doubleToStrDecimal(_icms->get_pST(), 4));
+                if (emitirICMSSTRet || _icms->has_vICMSSubstituto())
+                    this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
 
                 this->m_xmlw->writeTextElement("vICMSSTRet", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTRet(), 2));
 
-                if (_icms->get_vBCFCPSTRet() > 0 ||
-                    _icms->get_pFCPSTRet() > 0   ||
-                    _icms->get_vFCPSTRet() > 0   ||
-                    _icms->get_vBCSTDest() > 0   ||
-                    _icms->get_vICMSSTDest() > 0)
+                if (_icms->has_FCPSTRet())
                 {
                     this->m_xmlw->writeTextElement("vBCFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCFCPSTRet(), 2));
                     this->m_xmlw->writeTextElement("pFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_pFCPSTRet(), 4));
                     this->m_xmlw->writeTextElement("vFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vFCPSTRet(), 2));
-                    this->m_xmlw->writeTextElement("vBCSTDest", CppUtility::doubleToStrDecimal(_icms->get_vBCSTDest(), 2));
-                    this->m_xmlw->writeTextElement("vICMSSTDest", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTDest(), 2));
                 }
 
-                if (_icms->get_pRedBCEfet() > 0 ||
-                    _icms->get_vBCEfet() > 0    ||
-                    _icms->get_pICMSEfet() > 0  ||
-                    _icms->get_vICMSEfet() > 0)
+                this->m_xmlw->writeTextElement("vBCSTDest", CppUtility::doubleToStrDecimal(_icms->get_vBCSTDest(), 2));
+                this->m_xmlw->writeTextElement("vICMSSTDest", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTDest(), 2));
+
+                if (_icms->has_ICMSEfet())
                 {
                     this->m_xmlw->writeTextElement("pRedBCEfet", CppUtility::doubleToStrDecimal(_icms->get_pRedBCEfet(), 4));
                     this->m_xmlw->writeTextElement("vBCEfet", CppUtility::doubleToStrDecimal(_icms->get_vBCEfet(), 2));
@@ -1409,31 +1423,27 @@ void XmlWrite::get_ICMS(const int &i)
             //CSON 500
             if (_icms->get_CSOSN() == CsosnICMS::ICMSSN500)
             {
-                //Nota Técnica 2018->005 - v 1->30 - Rejeicao 938
-                if (this->m_infNFe->ide->get_indFinal() == IndFinal::Normal      ||
-                    _icms->get_vBCSTRet() > 0 ||
-                    _icms->get_pST() > 0      ||
-                    _icms->get_vICMSSTRet() > 0)
+                // Regras N12-81 e N12a-50 da NT 2018.005 para o modelo 55.
+                const bool emitirICMSSTRet = this->m_infNFe->ide->get_mod() == ModeloDF::NFe &&
+                                            this->m_infNFe->ide->get_indFinal() == IndFinal::Normal;
+                if (emitirICMSSTRet || _icms->has_ICMSSTRet() ||
+                    _icms->has_pST() || _icms->has_vICMSSubstituto())
                 {
                     this->m_xmlw->writeTextElement("vBCSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCSTRet(), 2));
                     this->m_xmlw->writeTextElement("pST", CppUtility::doubleToStrDecimal(_icms->get_pST(), 4));
-                    this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
+                    if (emitirICMSSTRet || _icms->has_vICMSSubstituto())
+                        this->m_xmlw->writeTextElement("vICMSSubstituto", CppUtility::doubleToStrDecimal(_icms->get_vICMSSubstituto(), 2));
                     this->m_xmlw->writeTextElement("vICMSSTRet", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTRet(), 2));
                 }
 
-                if (_icms->get_vBCFCPSTRet() > 0 ||
-                    _icms->get_pFCPSTRet() > 0   ||
-                    _icms->get_vFCPSTRet() > 0)
+                if (_icms->has_FCPSTRet())
                 {
                     this->m_xmlw->writeTextElement("vBCFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vBCFCPSTRet(), 2));
                     this->m_xmlw->writeTextElement("pFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_pFCPSTRet(), 4));
                     this->m_xmlw->writeTextElement("vFCPSTRet", CppUtility::doubleToStrDecimal(_icms->get_vFCPSTRet(), 2));
                 }
 
-                if (_icms->get_pRedBCEfet() > 0 ||
-                    _icms->get_vBCEfet() > 0    ||
-                    _icms->get_pICMSEfet() > 0  ||
-                    _icms->get_vICMSEfet() > 0)
+                if (_icms->has_ICMSEfet())
                 {
                     this->m_xmlw->writeTextElement("pRedBCEfet", CppUtility::doubleToStrDecimal(_icms->get_pRedBCEfet(), 4));
                     this->m_xmlw->writeTextElement("vBCEfet", CppUtility::doubleToStrDecimal(_icms->get_vBCEfet(), 2));
@@ -2405,11 +2415,12 @@ void XmlWrite::get_infRespTec()
         this->m_xmlw->writeTextElement("email", _infRespTec->get_email());
         this->m_xmlw->writeTextElement("fone", _infRespTec->get_fone());
         //ZD07
-        if (_infRespTec->get_idCSRT() != 0 &&
-            !_infRespTec->get_hashCSRT().isEmpty())
+        const QString hashCSRT = _infRespTec->hashCSRTParaChave(this->m_infNFe->get_Id().mid(3));
+        if (_infRespTec->get_idCSRT() != 0 && !hashCSRT.isEmpty())
         {
-            this->m_xmlw->writeTextElement("idCSRT", QString::number(_infRespTec->get_idCSRT()));
-            this->m_xmlw->writeTextElement("hashCSRT", _infRespTec->get_hashCSRT());
+            this->m_xmlw->writeTextElement("idCSRT",
+                                          QStringLiteral("%1").arg(_infRespTec->get_idCSRT(), 2, 10, QLatin1Char('0')));
+            this->m_xmlw->writeTextElement("hashCSRT", hashCSRT);
         }
         this->m_xmlw->writeEndElement();//fechamento grupo infRespTec
     }

@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "infresptec.h"
+#include <QCryptographicHash>
 
 InfRespTec::InfRespTec(): m_idCSRT(0)
 {
@@ -36,6 +37,7 @@ void InfRespTec::clear()
     this->m_fone.clear();
     this->m_idCSRT = 0;
     this->m_hashCSRT.clear();
+    this->m_CSRT.clear();
 }
 
 QString InfRespTec::get_CNPJ() const
@@ -96,4 +98,20 @@ QString InfRespTec::get_hashCSRT() const
 void InfRespTec::set_hashCSRT(const QString &hashCSRT)
 {
     this->m_hashCSRT = hashCSRT;
+    this->m_CSRT.clear();
+}
+
+void InfRespTec::set_CSRT(const QString &CSRT)
+{
+    this->m_CSRT = CSRT;
+    this->m_hashCSRT.clear();
+}
+
+QString InfRespTec::hashCSRTParaChave(const QString &chNFe) const
+{
+    if (this->m_CSRT.isEmpty())
+        return this->m_hashCSRT;
+
+    const QByteArray dados = this->m_CSRT.toUtf8() + chNFe.toLatin1();
+    return QString::fromLatin1(QCryptographicHash::hash(dados, QCryptographicHash::Sha1).toBase64());
 }

@@ -23,6 +23,8 @@ limitations under the License.
 
 #include <QString>
 #include <QDateTime>
+#include <QList>
+#include <QXmlStreamReader>
 #include <memory>
 #include <CppBase/cppbrasil_global.h>
 #include <CppBase/container.h>
@@ -39,9 +41,17 @@ limitations under the License.
 class CPPNFE_EXPORT ProtNFe
 {
 public:
+    struct MensagemSefaz
+    {
+        QString codigo;
+        QString texto;
+    };
+
     ProtNFe();
     ~ProtNFe();
     void clear();
+    void lerXML(QXmlStreamReader &xml);
+    QList<MensagemSefaz> get_mensagens() const;
     QString get_versao() const;
     void set_versao(const QString &versao);
     QString get_Id() const;
@@ -83,8 +93,7 @@ private:
     QString m_digVal;
     int m_cStat;
     QString m_xMotivo;
-    int m_cMsg;
-    QString m_xMsg;
+    QList<MensagemSefaz> m_mensagens;
     QString m_xml;
 
 };

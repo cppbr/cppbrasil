@@ -141,18 +141,7 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
                 //montando xml
                 _nfeProc = XmlWrite::get_nfeProc(this->retorno->get_versao());
 
-                _protNFe = XmlWrite::get_protNFe(this->retorno->protNFe->get_versao(),
-                                                 this->retorno->protNFe->get_Id(),
-                                                 this->retorno->protNFe->get_tpAmb(),
-                                                 this->retorno->protNFe->get_verAplic(),
-                                                 this->retorno->protNFe->get_chNFe(),
-                                                 this->retorno->protNFe->get_dhRecbto(),
-                                                 this->retorno->protNFe->get_nProt(),
-                                                 this->retorno->protNFe->get_digVal(),
-                                                 this->retorno->protNFe->get_cStat(),
-                                                 this->retorno->protNFe->get_xMotivo(),
-                                                 this->retorno->protNFe->get_cMsg(),
-                                                 this->retorno->protNFe->get_xMsg());
+                _protNFe = XmlWrite::get_protNFe(*this->retorno->protNFe);
 
                 //primeiro o xml original dentro de nfeProc
                 if (_libxml->addChildXML(_nfeProc, _xml, QByteArray("nfeProc")))

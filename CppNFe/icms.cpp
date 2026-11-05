@@ -73,6 +73,11 @@ void Icms::clear()
     this->m_vICMSOp = 0.0;
     this->m_pDif = 0.0;
     this->m_vICMSDif = 0.0;
+    this->m_ICMSSTRetInformado = false;
+    this->m_pSTInformado = false;
+    this->m_vICMSSubstitutoInformado = false;
+    this->m_FCPSTRetInformado = false;
+    this->m_ICMSEfetInformado = false;
     this->m_vBCSTRet = 0.0;
     this->m_pST = 0.0;
     this->m_vICMSSubstituto = 0.0;
@@ -355,6 +360,31 @@ void Icms::set_vICMSDif(const double &vICMSDif)
     this->m_vICMSDif = vICMSDif;
 }
 
+bool Icms::has_ICMSSTRet() const
+{
+    return this->m_ICMSSTRetInformado;
+}
+
+bool Icms::has_pST() const
+{
+    return this->m_pSTInformado;
+}
+
+bool Icms::has_vICMSSubstituto() const
+{
+    return this->m_vICMSSubstitutoInformado;
+}
+
+bool Icms::has_FCPSTRet() const
+{
+    return this->m_FCPSTRetInformado;
+}
+
+bool Icms::has_ICMSEfet() const
+{
+    return this->m_ICMSEfetInformado;
+}
+
 double Icms::get_vBCSTRet() const
 {
     return this->m_vBCSTRet;
@@ -362,6 +392,7 @@ double Icms::get_vBCSTRet() const
 
 void Icms::set_vBCSTRet(const double &vBCSTRet)
 {
+    this->m_ICMSSTRetInformado = true;
     this->m_vBCSTRet = vBCSTRet;
 }
 
@@ -372,6 +403,7 @@ double Icms::get_pST() const
 
 void Icms::set_pST(const double &pST)
 {
+    this->m_pSTInformado = true;
     this->m_pST = pST;
 }
 
@@ -382,6 +414,7 @@ double Icms::get_vICMSSubstituto() const
 
 void Icms::set_vICMSSubstituto(const double &vICMSSubstituto)
 {
+    this->m_vICMSSubstitutoInformado = true;
     this->m_vICMSSubstituto = vICMSSubstituto;
 }
 
@@ -392,6 +425,7 @@ double Icms::get_vICMSSTRet() const
 
 void Icms::set_vICMSSTRet(const double &vICMSSTRet)
 {
+    this->m_ICMSSTRetInformado = true;
     this->m_vICMSSTRet = vICMSSTRet;
 }
 
@@ -402,6 +436,7 @@ double Icms::get_vBCFCPSTRet() const
 
 void Icms::set_vBCFCPSTRet(const double &vBCFCPSTRet)
 {
+    this->m_FCPSTRetInformado = true;
     this->m_vBCFCPSTRet = vBCFCPSTRet;
 }
 
@@ -412,6 +447,7 @@ double Icms::get_pFCPSTRet() const
 
 void Icms::set_pFCPSTRet(const double &pFCPSTRet)
 {
+    this->m_FCPSTRetInformado = true;
     this->m_pFCPSTRet = pFCPSTRet;
 }
 
@@ -422,6 +458,7 @@ double Icms::get_vFCPSTRet() const
 
 void Icms::set_vFCPSTRet(const double &vFCPSTRet)
 {
+    this->m_FCPSTRetInformado = true;
     this->m_vFCPSTRet = vFCPSTRet;
 }
 
@@ -452,6 +489,7 @@ double Icms::get_pRedBCEfet() const
 
 void Icms::set_pRedBCEfet(const double &pRedBCEfet)
 {
+    this->m_ICMSEfetInformado = true;
     this->m_pRedBCEfet = pRedBCEfet;
 }
 
@@ -462,6 +500,7 @@ double Icms::get_vBCEfet() const
 
 void Icms::set_vBCEfet(const double &vBCEfet)
 {
+    this->m_ICMSEfetInformado = true;
     this->m_vBCEfet = vBCEfet;
 }
 
@@ -472,6 +511,7 @@ double Icms::get_pICMSEfet() const
 
 void Icms::set_pICMSEfet(const double &pICMSEfet)
 {
+    this->m_ICMSEfetInformado = true;
     this->m_pICMSEfet = pICMSEfet;
 }
 
@@ -482,6 +522,7 @@ double Icms::get_vICMSEfet() const
 
 void Icms::set_vICMSEfet(const double &vICMSEfet)
 {
+    this->m_ICMSEfetInformado = true;
     this->m_vICMSEfet = vICMSEfet;
 }
 

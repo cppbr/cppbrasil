@@ -12,6 +12,20 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 - Logotipo do C++ Brasil no topo do README.
 
+#### NF-e e NFC-e — NT 2018.005 v1.52
+
+- `InfRespTec::set_CSRT()` permite informar o código do responsável técnico
+  por nota. Informe também `idCSRT` e os dados de contato. Na geração do XML,
+  a biblioteca usa a chave de acesso da nota para calcular `hashCSRT` com
+  SHA-1 e Base64. Use `set_hashCSRT()` para fornecer um hash pronto.
+- `Retirada` e `Entrega` aceitam números de endereço como `S/N` e `12A`
+  por `set_nroTexto()` e `get_nroTexto()`. O acesso inteiro continua disponível.
+- `ProtNFe::get_mensagens()` expõe todas as mensagens da SEFAZ em ordem e
+  conserva os zeros à esquerda do código. `get_cMsg()` e `get_xMsg()` dão
+  acesso à última mensagem.
+- Recompile a biblioteca e as aplicações que a utilizam devido às alterações
+  no layout das classes.
+
 #### Combustíveis monofásicos — NT 2023.001 v1.60
 
 - NT 2023.001 v1.60: `Comb::pBio`, com leitura, escrita e limpeza, independente
@@ -421,6 +435,16 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 #### NF-e e NFC-e
 
+- NT 2018.005 v1.52. `idCSRT` é gravado com dois dígitos e importado no campo
+  correto. Os locais de retirada e entrega preservam o CEP com oito dígitos
+  e podem ser informados com CNPJ vazio quando o documento não estiver disponível.
+- O repasse de ICMS-ST grava os valores da UF de destino independentemente do
+  FCP. O XML preserva valores zero informados no ICMS-ST retido, FCP retido e
+  ICMS efetivo. A geração automática dos campos da rejeição 938 fica restrita
+  ao modelo 55.
+- A importação de NF-e processada recupera as mensagens da SEFAZ e o atributo
+  `Id` de `infProt`. A montagem do protocolo conserva as mensagens lidas e
+  omite `nProt` e `digVal` quando estiverem ausentes.
 - Leitura dos combustíveis: `pGNi`, `nBomba` e `vEncFin` passam a preencher seus
   próprios campos, sem sobrescrever `pGNn`, `nBico` e `vEncIni`, respectivamente.
 - CST 15: `pRedAdRem=0` explicitamente informado é preservado na geração.

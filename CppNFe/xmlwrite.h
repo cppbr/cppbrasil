@@ -38,6 +38,8 @@ limitations under the License.
 #include <CppNFe/urlnfe.h>
 #include <CppNFe/convnf.h>
 
+class ProtNFe;
+
 class CPPNFE_EXPORT XmlWrite
 {
 public:
@@ -55,6 +57,7 @@ public:
                                   const QString &nProt, const QString &digVal, const int &cStat,
                                   const QString &xMotivo, const int &cMsg, const QString &xMsg);
 
+    static QByteArray get_protNFe(const ProtNFe &protocolo);
     static QByteArray get_nfeProc(const QString &versao);
 
 
