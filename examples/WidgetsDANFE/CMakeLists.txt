@@ -23,11 +23,6 @@ if (CMAKE_SYSTEM MATCHES "Linux")
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
         ../../include
-        ../../third-party/windows/OpenSSL1.1.1q/include
-        ../../third-party/windows/libxml2-v2.9.13/include/libxml2
-        ../../third-party/windows/libiconv-for-Windows/include
-        ../../third-party/windows/zlib-1.2.12/include
-        ../../third-party/windows/QtRptProject3.0/include/QtRPT
     )
 endif()
 
@@ -92,11 +87,6 @@ if (CMAKE_SYSTEM MATCHES "Linux")
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(WidgetsDANFE
         PRIVATE ../../lib
-        PRIVATE ../../third-party/windows/OpenSSL1.1.1q/lib
-        PRIVATE ../../third-party/windows/libxml2-v2.9.13/lib
-        PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
-        PRIVATE ../../third-party/windows/zlib-1.2.12/lib
-        PRIVATE ../../third-party/windows/QtRptProject3.0/lib/debug/lib
     )
     target_link_libraries(WidgetsDANFE  PRIVATE CppDanfeQtRPT CppDanfe CppNFe CppBase QtRPT libcrypto libssl libiconv libxml2 zdll)
 

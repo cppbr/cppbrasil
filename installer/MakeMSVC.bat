@@ -16,17 +16,30 @@ if [%BUILD_TYPE%]==[d] set BUILD_TYPE=Debug
 
 set INSTALL_PATH=..\..\build\%BUILD_TYPE%
 set CPPBRASIL_PATH=..\..
-set OPENSSL_HEADER=..\..\third-party\windows\OpenSSL3.1.3\include
-set OPENSSL_LIB=..\..\third-party\windows\OpenSSL3.1.3\lib
-set LIBXML2_HEADER=..\..\third-party\windows\libxml2-v2.11.5\include\libxml2
-set LIBXML2_LIB=..\..\third-party\windows\libxml2-v2.11.5\lib
-set LIBICONV_HEADER=..\..\third-party\windows\libiconv-for-Windows\include 
-set LIBICONV_LIB=..\..\third-party\windows\libiconv-for-Windows\lib64\Release
-set ZLIB_HEADER=..\..\third-party\windows\zlib-1.3\include
-set ZLIB_LIB=..\..\third-party\windows\zlib-1.3\lib
-set QTRPT_HEADER=..\..\third-party\windows\QtRptProject3.0\include\QtRPT
-set QTRPT_LIB=..\..\third-party\windows\QtRptProject3.0\lib\release\lib
-if [%BUILD_TYPE%]==[Debug] set QTRPT_LIB=..\..\third-party\windows\QtRptProject3.0\lib\debug\lib
+echo.
+echo Informe o caminho completo das dependencias. Cada pasta deve conter include e lib.
+set /p OPENSSL_PATH=Pasta do OpenSSL: 
+set /p LIBXML2_PATH=Pasta da libxml2: 
+set /p LIBICONV_PATH=Pasta da libiconv: 
+set /p ZLIB_PATH=Pasta da zlib: 
+
+set OPENSSL_HEADER=%OPENSSL_PATH%\include
+set OPENSSL_LIB=%OPENSSL_PATH%\lib
+set LIBXML2_HEADER=%LIBXML2_PATH%\include\libxml2
+set LIBXML2_LIB=%LIBXML2_PATH%\lib
+set LIBICONV_HEADER=%LIBICONV_PATH%\include
+set LIBICONV_LIB=%LIBICONV_PATH%\lib
+set ZLIB_HEADER=%ZLIB_PATH%\include
+set ZLIB_LIB=%ZLIB_PATH%\lib
+
+echo.
+set /p QTRPT_HEADER=Pasta com o qtrpt.h. Caso nao informe, o DANFE nao sera compilado: 
+set CMD_DANFE=-DCPPBRASIL_BUILD_DANFE=OFF
+if "%QTRPT_HEADER%"=="" goto fim_qtrpt
+set /p QTRPT_LIBRARY=Caminho completo do arquivo QtRPT.lib: 
+set CMD_DANFE=-DQTRPT_INCLUDE_DIR=%QTRPT_HEADER% -DQTRPT_LIBRARY=%QTRPT_LIBRARY%
+:fim_qtrpt
+
 echo.
 echo.
 echo Informe o caminho do arquivo vcvars64.bat que se encontra na instalacao do Visual Studio
@@ -44,9 +57,9 @@ call "%FILE_VCVARS64%"
 mkdir build
 cd build
 
-set INCLUDE_CMD= /I %OPENSSL_HEADER% /I %LIBXML2_HEADER% /I %LIBICONV_HEADER% /I %ZLIB_HEADER% /I %QTRPT_HEADER%
-set LIB_CMD= /LIBPATH:%OPENSSL_LIB% /LIBPATH:%LIBXML2_LIB% /LIBPATH:%LIBICONV_LIB% /LIBPATH:%ZLIB_LIB% /LIBPATH:%QTRPT_LIB%
-cmake -GNinja %CPPBRASIL_PATH% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%QT_MSVC_PATH% -DCMAKE_CXX_FLAGS=" %INCLUDE_CMD% " -DCMAKE_SHARED_LINKER_FLAGS=" %LIB_CMD% " -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH%
+set INCLUDE_CMD= /I %OPENSSL_HEADER% /I %LIBXML2_HEADER% /I %LIBICONV_HEADER% /I %ZLIB_HEADER%
+set LIB_CMD= /LIBPATH:%OPENSSL_LIB% /LIBPATH:%LIBXML2_LIB% /LIBPATH:%LIBICONV_LIB% /LIBPATH:%ZLIB_LIB%
+cmake -GNinja %CPPBRASIL_PATH% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% -DCMAKE_PREFIX_PATH=%QT_MSVC_PATH% -DCMAKE_CXX_FLAGS=" %INCLUDE_CMD% " -DCMAKE_SHARED_LINKER_FLAGS=" %LIB_CMD% " -DCMAKE_INSTALL_PREFIX=%INSTALL_PATH% %CMD_DANFE%
 ninja
 ninja install
 
