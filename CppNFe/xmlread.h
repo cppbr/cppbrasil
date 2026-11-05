@@ -62,6 +62,7 @@ private:
     void set_det(QXmlStreamReader &xml) const; //H01 - Grupo H. Detalhamento de Produtos e Serviços da NF-e
 
     void set_prod(QXmlStreamReader &xml) const; //I01 - Grupo I. Produtos e Serviços da NF-e
+    void set_prod_gCred(QXmlStreamReader &xml) const; //I05g
 
     void set_DI(QXmlStreamReader &xml) const; //I18 - Grupo I01. Produtos e Serviços / Declaração de Importação
     void set_DI_adi(QXmlStreamReader &xml) const; //I25  - sub-grupo Adições

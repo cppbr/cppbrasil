@@ -72,6 +72,8 @@ add_library(CppNFe SHARED
     fat.cpp
     fordia.h
     fordia.cpp
+    gcred.h
+    gcred.cpp
     icms.h
     icms.cpp
     icmstot.h

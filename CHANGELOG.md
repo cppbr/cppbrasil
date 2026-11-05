@@ -8,6 +8,16 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Benefícios fiscais do ICMS — NT 2019.001 v1.70
+
+- Leia e grave até quatro créditos presumidos por item em `Prod::gCred`.
+  Preencha `cCredPresumido`, `pCredPresumido` e `vCredPresumido` no objeto do
+  contêiner e confirme cada grupo com `add()`.
+- Use `Icms::set_cBenefRBC()` para informar o código do benefício de redução
+  de base de cálculo acumulado com diferimento no CST 51. A aplicação
+  fornece os códigos e valores de acordo com a tabela e as regras da UF.
+  Recompile a biblioteca e as aplicações devido às mudanças em `Prod` e `Icms`.
+
 #### Documentação
 
 - Logotipo do C++ Brasil no topo do README.
@@ -435,6 +445,9 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 #### NF-e e NFC-e
 
+- O XML grava `cNF` com oito dígitos, incluindo os zeros à esquerda usados na
+  chave de acesso. Os campos opcionais do diferimento no CST 51 preservam
+  zeros informados, inclusive `vICMS` no diferimento total.
 - NT 2018.005 v1.52. `idCSRT` é gravado com dois dígitos e importado no campo
   correto. Os locais de retirada e entrega preservam o CEP com oito dígitos
   e podem ser informados com CNPJ vazio quando o documento não estiver disponível.

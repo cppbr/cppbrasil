@@ -192,7 +192,7 @@ void XmlWrite::get_ide()
     Ide *_ide = this->m_infNFe->ide.get();
     this->m_xmlw->writeStartElement("ide"); //abertura grupo ide
     this->m_xmlw->writeTextElement("cUF", QString::number(_ide->get_cUF()));
-    this->m_xmlw->writeTextElement("cNF", QString::number(_ide->get_cNF()));
+    this->m_xmlw->writeTextElement("cNF", CppUtility::insZeroLeft(QString::number(_ide->get_cNF()), 8));
     this->m_xmlw->writeTextElement("natOp", _ide->get_natOp());
     this->m_xmlw->writeTextElement("mod", ConvNF::modeloDFToStr(_ide->get_mod()));
     this->m_xmlw->writeTextElement("serie", QString::number(_ide->get_serie()));
@@ -601,6 +601,14 @@ void XmlWrite::get_prod(const int &i)
         this->m_xmlw->writeTextElement("CNPJFab", _prod->get_CNPJFab());
     if (!_prod->get_cBenef().isEmpty())
         this->m_xmlw->writeTextElement("cBenef", _prod->get_cBenef());
+    for (const auto *credito : *_prod->gCred)
+    {
+        this->m_xmlw->writeStartElement("gCred");
+        this->m_xmlw->writeTextElement("cCredPresumido", credito->get_cCredPresumido());
+        this->m_xmlw->writeTextElement("pCredPresumido", CppUtility::doubleToStrDecimal(credito->get_pCredPresumido(), 4));
+        this->m_xmlw->writeTextElement("vCredPresumido", CppUtility::doubleToStrDecimal(credito->get_vCredPresumido(), 2));
+        this->m_xmlw->writeEndElement();
+    }
     if (!_prod->get_EXTIPI().isEmpty())
         this->m_xmlw->writeTextElement("EXTIPI", _prod->get_EXTIPI());
     this->m_xmlw->writeTextElement("CFOP", _prod->get_CFOP());
@@ -1061,19 +1069,21 @@ void XmlWrite::get_ICMS(const int &i)
             {
                 if (_icms->get_modBC() != ModBC::None)
                     this->m_xmlw->writeTextElement("modBC", ConvNF::modBCToStr(_icms->get_modBC()));
-                if (_icms->get_pRedBC() > 0)
+                if (_icms->has_pRedBC())
                     this->m_xmlw->writeTextElement("pRedBC", CppUtility::doubleToStrDecimal(_icms->get_pRedBC(), 4));
-                if (_icms->get_vBC() > 0)
+                if (!_icms->get_cBenefRBC().isEmpty())
+                    this->m_xmlw->writeTextElement("cBenefRBC", _icms->get_cBenefRBC());
+                if (_icms->has_vBC())
                     this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(_icms->get_vBC(), 2));
-                if (_icms->get_pICMS() > 0)
+                if (_icms->has_pICMS())
                     this->m_xmlw->writeTextElement("pICMS", CppUtility::doubleToStrDecimal(_icms->get_pICMS(), 4));
-                if (_icms->get_vICMSOp() > 0)
+                if (_icms->has_vICMSOp())
                     this->m_xmlw->writeTextElement("vICMSOp", CppUtility::doubleToStrDecimal(_icms->get_vICMSOp(), 2));
-                if (_icms->get_pDif() > 0)
+                if (_icms->has_pDif())
                     this->m_xmlw->writeTextElement("pDif", CppUtility::doubleToStrDecimal(_icms->get_pDif(), 4));
-                if (_icms->get_vICMSDif() > 0)
+                if (_icms->has_vICMSDif())
                     this->m_xmlw->writeTextElement("vICMSDif", CppUtility::doubleToStrDecimal(_icms->get_vICMSDif(), 2));
-                if (_icms->get_vICMS() > 0)
+                if (_icms->has_vICMS())
                     this->m_xmlw->writeTextElement("vICMS", CppUtility::doubleToStrDecimal(_icms->get_vICMS(), 2));
 
                 if (_icms->get_vBCFCP() > 0 ||

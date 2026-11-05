@@ -33,6 +33,7 @@ limitations under the License.
 #include <CppNFe/arma.h>
 #include <CppNFe/comb.h>
 #include <CppNFe/convnf.h>
+#include <CppNFe/gcred.h>
 
 class CPPNFE_EXPORT Prod
 {
@@ -110,6 +111,7 @@ public:
     std::unique_ptr<Med> med;
     std::unique_ptr<Container<Arma>> arma;
     std::unique_ptr<Comb> comb;
+    std::unique_ptr<Container<GCred>> gCred;
 
 private:
     int m_nItem; //pertence a tag det H01 - Número do item
