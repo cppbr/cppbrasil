@@ -22,9 +22,9 @@ limitations under the License.
 #define PAG_H
 
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/detpag.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/detpag.h>
 
 class CPPNFE_EXPORT Pag
 {

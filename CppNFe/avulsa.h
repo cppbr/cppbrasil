@@ -23,8 +23,8 @@ limitations under the License.
 
 #include <QString>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
 
 
 class CPPNFE_EXPORT Avulsa

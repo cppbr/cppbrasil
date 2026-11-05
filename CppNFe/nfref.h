@@ -23,10 +23,10 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/refnf.h>
-#include <CppBrasil/NFe/refnfp.h>
-#include <CppBrasil/NFe/refecf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/refnf.h>
+#include <CppNFe/refnfp.h>
+#include <CppNFe/refecf.h>
 
 class CPPNFE_EXPORT NFRef
 {

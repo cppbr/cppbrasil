@@ -21,7 +21,7 @@ limitations under the License.
 #ifndef II_H
 #define II_H
 
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 class CPPNFE_EXPORT Ii
 {

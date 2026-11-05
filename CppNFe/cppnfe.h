@@ -23,10 +23,10 @@ limitations under the License.
 
 #include <memory>
 #include <QObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/notafiscal.h>
-#include <CppBrasil/NFe/eventonotafiscal.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/notafiscal.h>
+#include <CppNFe/eventonotafiscal.h>
 
 class CPPNFE_EXPORT CppNFe : public QObject
 {

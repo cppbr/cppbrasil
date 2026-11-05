@@ -23,6 +23,12 @@ limitations under the License.
 
 #include <QtCore/qglobal.h>
 
+#if defined(CPPBASE_LIBRARY)
+#  define CPPBASE_EXPORT Q_DECL_EXPORT
+#else
+#  define CPPBASE_EXPORT Q_DECL_IMPORT
+#endif
+
 #if defined(CPPNFE_LIBRARY)
 #  define CPPNFE_EXPORT Q_DECL_EXPORT
 #else
@@ -33,6 +39,12 @@ limitations under the License.
 #  define CPPDANFE_EXPORT Q_DECL_EXPORT
 #else
 #  define CPPDANFE_EXPORT Q_DECL_IMPORT
+#endif
+
+#if defined(CPPDANFEQTRPT_LIBRARY)
+#  define CPPDANFEQTRPT_EXPORT Q_DECL_EXPORT
+#else
+#  define CPPDANFEQTRPT_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // CPPNFE_GLOBAL_H

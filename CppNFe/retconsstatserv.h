@@ -23,10 +23,10 @@ limitations under the License.
 
 #include <QString>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/convnf.h>
 
 
 class CPPNFE_EXPORT RetConsStatServ

@@ -24,9 +24,9 @@ limitations under the License.
 #include <memory>
 #include <QString>
 #include <QDate>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/card.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/card.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT DetPag
 {

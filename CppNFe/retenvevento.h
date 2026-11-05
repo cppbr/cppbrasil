@@ -4,11 +4,11 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/confignfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/container.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/confignfe.h>
 
 class CPPNFE_EXPORT InfEventoRet
 {

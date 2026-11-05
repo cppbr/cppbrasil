@@ -23,9 +23,9 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/enderemit.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/enderemit.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT Emit
 {

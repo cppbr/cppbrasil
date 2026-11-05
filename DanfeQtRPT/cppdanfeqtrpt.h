@@ -23,12 +23,12 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppdanfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppDanfe/cppdanfe.h>
 #include <qtrpt.h>
 
 
-class CPPDANFE_EXPORT CppDanfeQtRPT: public QObject, public CppDanfe
+class CPPDANFEQTRPT_EXPORT CppDanfeQtRPT: public QObject, public CppDanfe
 {
     Q_OBJECT
 

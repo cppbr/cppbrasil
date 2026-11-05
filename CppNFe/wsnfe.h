@@ -24,17 +24,17 @@ limitations under the License.
 #include <QObject>
 #include <QXmlStreamReader>
 #include <QDateTime>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/webservices.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/cppzip.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/retornonfe.h>
-#include <CppBrasil/NFe/retconsstatserv.h>
-#include <CppBrasil/NFe/urlnfe.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/retenvevento.h>
-#include <CppBrasil/NFe/retconssitnfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/webservices.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/cppzip.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/retornonfe.h>
+#include <CppNFe/retconsstatserv.h>
+#include <CppNFe/urlnfe.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/retenvevento.h>
+#include <CppNFe/retconssitnfe.h>
 
 //obs: A versão do Layout do xml, nem sempre é a mesma versão do Web Services.
 class CPPNFE_EXPORT WSNFeBase : public WebServices

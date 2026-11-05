@@ -25,8 +25,8 @@ limitations under the License.
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
 
 enum class TipoInfNFeSupl{qrCode, urlChave};
 

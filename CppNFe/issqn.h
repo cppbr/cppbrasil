@@ -22,8 +22,8 @@ limitations under the License.
 #define ISSQN_H
 
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT IssQN
 {

@@ -22,7 +22,7 @@ limitations under the License.
 #define LACRES_H
 
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 class CPPNFE_EXPORT Lacres
 {

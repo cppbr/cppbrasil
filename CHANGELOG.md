@@ -280,6 +280,28 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### Estrutura do projeto
+
+**Alteração incompatível:** quem usa a biblioteca precisa ajustar includes e links.
+
+- Os módulos passam a ficar na raiz do projeto, cada um com sua biblioteca:
+  `CppBase` (arquivos comuns), `CppNFe`, `CppDanfe` (base do DANFE, código de
+  barras e QR Code) e `DanfeQtRPT`. Os arquivos comuns deixam de depender da
+  NF-e e do DANFE, e a CppNFe segue sem exigir Qt Gui nem Qt Widgets.
+- Nova biblioteca `libCppBase`, que deve ser ligada junto com a `libCppNFe`. Para o
+  DANFE, ligue também a `libCppDanfe`, além da `libCppDanfeQtRPT`.
+- Os includes `<CppBrasil/NFe/...>`, `<CppBrasil/DanfeQtRPT/...>` e
+  `<CppBrasil/...>` passam a ser `<CppNFe/...>`, `<DanfeQtRPT/...>`, `<CppBase/...>`
+  ou `<CppDanfe/...>`, este último para `cppdanfe.h`, `code128.h`, `cppbarcode.h`
+  e `qrcodegen.hpp`. Os headers são instalados nas mesmas pastas, em `include/`.
+- Um único `CMakeLists.txt` na raiz compila todos os módulos. Use
+  `-DCPPBRASIL_BUILD_DANFE=OFF` para compilar sem o DANFE e sem o QtRPT; os scripts
+  de instalação também passam a usar esse arquivo.
+- As macros de exportação dos arquivos comuns passam de `CPPNFE_EXPORT` para
+  `CPPBASE_EXPORT`, e `CppDanfeQtRPT` passa a usar `CPPDANFEQTRPT_EXPORT`.
+- Símbolos sem macro de exportação ficam ocultos também no Linux e no macOS, como
+  já acontecia no Windows.
+
 As alterações de compatibilidade abaixo exigem atenção ao atualizar a biblioteca e as aplicações.
 
 #### NT 2023.001: recompilar as aplicações
@@ -378,12 +400,17 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Removido
 
+- Projetos qmake (`.pro`). O CMake é o único sistema de build.
+
 - Dependências pré-compiladas antigas para Windows: OpenSSL 3.1.3, libxml2 2.11.5,
   zlib 1.3 e libiconv. As versões novas serão distribuídas como pacotes compactados.
   Até lá, o instalador MSVC e os exemplos precisam de ajustes nas referências às dependências.
 - Exemplo legado QtCon-2022, sem manutenção.
 
 ### Corrigido
+
+- `OrigComb` não era exportada pela biblioteca, o que impedia o uso direto da classe
+  por aplicações no Windows.
 
 #### NF-e e NFC-e
 

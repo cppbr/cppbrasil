@@ -22,16 +22,16 @@ limitations under the License.
 #define IMPOSTO_H
 
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/icms.h>
-#include <CppBrasil/NFe/icmsufdest.h>
-#include <CppBrasil/NFe/ipi.h>
-#include <CppBrasil/NFe/ii.h>
-#include <CppBrasil/NFe/pis.h>
-#include <CppBrasil/NFe/pisst.h>
-#include <CppBrasil/NFe/cofins.h>
-#include <CppBrasil/NFe/cofinsst.h>
-#include <CppBrasil/NFe/issqn.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/icms.h>
+#include <CppNFe/icmsufdest.h>
+#include <CppNFe/ipi.h>
+#include <CppNFe/ii.h>
+#include <CppNFe/pis.h>
+#include <CppNFe/pisst.h>
+#include <CppNFe/cofins.h>
+#include <CppNFe/cofinsst.h>
+#include <CppNFe/issqn.h>
 
 class CPPNFE_EXPORT Imposto
 {

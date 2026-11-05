@@ -24,10 +24,10 @@ limitations under the License.
 #include <QString>
 #include <QDir>
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/config.h>
-#include <CppBrasil/cppxml.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
+#include <CppBase/config.h>
+#include <CppBase/cppxml.h>
 
 
 class CPPNFE_EXPORT Certificado: public ConfCertificado

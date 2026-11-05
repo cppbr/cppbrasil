@@ -45,12 +45,12 @@ limitations under the License.
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/httpclient.h>
-#include <CppBrasil/cppcrypto.h>
-#include <CppBrasil/cpputility.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/httpclient.h>
+#include <CppBase/cppcrypto.h>
+#include <CppBase/cpputility.h>
 
-class CPPNFE_EXPORT HttpOpenSSL : public HttpClient
+class CPPBASE_EXPORT HttpOpenSSL : public HttpClient
 {
     Q_OBJECT
 public:

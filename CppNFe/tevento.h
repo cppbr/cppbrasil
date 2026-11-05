@@ -7,12 +7,12 @@
 #include <QString>
 #include <QDateTime>
 #include <QXmlStreamReader>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/detpag.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppBase/container.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/detpag.h>
 
 
 class CPPNFE_EXPORT AutXMLAtor

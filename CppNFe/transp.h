@@ -23,14 +23,14 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/transporta.h>
-#include <CppBrasil/NFe/rettransp.h>
-#include <CppBrasil/NFe/veictransp.h>
-#include <CppBrasil/NFe/reboque.h>
-#include <CppBrasil/NFe/vol.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/transporta.h>
+#include <CppNFe/rettransp.h>
+#include <CppNFe/veictransp.h>
+#include <CppNFe/reboque.h>
+#include <CppNFe/vol.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT Transp
 {

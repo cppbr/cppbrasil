@@ -23,8 +23,8 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/exportind.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/exportind.h>
 
 class CPPNFE_EXPORT DetExport
 {

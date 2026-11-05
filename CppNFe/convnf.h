@@ -20,8 +20,8 @@ limitations under the License.
 
 #ifndef CONVNF_H
 #define CONVNF_H
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/convdf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/convdf.h>
 
 //TIPOS NFe e NFCe
 

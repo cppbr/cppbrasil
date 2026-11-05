@@ -23,16 +23,16 @@ limitations under the License.
 
 #include <QString>
 #include <memory>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/container.h>
-#include <CppBrasil/NFe/di.h>
-#include <CppBrasil/NFe/detexport.h>
-#include <CppBrasil/NFe/rastro.h>
-#include <CppBrasil/NFe/veicprod.h>
-#include <CppBrasil/NFe/med.h>
-#include <CppBrasil/NFe/arma.h>
-#include <CppBrasil/NFe/comb.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/container.h>
+#include <CppNFe/di.h>
+#include <CppNFe/detexport.h>
+#include <CppNFe/rastro.h>
+#include <CppNFe/veicprod.h>
+#include <CppNFe/med.h>
+#include <CppNFe/arma.h>
+#include <CppNFe/comb.h>
+#include <CppNFe/convnf.h>
 
 class CPPNFE_EXPORT Prod
 {

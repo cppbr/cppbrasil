@@ -21,7 +21,7 @@ limitations under the License.
 #ifndef EXPORTIND_H
 #define EXPORTIND_H
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 class CPPNFE_EXPORT ExportInd
 {

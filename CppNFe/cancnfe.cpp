@@ -1,7 +1,7 @@
 #include "cancnfe.h"
 #include <QRegularExpression>
 #include <QXmlStreamWriter>
-#include <CppBrasil/NFe/wsnfe.h>
+#include <CppNFe/wsnfe.h>
 
 namespace {
 

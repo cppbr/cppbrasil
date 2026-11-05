@@ -25,12 +25,12 @@ limitations under the License.
 #include <QPixmap>
 #include <QPainter>
 #include <QSvgRenderer>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cpputility.h>
-#include <CppBrasil/cppbarcode.h>
-#include <CppBrasil/convdf.h>
-#include <CppBrasil/qrcodegen.hpp>
-#include <CppBrasil/NFe/cppnfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cpputility.h>
+#include <CppDanfe/cppbarcode.h>
+#include <CppBase/convdf.h>
+#include <CppDanfe/qrcodegen.hpp>
+#include <CppNFe/cppnfe.h>
 #ifdef _WIN32
  #include <sstream>
 #endif

@@ -1,111 +1,49 @@
-cmake_minimum_required(VERSION 3.14)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Xml Charts Qml Sql PrintSupport)
 
-project(CppDanfeQtRPT LANGUAGES CXX)
+#QtRPT: por padrão usa a cópia de third-party. Para usar outra, informe -DQTRPT_INCLUDE_DIR e -DQTRPT_LIBRARY
+if(CMAKE_SYSTEM MATCHES "Windows")
+    set(QTRPT_ROOT ${PROJECT_SOURCE_DIR}/third-party/windows/QtRptProject3.0)
+else()
+    set(QTRPT_ROOT ${PROJECT_SOURCE_DIR}/third-party/linux/QtRptProject3.0)
+endif()
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(QTRPT_LIB_DIR ${QTRPT_ROOT}/lib/debug)
+else()
+    set(QTRPT_LIB_DIR ${QTRPT_ROOT}/lib/release)
+endif()
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Gui Xml Charts Qml Sql Svg PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Gui Xml Charts Qml Sql Svg PrintSupport)
+find_path(QTRPT_INCLUDE_DIR NAMES qtrpt.h HINTS ${QTRPT_ROOT}/include/QtRPT)
+find_library(QTRPT_LIBRARY NAMES QtRPT HINTS ${QTRPT_LIB_DIR} ${QTRPT_LIB_DIR}/lib)
 
-#Caso necessário, informe os diretório dos Header Files openssl, libxml2, zlib, libIconv(caso esteja no windows) e libQtRPT
-#include_directories(
-#/usr/include/openssl
-#/usr/include/libxml2
-#/usr/include/zlib
-#/usr/include/libIconv
-#/usr/include/QtRPT
-#)
+if(NOT QTRPT_INCLUDE_DIR OR NOT QTRPT_LIBRARY)
+    message(FATAL_ERROR "QtRPT não encontrado. Informe QTRPT_INCLUDE_DIR e QTRPT_LIBRARY "
+                        "ou desative o DANFE com -DCPPBRASIL_BUILD_DANFE=OFF")
+endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..)
-
-set(cppdanfe_SRC
-    ../cppbrasil_global.h
-    ../code128.h
-    ../code128.cpp
-    ../cppbarcode.h
-    ../cppbarcode.cpp
-    ../cppdanfe.h
-    ../cppdanfe.cpp
-    ../qrcodegen.hpp
-    ../qrcodegen.cpp
+add_library(CppDanfeQtRPT SHARED
     cppdanfeqtrpt.h
     cppdanfeqtrpt.cpp
 )
 
-set(HEADER_GERAL
-    ../cppbrasil_global.h
-    ../code128.h
-    ../cppbarcode.h
-    ../cppdanfe.h
-    ../qrcodegen.hpp
-)
+target_compile_definitions(CppDanfeQtRPT PRIVATE CPPDANFEQTRPT_LIBRARY)
 
-set(HEADER_DANFE
-    cppdanfeqtrpt.h
-    CppDanfeQtRPT
-)
+target_include_directories(CppDanfeQtRPT PUBLIC ${QTRPT_INCLUDE_DIR})
 
-add_library(CppDanfeQtRPT SHARED
-    ${cppbrasil_GERAL}
-    ${cppdanfe_SRC}
-)
-
-target_link_libraries(CppDanfeQtRPT PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Gui
+target_link_libraries(CppDanfeQtRPT PUBLIC
+    CppDanfe
+    ${QTRPT_LIBRARY}
     Qt${QT_VERSION_MAJOR}::Xml
     Qt${QT_VERSION_MAJOR}::Charts
     Qt${QT_VERSION_MAJOR}::Qml
     Qt${QT_VERSION_MAJOR}::Sql
-    Qt${QT_VERSION_MAJOR}::Svg
     Qt${QT_VERSION_MAJOR}::PrintSupport
 )
 
-target_compile_definitions(CppDanfeQtRPT PRIVATE CPPDANFE_LIBRARY)
-
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    if (CMAKE_SYSTEM MATCHES "Linux")
-        set(CMAKE_INSTALL_PREFIX
-            "/usr" CACHE PATH "CppBrasil default install prefix" FORCE)
-    endif()         
-endif()
-
-install(TARGETS CppDanfeQtRPT
-    LIBRARY
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+install(TARGETS CppDanfeQtRPT)
+install(FILES
+    cppdanfeqtrpt.h
+    CppDanfeQtRPT
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/DanfeQtRPT
+    COMPONENT devel
 )
-
-set_property(TARGET CppDanfeQtRPT PROPERTY PUBLIC_HEADER ${HEADER_GERAL})
-install(TARGETS CppDanfeQtRPT
-    PUBLIC_HEADER DESTINATION include/CppBrasil COMPONENT devel
-)
-set_property(TARGET CppDanfeQtRPT PROPERTY PUBLIC_HEADER ${HEADER_DANFE})
-install(TARGETS CppDanfeQtRPT
-        PUBLIC_HEADER DESTINATION include/CppBrasil/DanfeQtRPT COMPONENT devel
-)
-
-#caso necessário, informe os diretórios das libs openssl, libxml2, zlib, libIconv(caso esteja no windows), libCppNFe e libQtRPT
-#target_link_directories(CppDanfeQtRPT
-#    PRIVATE "/home/usuario/openssl/"
-#    PRIVATE "/home/usuario/libxml2"
-#    PRIVATE "/home/usuario/zlib"
-#    PRIVATE "/home/usuario/libiconv" 
-#    PRIVATE "/home/usuario/CppBrasil/lib"
-#    PRIVATE "/home/usuario/QtRptProject/lib"
-#)
-
-#link libs no windows, linux e macos
-if (CMAKE_SYSTEM MATCHES "Windows")
-    target_link_libraries(CppDanfeQtRPT PRIVATE CppNFe QtRPT libcrypto libssl libiconv libxml2 zdll)
-elseif (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(CppDanfeQtRPT  PRIVATE -lCppNFe -lQtRPT -lcrypto -lssl  -lxml2 -lz)
-elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin") #Darwin para Mac OS
-    target_link_libraries(CppDanfeQtRPT  PRIVATE CppNFe QtRPT crypto ssl  xml2 z)
-endif()
-

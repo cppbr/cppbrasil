@@ -4,9 +4,9 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QString>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/retenvevento.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/retenvevento.h>
 
 // Resultado de um pedido de cancelamento: os dados do lote e do único evento enviado.
 class CPPNFE_EXPORT RetEventoCancNFe

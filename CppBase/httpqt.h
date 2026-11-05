@@ -23,10 +23,10 @@ limitations under the License.
 
 #include <QObject>
 #include <QDebug>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/httpclient.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/httpclient.h>
 
-class CPPNFE_EXPORT HttpQt : public HttpClient
+class CPPBASE_EXPORT HttpQt : public HttpClient
 {
     Q_OBJECT
 public:

@@ -23,7 +23,7 @@ limitations under the License.
 
 #include <QString>
 #include <QList>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
 
 enum class TYPES { DYNAMIC, A, B, C };

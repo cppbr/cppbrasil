@@ -4,11 +4,11 @@
 #include <memory>
 #include <QDateTime>
 #include <QObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/retenvevento.h>
-#include <CppBrasil/NFe/reteventocancnfe.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/retenvevento.h>
+#include <CppNFe/reteventocancnfe.h>
 
 // Cancelamento (110111) e cancelamento por substituição da NFC-e (110112).
 class CPPNFE_EXPORT CancNFe : public QObject

@@ -3,11 +3,11 @@
 
 #include <memory>
 #include <QObject>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
-#include <CppBrasil/NFe/confignfe.h>
-#include <CppBrasil/NFe/wsnfe.h>
-#include <CppBrasil/NFe/retconsstatserv.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
+#include <CppNFe/confignfe.h>
+#include <CppNFe/wsnfe.h>
+#include <CppNFe/retconsstatserv.h>
 
 
 class CPPNFE_EXPORT StatusServico : public QObject

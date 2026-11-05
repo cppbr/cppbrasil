@@ -24,9 +24,9 @@ limitations under the License.
 #include <QObject>
 #include <QDebug>
 #include <zlib.h>
-#include <CppBrasil/cppbrasil_global.h>
+#include <CppBase/cppbrasil_global.h>
 
-class CPPNFE_EXPORT CppZip
+class CPPBASE_EXPORT CppZip
 {
 public:
     CppZip();

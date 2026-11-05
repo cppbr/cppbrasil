@@ -26,16 +26,16 @@ limitations under the License.
 #include <QCoreApplication>
 #include <QNetworkProxy>
 #include <QSsl>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/cppcrypto.h>
-#include <CppBrasil/cppopenssl.h>
-#include <CppBrasil/cppxml.h>
-#include <CppBrasil/cpplibxml2.h>
-#include <CppBrasil/convdf.h>
-#include <CppBrasil/httpclient.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/cppcrypto.h>
+#include <CppBase/cppopenssl.h>
+#include <CppBase/cppxml.h>
+#include <CppBase/cpplibxml2.h>
+#include <CppBase/convdf.h>
+#include <CppBase/httpclient.h>
 
 
-class CPPNFE_EXPORT ConfCertificado
+class CPPBASE_EXPORT ConfCertificado
 {
 public:
     ConfCertificado();
@@ -69,7 +69,7 @@ private:
 
 //---------------------------------------------------
 
-class CPPNFE_EXPORT ConfArquivos
+class CPPBASE_EXPORT ConfArquivos
 {
 public:
     ConfArquivos();
@@ -112,7 +112,7 @@ private:
 
 //---------------------------------------------------
 
-class CPPNFE_EXPORT ConfWebServices
+class CPPBASE_EXPORT ConfWebServices
 {
  public:
     ConfWebServices();

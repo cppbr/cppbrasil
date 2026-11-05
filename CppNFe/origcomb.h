@@ -20,10 +20,10 @@ limitations under the License.
 #ifndef ORIGCOMB_H
 #define ORIGCOMB_H
 
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/NFe/convnf.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppNFe/convnf.h>
 
-class OrigComb
+class CPPNFE_EXPORT OrigComb
 {
 public:
     OrigComb();

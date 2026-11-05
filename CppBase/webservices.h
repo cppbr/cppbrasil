@@ -25,13 +25,13 @@ limitations under the License.
 #include <QString>
 #include <QByteArray>
 #include <QTimer>
-#include <CppBrasil/cppbrasil_global.h>
-#include <CppBrasil/httpclient.h>
-#include <CppBrasil/httpqt.h>
-#include <CppBrasil/httpopenssl.h>
-#include <CppBrasil/cppcrypto.h>
+#include <CppBase/cppbrasil_global.h>
+#include <CppBase/httpclient.h>
+#include <CppBase/httpqt.h>
+#include <CppBase/httpopenssl.h>
+#include <CppBase/cppcrypto.h>
 
-class CPPNFE_EXPORT WebServices : public QObject
+class CPPBASE_EXPORT WebServices : public QObject
 {
     Q_OBJECT
 
