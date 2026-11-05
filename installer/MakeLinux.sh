@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CPPBRASIL_PATH="../.."
-QTRPT_HEADER="../../third-party/linux/QtRptProject3.0/include/QtRPT"
 
 echo "Informe o Diretorio do Qt onde se encontra o gcc_64: "
 read  QT_GCC_PATH;
@@ -31,11 +30,21 @@ read  BUILD_TYPE;
 
 if [ -z $BUILD_TYPE ] || [ $BUILD_TYPE  == "R" ] || [ $BUILD_TYPE  == "r" ]; then
     CMD_BUILD_TYPE="-DCMAKE_BUILD_TYPE=Release"
-    QTRPT_LIB="../../third-party/linux/QtRptProject3.0/lib/release"
 else
     CMD_BUILD_TYPE="-DCMAKE_BUILD_TYPE=Debug"
-    QTRPT_LIB="../../third-party/linux/QtRptProject3.0/lib/debug"
+fi
 
+echo
+echo
+echo "Informe o caminho completo do diretorio com o qtrpt.h. Caso nao informe, o DANFE nao sera compilado: "
+read QTRPT_HEADER;
+
+if [ -z "$QTRPT_HEADER" ]; then
+    CMD_DANFE="-DCPPBRASIL_BUILD_DANFE=OFF"
+else
+    echo "Informe o caminho completo do arquivo libQtRPT.so: "
+    read QTRPT_LIB;
+    CMD_DANFE="-DQTRPT_INCLUDE_DIR=$QTRPT_HEADER -DQTRPT_LIBRARY=$QTRPT_LIB"
 fi
 
 
@@ -43,21 +52,12 @@ rm -fr build
 mkdir build
 cd build
 
-cmake -GNinja $CPPBRASIL_PATH $CMD_BUILD_TYPE $CMD_PREFIX_PATH $CMD_INSTALL
+cmake -GNinja $CPPBRASIL_PATH $CMD_BUILD_TYPE $CMD_PREFIX_PATH $CMD_INSTALL $CMD_DANFE
 #se a instalação for no /usr/ pede senha do sudo
 if [ -z $CMD_INSTALL ]; then
     ninja && sudo ninja install
 else
     ninja && ninja install
-fi
-
-#copia a libQtRPT e seus headers para o mesmo destino das libs da CppBrasil
-if [ -z $CMD_INSTALL ]; then
-    sudo cp -R $QTRPT_HEADER /usr/include
-    sudo cp "$QTRPT_LIB/libQtRPT.so" /usr/lib
-else
-    cp -R $QTRPT_HEADER "$INSTALL_PATH/include"
-    cp "$QTRPT_LIB/libQtRPT.so" "$INSTALL_PATH/lib"
 fi
 
 cd ..

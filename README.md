@@ -27,6 +27,7 @@ Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as
 - OpenSSL >= 1.1.1 (recomendado 3.x)
 - LibXML2 (testada com 2.12 e 2.15; recomendado **2.13 ou superior**, ver abaixo)
 - ZLib
+- QtRPT (apenas para o DANFE)
 - libIconv(caso opte por compilar a libxml2 com suporte a libIconv. No Linux vem instalado por padrão. Para Windows [link.](https://github.com/pffang/libiconv-for-Windows))
 
 ### Fedora/RHEL e derivados: assinatura SHA1
@@ -58,6 +59,11 @@ Windows, Debian e Ubuntu não têm esse bloqueio.
   contra a versão nova; os binários compilados com a antiga não carregam a nova.
 - A lib funciona com a libxml2 compilada sem a interface antiga SAX1 (`--without-sax1`).
 
+### Dependências
+As dependências não acompanham o projeto: instale-as antes de compilar. Isso inclui o QtRPT, que não vem mais compilado;
+o código-fonte está em `DanfeQtRPT/QtRptProject-Source`. Informe `-DQTRPT_INCLUDE_DIR` e `-DQTRPT_LIBRARY` ao cmake quando ele
+não estiver nos caminhos padrão do sistema.
+
 ### Migração para a nova estrutura de módulos
 Os includes mudaram (`<CppNFe/...>`, `<CppBase/...>`, `<CppDanfe/...>` e `<DanfeQtRPT/...>`) e a `libCppBase` agora é
 obrigatória: ligue `-lCppNFe -lCppBase`. Para o DANFE, use `-lCppDanfeQtRPT -lCppDanfe -lCppNFe -lCppBase -lQtRPT`.
@@ -69,7 +75,7 @@ Compile a partir do `CMakeLists.txt` da raiz do projeto. Para compilar sem o DAN
 A compilação no Linux pode ser feita via cmake ou utilizando o script MakeLinux.sh. O script utiliza o cmake e o ninja e será instalado dentro do diretório /usr.
 
 ### Windows
-A compilação no Windows pode ser feita via cmake ou utilizando o script MakeMSVC.bat. A compilação é feita através do compilador MSVC que pode ser obtido através da instalação do visual studio. Vocẽ também precisa indicar, em Variáveis de Ambiente, o caminho do cmake e ninja que se encontram na instalação do Qt. Para windows foi disponibilizado os requisitos no diretório third-party. Caso você queira utilizar versões mais atualizadas, basta substituir os arquivos em third-party/windows. Caso seja alterado o nome da pasta, será necessário alterar em MakeMSVC.bat.
+A compilação no Windows pode ser feita via cmake ou utilizando o script MakeMSVC.bat. A compilação é feita através do compilador MSVC que pode ser obtido através da instalação do visual studio. Vocẽ também precisa indicar, em Variáveis de Ambiente, o caminho do cmake e ninja que se encontram na instalação do Qt. O script pede os caminhos das dependências.
 
 
 # Autor

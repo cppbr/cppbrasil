@@ -22,10 +22,6 @@ if (CMAKE_SYSTEM MATCHES "Linux")
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
         ../../include
-        ../../third-party/windows/OpenSSL1.1.1q/include
-        ../../third-party/windows/libxml2-v2.9.13/include/libxml2
-        ../../third-party/windows/libiconv-for-Windows/include
-        ../../third-party/windows/zlib-1.2.12/include
     )
 endif()
 
@@ -45,10 +41,6 @@ if (CMAKE_SYSTEM MATCHES "Linux")
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(consoleNFe
         PRIVATE ../../lib
-        PRIVATE ../../third-party/windows/OpenSSL1.1.1q/lib
-        PRIVATE ../../third-party/windows/libxml2-v2.9.13/lib
-        PRIVATE ../../third-party/windows/libiconv-for-Windows/lib64
-        PRIVATE ../../third-party/windows/zlib-1.2.12/lib
     )
     target_link_libraries(consoleNFe PRIVATE CppNFe CppBase libcrypto libssl libiconv libxml2 zdll)
 endif()

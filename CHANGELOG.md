@@ -295,8 +295,9 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
   ou `<CppDanfe/...>`, este último para `cppdanfe.h`, `code128.h`, `cppbarcode.h`
   e `qrcodegen.hpp`. Os headers são instalados nas mesmas pastas, em `include/`.
 - Um único `CMakeLists.txt` na raiz compila todos os módulos. Use
-  `-DCPPBRASIL_BUILD_DANFE=OFF` para compilar sem o DANFE e sem o QtRPT; os scripts
-  de instalação também passam a usar esse arquivo.
+  `-DCPPBRASIL_BUILD_DANFE=OFF` para compilar sem o DANFE e sem o QtRPT, ou informe
+  `-DQTRPT_INCLUDE_DIR` e `-DQTRPT_LIBRARY`. Os scripts de instalação usam esse
+  arquivo e pedem o caminho das dependências.
 - As macros de exportação dos arquivos comuns passam de `CPPNFE_EXPORT` para
   `CPPBASE_EXPORT`, e `CppDanfeQtRPT` passa a usar `CPPDANFEQTRPT_EXPORT`.
 - Símbolos sem macro de exportação ficam ocultos também no Linux e no macOS, como
@@ -400,6 +401,8 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Removido
 
+- Dependências pré-compiladas para Linux, Windows e Android. Elas devem ser instaladas
+  à parte. O código-fonte do QtRPT passa a acompanhar o módulo `DanfeQtRPT`.
 - Projetos qmake (`.pro`). O CMake é o único sistema de build.
 
 - Dependências pré-compiladas antigas para Windows: OpenSSL 3.1.3, libxml2 2.11.5,
