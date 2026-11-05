@@ -8,6 +8,10 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Documentação
+
+- Logotipo do C++ Brasil no topo do README.
+
 #### Combustíveis monofásicos — NT 2023.001 v1.60
 
 - NT 2023.001 v1.60: `Comb::pBio`, com leitura, escrita e limpeza, independente

@@ -1,3 +1,5 @@
+<img src="doc/cppbrasil-logo.png" alt="Logotipo do C++ Brasil" width="420">
+
 # Projeto C++ Brasil  
 ![GitHub](https://img.shields.io/github/license/cppbr/cppbrasil?color=blueviolet)
 
