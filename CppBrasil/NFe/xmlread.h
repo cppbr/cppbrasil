@@ -79,6 +79,7 @@ private:
 
     void set_comb(QXmlStreamReader &xml) const; //LA01 - Grupo LA. Detalhamento Específico de Combustíveis
     void set_comb_CIDE(QXmlStreamReader &xml) const; //LA07 - sub-grupo CIDE
+    void set_comb_origComb(QXmlStreamReader &xml) const; //LA18 - Origem do combustivel
     void set_comb_encerrante(QXmlStreamReader &xml) const; //LA11 - sub-grupo encerrante
 
     void set_imposto(QXmlStreamReader &xml) const; //M01 - Grupo M. Tributos incidentes no Produto ou Serviço

@@ -7,6 +7,13 @@ O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### ⚠️ Mudanças que exigem atenção (quebra de compatibilidade)
 
+#### NT 2023.001: recompilar as aplicações
+As classes `Comb` e `Icms` receberam membros para o índice de mistura e o controle
+de presença de campos opcionais. Recompile a biblioteca e as aplicações que a utilizam.
+Nos CSTs monofásicos, quantidades opcionais não preenchidas passam a ser omitidas;
+chamar o setter com zero mantém a tag com zero. No CST 53, o mesmo vale para
+alíquota, valores e percentual de diferimento. `clear()` restaura a ausência.
+
 #### Membros das classes da NFe não podem mais ser copiados
 Os membros da árvore da NFe (`CppNFe`, `NotaFiscal`, `Nfe`, `InfNFe`, `Det`, `Prod`, ...) passaram de
 `std::shared_ptr` para `std::unique_ptr`. O acesso pelo `->` **não muda**, mas copiar um membro deixa de compilar.
@@ -77,6 +84,17 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
   a libxml2 precisa **recompilar a CppBrasil e a aplicação**. Isso vale também para os novos pacotes de dependências do Windows.
 
 ### Adicionado
+- NT 2023.001 v1.60: `Comb::pBio`, com leitura, escrita e limpeza, independente
+  do grupo de encerrante. Mantido o acesso legado por `Encerrante::pBio`, agora
+  inicializado e limpo corretamente; quando ambos forem preenchidos, o valor
+  definido por `Comb::set_pBio()` prevalece, inclusive zero para omitir a tag.
+- Leitura de `origComb`, dos campos monofásicos dos CSTs 02/15/53/61 e dos seis
+  totais correspondentes. Preservados os percentuais de redução, seus motivos,
+  as quantidades com até quatro casas nos itens e os totais com duas casas.
+- Consultas `Icms::has_qBCMono()`, `has_qBCMonoReten()`, `has_qBCMonoRet()`,
+  `has_adRemICMS()`, `has_vICMSMono()`, `has_vICMSMonoOp()`, `has_pDif()`,
+  `has_vICMSMonoDif()` e `has_pRedAdRem()` para distinguir campos opcionais
+  ausentes de valores explicitamente informados, inclusive zero.
 - Endereços dos serviços NF-e/NFC-e e consultas públicas atualizados.
   Corrigidos o uso de produção na homologação da
   NFC-e de SP, os serviços de GO apontando para CE, o retorno de autorização de GO,
@@ -203,6 +221,11 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Este arquivo de changelog.
 
 ### Corrigido
+- Leitura dos combustíveis: `pGNi`, `nBomba` e `vEncFin` passam a preencher seus
+  próprios campos, sem sobrescrever `pGNn`, `nBico` e `vEncIni`, respectivamente.
+- CST 15: `pRedAdRem=0` explicitamente informado é preservado na geração.
+  A sequência de redução exige também `motRedAdRem`; pares incompletos são
+  rejeitados pela validação por XSD.
 - Preservação do atributo `infEvento/@Id` na leitura do retorno de `WSEvento`.
 - Conversão de leitura dos CSTs do ICMS: agora usa a posição do enum, em vez do
   número fiscal, preservando também Part10/Part90/ST41/ST60. Antes a leitura podia
@@ -292,6 +315,51 @@ A lib foi testada com a libxml2 **2.12.10** e **2.15.4** (assinaturas idênticas
 - Exemplo `examples/QtCon-2022` (legado, sem manutenção).
 
 ### Orientações de uso das Notas Técnicas
+
+#### Combustíveis monofásicos — NT 2023.001 v1.60
+
+Use os grupos existentes em `det->imposto->ICMS`, com `CstICMS::ICMS02`,
+`ICMS15`, `ICMS53` ou `ICMS61`. A biblioteca conserva os valores informados;
+não calcula o imposto, os saldos ou os totais automaticamente.
+
+Informe o índice de mistura em `det->prod->comb->set_pBio(...)`: percentual
+de biodiesel no Diesel B ou de etanol anidro na Gasolina C, maior que zero e
+até 100, com até quatro casas. Zero omite a tag. O campo é filho de `comb`
+e pode ser utilizado sem dados de encerrante.
+
+Preencha cada origem em `comb->origComb->obj`, com `set_indImport(...)`,
+`set_cUFOrig(...)` e `set_pOrig(...)`, e confirme com `origComb->add()`.
+O leiaute permite até 30 origens. A exigência ou proibição de `pBio` e de
+`origComb` depende da tabela ANP e da operação, incluindo as exceções para
+consumidor final, complementar/devolução e CFOP 5922/6922. A v1.60 ativa
+LA18-10, que exige origem conforme a tabela e suas exceções.
+
+Nos CSTs 02/15/53, use `qBCMono`, `adRemICMS` e `vICMSMono`. No CST 15,
+preencha também `qBCMonoReten`, `adRemICMSReten` e `vICMSMonoReten`;
+se houver redução, informe juntos `pRedAdRem` e `motRedAdRem` (1 ou 9).
+No CST 53, os campos opcionais `vICMSMonoOp`, `pDif`, `vICMSMonoDif`
+e `vICMSMono` representam operação, percentual diferido, valor diferido
+e valor devido. Para diferimento total, informe `pDif=100` e os valores
+correspondentes, inclusive zero quando aplicável. No CST 61, use
+`qBCMonoRet`, `adRemICMSRet` e `vICMSMonoRet`.
+
+A v1.60 amplia a lista ANP especial de N41-10/N41-20 para incluir Diesel B.
+Na hipótese descrita para refinarias ou suas bases, a retenção do CST 15 usa
+`qBCMonoReten * adRemICMSReten * 0,3333`, com arredondamento a duas casas;
+o fator não se aplica indistintamente a todos os combustíveis. O exemplo
+da NT informa quantidade 140, alíquota 1,12 e retenção 52,26. São valores
+ilustrativos; utilize a alíquota e a mistura aplicáveis à operação.
+
+Preencha os seis totais monofásicos em `total->ICMSTot` com os somatórios
+correspondentes, a duas casas. Observe a inclusão de `vICMSMonoReten` em
+`vNF` conforme W16-10 e as demais regras vigentes de composição do total.
+Informe os textos exigidos pela seção 6 em `infAdic->infCpl` e em
+`det->infAdProd`; a biblioteca não os compõe automaticamente. A apresentação
+das informações adicionais por produto depende do componente de DANFE utilizado.
+
+`validar()` verifica a estrutura pelo XSD. Tabela ANP, unidade tributável,
+exceções, cálculos, tolerâncias e demais regras fiscais dependem dos dados
+preparados pela aplicação e das validações da SEFAZ. Utilize schemas atualizados.
 
 #### Evento ECONF (NT 2024.002 v1.00)
 O acesso é feito por `cppnfe->eventos->envEvento`. Preencha os eventos em `evento->obj`

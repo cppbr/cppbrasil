@@ -17,12 +17,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 #include "comb.h"
 
 Comb::Comb() :
     CIDE(new Cide), encerrante(new Encerrante), origComb(new Container<OrigComb>),
-    m_cProdANP(0), m_pGLP(0.0), m_pGNn(0.0), m_pGNi(0.0), m_vPart(0.0), m_qTemp(0.0)
+    m_pBio(0.0), m_pBioInformado(false), m_cProdANP(0), m_pGLP(0.0), m_pGNn(0.0), m_pGNi(0.0), m_vPart(0.0), m_qTemp(0.0)
 {
 
 }
@@ -33,6 +32,8 @@ Comb::~Comb()
 
 void Comb::clear()
 {
+    this->m_pBio = 0.0;
+    this->m_pBioInformado = false;
     this->m_cProdANP = 0;
     this->m_descANP.clear();
     this->m_pGLP = 0.0;
@@ -136,4 +137,15 @@ QString Comb::get_UFCons() const
 void Comb::set_UFCons(const QString &UFCons)
 {
     this->m_UFCons = UFCons;
+}
+
+double Comb::get_pBio() const
+{
+    return this->m_pBioInformado ? this->m_pBio : this->encerrante->get_pBio();
+}
+
+void Comb::set_pBio(const double &pBio)
+{
+    this->m_pBio = pBio;
+    this->m_pBioInformado = true;
 }

@@ -39,6 +39,7 @@ public:
     void set_vEncIni(const double &vEncIni);
     double get_vEncFin() const;
     void set_vEncFin(const double &vEncFin);
+    // Acesso legado: preferir Comb::get_pBio()/set_pBio().
     double get_pBio() const;
     void set_pBio(const double &pBio);
 
