@@ -54,10 +54,16 @@ public:
     QString get_UFCons() const;
     void set_UFCons(const QString &UFCons);
 
+    double get_pBio() const;
+    void set_pBio(const double &pBio);
+
     std::unique_ptr<Cide> CIDE;
     std::unique_ptr<Encerrante> encerrante;
     std::unique_ptr<Container<OrigComb>> origComb;
 private:
+    // O setter de Comb prevalece sobre o acesso legado em Encerrante.
+    double m_pBio;
+    bool m_pBioInformado;
     int m_cProdANP;
     QString m_descANP;
     double m_pGLP;

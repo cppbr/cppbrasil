@@ -792,6 +792,9 @@ void XmlWrite::get_prod(const int &i)
             this->m_xmlw->writeTextElement("vEncFin", CppUtility::doubleToStrDecimal(_encerrante->get_vEncFin(), 3));
             this->m_xmlw->writeEndElement();//fechamento grupo encerrante
         }
+        //pBio - LA17 (filho de comb, independente de encerrante)
+        if (_comb->get_pBio() != 0.0)
+            this->m_xmlw->writeTextElement("pBio", CppUtility::doubleToStrDecimal(_comb->get_pBio(), 4));
         //origComb - LA18
         if (_comb->origComb->count() > 0)
         {
@@ -886,7 +889,8 @@ void XmlWrite::get_ICMS(const int &i)
             //ICMS02 - N02a
             if (_icms->get_CST() == CstICMS::ICMS02)
             {
-                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
+                if (_icms->has_qBCMono())
+                    this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
                 this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(_icms->get_adRemICMS(), 4));
                 this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(_icms->get_vICMSMono(), 2));
             }
@@ -935,14 +939,16 @@ void XmlWrite::get_ICMS(const int &i)
             //ICMS15 - N03a
             if (_icms->get_CST() == CstICMS::ICMS15)
             {
-                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
+                if (_icms->has_qBCMono())
+                    this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
                 this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(_icms->get_adRemICMS(), 4));
                 this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(_icms->get_vICMSMono(), 2));
-                this->m_xmlw->writeTextElement("qBCMonoReten", CppUtility::doubleToStrDecimal(_icms->get_qBCMonoReten(), 4));
+                if (_icms->has_qBCMonoReten())
+                    this->m_xmlw->writeTextElement("qBCMonoReten", CppUtility::doubleToStrDecimal(_icms->get_qBCMonoReten(), 4));
                 this->m_xmlw->writeTextElement("adRemICMSReten", CppUtility::doubleToStrDecimal(_icms->get_adRemICMSReten(), 4));
                 this->m_xmlw->writeTextElement("vICMSMonoReten", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoReten(), 2));
 
-                if (_icms->get_pRedAdRem() > 0)
+                if (_icms->has_pRedAdRem())
                     this->m_xmlw->writeTextElement("pRedAdRem", CppUtility::doubleToStrDecimal(_icms->get_pRedAdRem(), 2));
 
                 if (_icms->get_motRedAdRem() != MotRedAdRem::None)
@@ -1064,13 +1070,18 @@ void XmlWrite::get_ICMS(const int &i)
             //ICMS53 - N07a
             if (_icms->get_CST() == CstICMS::ICMS53)
             {
-                this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
-                this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(_icms->get_adRemICMS(), 4));
-                this->m_xmlw->writeTextElement("vICMSMonoOp", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoOp(), 2));
-                if (_icms->get_pDif() > 0)
+                if (_icms->has_qBCMono())
+                    this->m_xmlw->writeTextElement("qBCMono", CppUtility::doubleToStrDecimal(_icms->get_qBCMono(), 4));
+                if (_icms->has_adRemICMS())
+                    this->m_xmlw->writeTextElement("adRemICMS", CppUtility::doubleToStrDecimal(_icms->get_adRemICMS(), 4));
+                if (_icms->has_vICMSMonoOp())
+                    this->m_xmlw->writeTextElement("vICMSMonoOp", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoOp(), 2));
+                if (_icms->has_pDif())
                     this->m_xmlw->writeTextElement("pDif", CppUtility::doubleToStrDecimal(_icms->get_pDif(), 4));
-                this->m_xmlw->writeTextElement("vICMSMonoDif", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoDif(), 2));
-                this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(_icms->get_vICMSMono(), 2));
+                if (_icms->has_vICMSMonoDif())
+                    this->m_xmlw->writeTextElement("vICMSMonoDif", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoDif(), 2));
+                if (_icms->has_vICMSMono())
+                    this->m_xmlw->writeTextElement("vICMSMono", CppUtility::doubleToStrDecimal(_icms->get_vICMSMono(), 2));
             }
 
             //ICMS60 - N08
@@ -1112,7 +1123,8 @@ void XmlWrite::get_ICMS(const int &i)
             //ICMS61 - N08a
             if (_icms->get_CST() == CstICMS::ICMS61)
             {
-                this->m_xmlw->writeTextElement("qBCMonoRet", CppUtility::doubleToStrDecimal(_icms->get_qBCMonoRet(), 4));
+                if (_icms->has_qBCMonoRet())
+                    this->m_xmlw->writeTextElement("qBCMonoRet", CppUtility::doubleToStrDecimal(_icms->get_qBCMonoRet(), 4));
                 this->m_xmlw->writeTextElement("adRemICMSRet", CppUtility::doubleToStrDecimal(_icms->get_adRemICMSRet(), 4));
                 this->m_xmlw->writeTextElement("vICMSMonoRet", CppUtility::doubleToStrDecimal(_icms->get_vICMSMonoRet(), 2));
             }

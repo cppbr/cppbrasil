@@ -1907,7 +1907,7 @@ void XmlRead::set_comb(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->det->obj->prod->comb->set_pGNn(_valor.toDouble());
+               nota->infNFe->det->obj->prod->comb->set_pGNi(_valor.toDouble());
         }
         if (xml.name() == QStringLiteral("vPart")) //LA03d
         {
@@ -1939,9 +1939,35 @@ void XmlRead::set_comb(QXmlStreamReader &xml) const
         //Grupo Informações do grupo de encerrante
         if (xml.name() == QStringLiteral("encerrante")) //LA11
           set_comb_encerrante(xml);
+        if (xml.name() == QStringLiteral("pBio")) //LA17
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->prod->comb->set_pBio(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("origComb")) //LA18
+            set_comb_origComb(xml);
 
         xml.readNext();
     }
+}
+
+void XmlRead::set_comb_origComb(QXmlStreamReader &xml) const
+{
+    auto *origens = nota->infNFe->det->obj->prod->comb->origComb.get();
+    origens->obj->clear();
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("indImport"))
+            origens->obj->set_indImport(ConvNF::strToIndImport(xml.readElementText()));
+        else if (xml.name() == QStringLiteral("cUFOrig"))
+            origens->obj->set_cUFOrig(xml.readElementText().toInt());
+        else if (xml.name() == QStringLiteral("pOrig"))
+            origens->obj->set_pOrig(xml.readElementText().toDouble());
+        else
+            xml.skipCurrentElement();
+    }
+    origens->add();
 }
 
 void XmlRead::set_comb_CIDE(QXmlStreamReader &xml) const
@@ -1989,7 +2015,7 @@ void XmlRead::set_comb_encerrante(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->det->obj->prod->comb->encerrante->set_nBico(_valor.toInt());
+               nota->infNFe->det->obj->prod->comb->encerrante->set_nBomba(_valor.toInt());
         }
         if (xml.name() == QStringLiteral("nTanque")) //LA14
         {
@@ -2007,7 +2033,7 @@ void XmlRead::set_comb_encerrante(QXmlStreamReader &xml) const
         {
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
-               nota->infNFe->det->obj->prod->comb->encerrante->set_vEncIni(_valor.toDouble());
+               nota->infNFe->det->obj->prod->comb->encerrante->set_vEncFin(_valor.toDouble());
         }
 
         xml.readNext();
@@ -2413,6 +2439,85 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->imposto->ICMS->set_vFCPEfet(_valor.toDouble());
+        }
+
+        if (xml.name() == QStringLiteral("qBCMono"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_qBCMono(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("adRemICMS"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_adRemICMS(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMono"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_vICMSMono(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("qBCMonoReten"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_qBCMonoReten(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("adRemICMSReten"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_adRemICMSReten(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoReten"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_vICMSMonoReten(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("pRedAdRem"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_pRedAdRem(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoOp"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_vICMSMonoOp(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoDif"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_vICMSMonoDif(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("qBCMonoRet"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_qBCMonoRet(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("adRemICMSRet"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_adRemICMSRet(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoRet"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_vICMSMonoRet(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("motRedAdRem"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->det->obj->imposto->ICMS->set_motRedAdRem(ConvNF::strToMotRedAdRem(_valor));
         }
 
         xml.readNext();
@@ -3127,6 +3232,43 @@ void XmlRead::set_ICMSTot(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->total->ICMSTot->set_vTotTrib(_valor.toDouble());
+        }
+
+        if (xml.name() == QStringLiteral("qBCMono"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_qBCMono(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMono"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_vICMSMono(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("qBCMonoReten"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_qBCMonoReten(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoReten"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_vICMSMonoReten(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("qBCMonoRet"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_qBCMonoRet(_valor.toDouble());
+        }
+        if (xml.name() == QStringLiteral("vICMSMonoRet"))
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+                nota->infNFe->total->ICMSTot->set_vICMSMonoRet(_valor.toDouble());
         }
 
         xml.readNext();

@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "encerrante.h"
 
-Encerrante::Encerrante():m_nBico(0), m_nBomba(0), m_nTanque(0), m_vEncIni(0.0), m_vEncFin(0.0)
+Encerrante::Encerrante():m_nBico(0), m_nBomba(0), m_nTanque(0), m_vEncIni(0.0), m_vEncFin(0.0), m_pBio(0.0)
 {
 }
 
@@ -30,6 +30,7 @@ Encerrante::~Encerrante()
 
 void Encerrante::clear()
 {
+    this->m_pBio = 0.0;
     this->m_nBico = 0;
     this->m_nBomba = 0;
     this->m_nTanque = 0;

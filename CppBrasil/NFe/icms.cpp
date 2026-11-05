@@ -17,7 +17,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 #include "icms.h"
 
 Icms::Icms(): m_indDeduzDeson(IndDeduzDeson::None), m_orig(Orig::None), m_CST(CstICMS::None), m_CSOSN(CsosnICMS::None),
@@ -42,6 +41,13 @@ Icms::~Icms()
 
 void Icms::clear()
 {
+    this->m_pRedAdRemInformado = false;
+    this->m_vICMSMonoDifInformado = false;
+    this->m_pDifInformado = false;
+    this->m_vICMSMonoOpInformado = false;
+    this->m_vICMSMonoInformado = false;
+    this->m_adRemICMSInformado = false;
+    this->m_qBCMonoInformado = false;
     this->m_indDeduzDeson = IndDeduzDeson::None;
     this->m_orig = Orig::None;
     this->m_CST = CstICMS::None;
@@ -94,6 +100,7 @@ void Icms::clear()
     this->m_adRemICMS = 0.0;
     this->m_vICMSMono = 0.0;
     this->m_qBCMonoReten = 0.0;
+    this->m_qBCMonoRetenInformado = false;
     this->m_adRemICMSReten = 0.0;
     this->m_vICMSMonoReten = 0.0;
     this->m_pRedAdRem = 0.0;
@@ -101,6 +108,7 @@ void Icms::clear()
     this->m_vICMSMonoOp = 0.0;
     this->m_vICMSMonoDif = 0.0;
     this->m_qBCMonoRet = 0.0;
+    this->m_qBCMonoRetInformado = false;
     this->m_adRemICMSRet = 0.0;
     this->m_vICMSMonoRet = 0.0;
 
@@ -334,6 +342,7 @@ double Icms::get_pDif() const
 void Icms::set_pDif(const double &pDif)
 {
     this->m_pDif = pDif;
+    this->m_pDifInformado = true;
 }
 
 double Icms::get_vICMSDif() const
@@ -584,6 +593,7 @@ double Icms::get_qBCMono() const
 void Icms::set_qBCMono(const double &qBCMono)
 {
     this->m_qBCMono = qBCMono;
+    this->m_qBCMonoInformado = true;
 }
 
 double Icms::get_adRemICMS() const
@@ -594,6 +604,7 @@ double Icms::get_adRemICMS() const
 void Icms::set_adRemICMS(const double &adRemICMS)
 {
     this->m_adRemICMS = adRemICMS;
+    this->m_adRemICMSInformado = true;
 }
 
 double Icms::get_vICMSMono() const
@@ -604,6 +615,7 @@ double Icms::get_vICMSMono() const
 void Icms::set_vICMSMono(const double &vICMSMono)
 {
     this->m_vICMSMono = vICMSMono;
+    this->m_vICMSMonoInformado = true;
 }
 
 double Icms::get_qBCMonoReten() const
@@ -614,6 +626,7 @@ double Icms::get_qBCMonoReten() const
 void Icms::set_qBCMonoReten(const double &qBCMonoReten)
 {
     this->m_qBCMonoReten = qBCMonoReten;
+    this->m_qBCMonoRetenInformado = true;
 }
 
 double Icms::get_adRemICMSReten() const
@@ -644,6 +657,7 @@ double Icms::get_pRedAdRem() const
 void Icms::set_pRedAdRem(const double &pRedAdRem)
 {
     this->m_pRedAdRem = pRedAdRem;
+    this->m_pRedAdRemInformado = true;
 }
 
 MotRedAdRem Icms::get_motRedAdRem() const
@@ -664,6 +678,7 @@ double Icms::get_vICMSMonoOp() const
 void Icms::set_vICMSMonoOp(const double &vICMSMonoOp)
 {
     this->m_vICMSMonoOp = vICMSMonoOp;
+    this->m_vICMSMonoOpInformado = true;
 }
 
 double Icms::get_vICMSMonoDif() const
@@ -674,6 +689,7 @@ double Icms::get_vICMSMonoDif() const
 void Icms::set_vICMSMonoDif(const double &vICMSMonoDif)
 {
     this->m_vICMSMonoDif = vICMSMonoDif;
+    this->m_vICMSMonoDifInformado = true;
 }
 
 double Icms::get_qBCMonoRet() const
@@ -684,6 +700,7 @@ double Icms::get_qBCMonoRet() const
 void Icms::set_qBCMonoRet(const double &qBCMonoRet)
 {
     this->m_qBCMonoRet = qBCMonoRet;
+    this->m_qBCMonoRetInformado = true;
 }
 
 double Icms::get_adRemICMSRet() const
@@ -714,4 +731,49 @@ IndDeduzDeson Icms::get_indDeduzDeson() const
 void Icms::set_indDeduzDeson(const IndDeduzDeson &indDeduzDeson)
 {
     this->m_indDeduzDeson = indDeduzDeson;
+}
+
+bool Icms::has_qBCMono() const
+{
+    return this->m_qBCMonoInformado;
+}
+
+bool Icms::has_adRemICMS() const
+{
+    return this->m_adRemICMSInformado;
+}
+
+bool Icms::has_vICMSMono() const
+{
+    return this->m_vICMSMonoInformado;
+}
+
+bool Icms::has_vICMSMonoOp() const
+{
+    return this->m_vICMSMonoOpInformado;
+}
+
+bool Icms::has_pDif() const
+{
+    return this->m_pDifInformado;
+}
+
+bool Icms::has_vICMSMonoDif() const
+{
+    return this->m_vICMSMonoDifInformado;
+}
+
+bool Icms::has_pRedAdRem() const
+{
+    return this->m_pRedAdRemInformado;
+}
+
+bool Icms::has_qBCMonoReten() const
+{
+    return this->m_qBCMonoRetenInformado;
+}
+
+bool Icms::has_qBCMonoRet() const
+{
+    return this->m_qBCMonoRetInformado;
 }
