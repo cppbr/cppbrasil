@@ -249,9 +249,9 @@ void Nfe::gerarChaveAcesso()
     QString cUF = QString::number(this->infNFe->ide->get_cUF());  //Código da UF do emitente do Documento Fiscal
     cUF = CppUtility::insZeroLeft(cUF, 2);
     QString dhEmi = this->infNFe->ide->get_dhEmi().toString("yyMM"); //AAMM - Ano e Mês de emissão da NF-e
-    QString cnpj_cpf = (!this->infNFe->emite->get_CNPJ().isEmpty() ?
-                        this->infNFe->emite->get_CNPJ() :
-                        CppUtility::insZeroLeft(this->infNFe->emite->get_CPF(), 14)) ; //CNPJ ou CPF do emitente
+    const bool usaCnpj = !this->infNFe->emite->get_CNPJ().isEmpty();
+    const QString cnpj_cpf = usaCnpj ? this->infNFe->emite->get_CNPJ()
+                                    : CppUtility::insZeroLeft(this->infNFe->emite->get_CPF(), 14);
     QString mod = ConvNF::modeloDFToStr(this->infNFe->ide->get_mod());//Modelo do Documento Fiscal
     QString serie = QString::number(this->infNFe->ide->get_serie());//Serie do Documento Fiscal
     serie = CppUtility::insZeroLeft(serie, 3);
@@ -262,12 +262,14 @@ void Nfe::gerarChaveAcesso()
     cNF = CppUtility::insZeroLeft(cNF, 8);
     QString chaveNF = QString("%1%2%3%4%5%6%7%8").arg(cUF, dhEmi, cnpj_cpf, mod, serie, nf,
                                                       tpemis, cNF);
-    //a chave sem o DV deve ter 43 digitos numericos, caso contrario a SEFAZ rejeita a nota.
-    static const QRegularExpression _re43(QStringLiteral("^\\d{43}$"));
-    if (!_re43.match(chaveNF).hasMatch())
+    // A chave sem o DV admite letras apenas nas 12 primeiras posições do CNPJ.
+    static const QRegularExpression formatoChave(QStringLiteral("^[0-9]{6}[0-9A-Z]{12}[0-9]{25}\\z"));
+    static const QRegularExpression formatoCpf(QStringLiteral("^[0-9]{14}\\z"));
+    if (cnpj_cpf.size() != 14 || !formatoChave.match(chaveNF).hasMatch() ||
+        (!usaCnpj && !formatoCpf.match(cnpj_cpf).hasMatch()))
     {
-        this->m_error = "Chave de acesso invalida (" + chaveNF + "): verifique cUF, dhEmi, CNPJ/CPF do emitente "
-                        "(somente numeros), mod, serie, nNF, tpEmis e cNF.";
+        this->m_error = "Chave de acesso invalida (" + chaveNF + "): verifique cUF, dhEmi, CNPJ/CPF do emitente, "
+                        "mod, serie, nNF, tpEmis e cNF.";
         return;
     }
     QString cdv = QString::number(CppUtility::dvModulo11(chaveNF)); //Digito Verificador da Chave de Acesso

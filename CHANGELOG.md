@@ -508,6 +508,17 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Corrigido
 
+#### Chave de acesso com CNPJ alfanumérico — NT 2026.004 v1.01
+
+- A geração da chave da NF-e e da NFC-e aceita letras nas 12 primeiras
+  posições do CNPJ e calcula o dígito verificador com o valor ASCII menos 48.
+- As validações de cancelamento, substituição, manifestação e prorrogação
+  aceitam chaves alfanuméricas. A validação XML dos eventos requer schemas
+  compatíveis com os respectivos identificadores.
+- A validação local com certificado digital cobriu a assinatura e a
+  reimportação de NF-e e NFC-e com emitente alfanumérico, o QR Code v3
+  on-line e em contingência e a assinatura dos eventos testados.
+
 #### Destinatário, transporte e referência da NF-e — NT 2022.002 v1.30a
 
 - A NF-e grava um único identificador do destinatário. Em operações com o
