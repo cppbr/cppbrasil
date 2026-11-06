@@ -8,6 +8,16 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Produtos agropecuários — NT 2024.003 v1.10
+
+- Leia e gere o grupo opcional `agropecuario` da NF-e e da NFC-e em
+  `InfNFe::agropecuario`. Preencha de 1 a 20 receituários em `defensivo`,
+  confirmando cada registro com `add()`, ou preencha uma única
+  `guiaTransito`, com série opcional.
+- A leitura e a geração preservam os zeros à esquerda no CPF do responsável
+  técnico e no número da guia. Recompile a biblioteca e as aplicações devido
+  à alteração na classe `InfNFe`.
+
 #### Manifestação do destinatário — NT 2020.001 v1.60
 
 - Envie Confirmação da Operação (210200), Ciência da Operação (210210),

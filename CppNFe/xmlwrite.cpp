@@ -34,6 +34,18 @@ XmlWrite::~XmlWrite()
 
 bool XmlWrite::gerarXML(QByteArray *output)
 {
+    const auto &agropecuario = *m_infNFe->agropecuario;
+    if (agropecuario.defensivo->count() > 20)
+    {
+        qWarning() << "O grupo agropecuario aceita até 20 defensivos.";
+        return false;
+    }
+    if (!agropecuario.defensivo->isEmpty() && !agropecuario.guiaTransito->isEmpty())
+    {
+        qWarning() << "Informe defensivos ou guia de trânsito no grupo agropecuario.";
+        return false;
+    }
+
     try{
         gerarNFE();
         output->append(this->m_strXML.data());
@@ -245,6 +257,7 @@ void XmlWrite::get_infNFe()
     get_compra();
     get_cana();
     get_infRespTec();
+    get_agropecuario();
     this->m_xmlw->writeEndElement();//fechamento grupo infNFe
 }
 
@@ -2523,6 +2536,37 @@ void XmlWrite::get_infRespTec()
         }
         this->m_xmlw->writeEndElement();//fechamento grupo infRespTec
     }
+}
+
+void XmlWrite::get_agropecuario()
+{
+    const auto &agropecuario = *m_infNFe->agropecuario;
+    const auto &defensivos = *agropecuario.defensivo;
+    const auto &guia = *agropecuario.guiaTransito;
+    const bool temDefensivos = !defensivos.isEmpty();
+    const bool temGuia = !guia.isEmpty();
+    if (!temDefensivos && !temGuia)
+        return;
+
+    m_xmlw->writeStartElement("agropecuario");
+    for (const auto *defensivo : defensivos)
+    {
+        m_xmlw->writeStartElement("defensivo");
+        m_xmlw->writeTextElement("nReceituario", defensivo->get_nReceituario());
+        m_xmlw->writeTextElement("CPFRespTec", defensivo->get_CPFRespTec());
+        m_xmlw->writeEndElement();
+    }
+    if (temGuia)
+    {
+        m_xmlw->writeStartElement("guiaTransito");
+        m_xmlw->writeTextElement("tpGuia", QString::number(guia.get_tpGuia()));
+        m_xmlw->writeTextElement("UFGuia", guia.get_UFGuia());
+        if (!guia.get_serieGuia().isEmpty())
+            m_xmlw->writeTextElement("serieGuia", guia.get_serieGuia());
+        m_xmlw->writeTextElement("nGuia", guia.get_nGuia());
+        m_xmlw->writeEndElement();
+    }
+    m_xmlw->writeEndElement();
 }
 
 void XmlWrite::get_infNFeSupl_ONLINE()

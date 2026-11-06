@@ -43,6 +43,7 @@ limitations under the License.
 #include <CppNFe/cana.h>
 #include <CppNFe/infresptec.h>
 #include <CppNFe/infintermed.h>
+#include <CppNFe/agropecuario.h>
 
 class CPPNFE_EXPORT InfNFe
 {
@@ -73,6 +74,7 @@ public:
     std::unique_ptr<Compra> compra;
     std::unique_ptr<Cana> cana;
     std::unique_ptr<InfRespTec> infRespTec;
+    std::unique_ptr<Agropecuario> agropecuario;
 
 private:
     QString m_versao;

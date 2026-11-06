@@ -105,6 +105,7 @@ private:
     void get_compra();
     void get_cana();
     void get_infRespTec();
+    void get_agropecuario();
     void get_infNFeSupl_ONLINE();
     void gerarNFE();
 };

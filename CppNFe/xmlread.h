@@ -135,6 +135,9 @@ private:
     void set_cana_deduc(QXmlStreamReader &xml) const; //ZC10 - sub-grupo Deduções – Taxas e Contribuições
 
     void set_infRespTec(QXmlStreamReader &xml) const; //ZD01 - Grupo ZD. Informações do Responsável Técnico
+    void set_agropecuario(QXmlStreamReader &xml) const; //ZF01
+    void set_defensivo(QXmlStreamReader &xml) const; //ZF02
+    void set_guiaTransito(QXmlStreamReader &xml) const; //ZF04
 
     void set_infNFeSupl(QXmlStreamReader &xml) const; //Grupo ZX. Informações Suplementares da Nota Fiscal
 };

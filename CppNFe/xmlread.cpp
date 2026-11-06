@@ -42,7 +42,8 @@ bool XmlRead::nfe() const
         if (_xml.tokenType() == QXmlStreamReader::StartElement && _xml.name() == QStringLiteral("NFe"))
         {
             nota->set_XMLOriginal("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + CppUtility::extractStr(this->m_xml, "<NFe xmlns", "</NFe>"));
-            while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("NFe")))
+            while (!_xml.atEnd() &&
+                   !(_xml.isEndElement() && _xml.name() == QStringLiteral("NFe")))
             {
                 _ret = true; //encontrou o grupo NFe _ret será true
                  attributes = _xml.attributes();
@@ -85,13 +86,13 @@ bool XmlRead::nfe() const
          _xml.readNext();
      }
 
-    return _ret;
+    return _ret && !_xml.hasError();
 }
 
 void XmlRead::set_infNFe(QXmlStreamReader &xml) const
 {
     //A01 - infNFe
-    while(!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == QStringLiteral("infNFe")))
+    while (!xml.atEnd() && !(xml.isEndElement() && xml.name() == QStringLiteral("infNFe")))
     {
         //Grupo B. Identificação da Nota Fiscal eletrônica
         if (xml.name() == QStringLiteral("ide")) //B01
@@ -164,6 +165,10 @@ void XmlRead::set_infNFe(QXmlStreamReader &xml) const
         //Grupo ZD. Informações do Responsável Técnico
         if (xml.name() == QStringLiteral("infRespTec")) //ZD01
           set_infRespTec(xml);
+
+        //Grupo ZF. Produtos da Agricultura, Pecuária e Produção Florestal
+        if (xml.isStartElement() && xml.name() == QStringLiteral("agropecuario")) //ZF01
+          set_agropecuario(xml);
 
         xml.readNext();
     }
@@ -4212,6 +4217,53 @@ void XmlRead::set_infRespTec(QXmlStreamReader &xml) const
         }
 
         xml.readNext();
+    }
+}
+
+void XmlRead::set_agropecuario(QXmlStreamReader &xml) const
+{
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("defensivo"))
+            set_defensivo(xml);
+        else if (xml.name() == QStringLiteral("guiaTransito"))
+            set_guiaTransito(xml);
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void XmlRead::set_defensivo(QXmlStreamReader &xml) const
+{
+    auto &defensivos = *nota->infNFe->agropecuario->defensivo;
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("nReceituario"))
+            defensivos.obj->set_nReceituario(xml.readElementText());
+        else if (xml.name() == QStringLiteral("CPFRespTec"))
+            defensivos.obj->set_CPFRespTec(xml.readElementText());
+        else
+            xml.skipCurrentElement();
+    }
+    if (!xml.hasError())
+        defensivos.add();
+}
+
+void XmlRead::set_guiaTransito(QXmlStreamReader &xml) const
+{
+    auto &guia = *nota->infNFe->agropecuario->guiaTransito;
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("tpGuia"))
+            guia.set_tpGuia(xml.readElementText().toInt());
+        else if (xml.name() == QStringLiteral("UFGuia"))
+            guia.set_UFGuia(xml.readElementText());
+        else if (xml.name() == QStringLiteral("serieGuia"))
+            guia.set_serieGuia(xml.readElementText());
+        else if (xml.name() == QStringLiteral("nGuia"))
+            guia.set_nGuia(xml.readElementText());
+        else
+            xml.skipCurrentElement();
     }
 }
 

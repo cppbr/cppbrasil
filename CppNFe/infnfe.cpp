@@ -24,7 +24,7 @@ InfNFe::InfNFe():ide(new Ide), emite(new Emit), avulsa(new Avulsa), dest(new Des
     retirada(new Retirada), entrega(new Entrega), autXML(new Container<AutXML>),
     det(new Container<Det>), total(new Total), transp(new Transp), cobr(new Cobr),
     pag(new Pag), infIntermed(new InfIntermed), infAdic(new InfAdic), exporta(new Exporta),
-    compra(new Compra), cana(new Cana), infRespTec(new InfRespTec)
+    compra(new Compra), cana(new Cana), infRespTec(new InfRespTec), agropecuario(new Agropecuario)
 {
 }
 
@@ -55,6 +55,7 @@ void InfNFe::clear()
     this->compra->clear();
     this->cana->clear();
     this->infRespTec->clear();
+    this->agropecuario->clear();
 }
 
 QString InfNFe::get_versao() const
