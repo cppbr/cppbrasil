@@ -4,6 +4,8 @@ add_library(CppNFe SHARED
     cppnfe.cpp
     adi.h
     adi.cpp
+    agropecuario.h
+    agropecuario.cpp
     arma.h
     arma.cpp
     autxml.h
