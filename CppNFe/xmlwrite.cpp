@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "xmlwrite.h"
 #include "retornonfe.h"
+#include <QStringList>
 
 XmlWrite::XmlWrite(const InfNFe *infNFe, const ConfigNFe *confgNFe): m_infNFe(infNFe),
     m_confgNFe(confgNFe), m_xmlw(new QXmlStreamWriter(&this->m_strXML))
@@ -47,6 +48,10 @@ QByteArray XmlWrite::get_infNFeSupl_OFFLINE(const QString &chave, const VersaoQr
   const TpAmb &tpAmb, const QDateTime &emissao, const double &vNF, const QString &digestValue,
   const QString &idCSC, const QString &CSC, const int &codigoUF, const bool &element_infNFeSupl)
 {
+    // Este método recebe os dados do CSC e do DigestValue usados na versão 2.
+    if (versaoQrcodeNF == VersaoQrCodeNF::v300)
+        return {};
+
     //infNFeSupl - ZX01
     QString _chave, _versaoQr, _ambiente, _diaEmiss, _valornf, _digest, _idcsc, _csc;
     QString _qrcode, _inputHash, _xml;
@@ -90,6 +95,62 @@ QByteArray XmlWrite::get_infNFeSupl_OFFLINE(const QString &chave, const VersaoQr
     _xml += QStringLiteral("</a>");
 
     return _xml.toLocal8Bit();
+}
+
+VersaoQrCodeNF XmlWrite::versaoQrCode(const InfNFe &infNFe, const ConfigNFe &config)
+{
+    if (!infNFe.emite->get_CPF().isEmpty() && ConvNF::intToUF(infNFe.ide->get_cUF()) != UF::PR)
+        return VersaoQrCodeNF::v300;
+    return config.get_VersaoQrCodeNF();
+}
+
+QByteArray XmlWrite::get_infNFeSupl_OFFLINE_V3(const QString &chave, const InfNFe &infNFe,
+                                            CppCrypto &crypto, QString &erro)
+{
+    const auto &ide = *infNFe.ide;
+    const auto &dest = *infNFe.dest;
+    QString tipoDocumento;
+    QString documento;
+    if (!dest.get_CNPJ().isEmpty())
+    {
+        tipoDocumento = QStringLiteral("1");
+        documento = dest.get_CNPJ();
+    }
+    else if (!dest.get_CPF().isEmpty())
+    {
+        tipoDocumento = QStringLiteral("2");
+        documento = dest.get_CPF();
+    }
+    else if (!dest.get_idEstrangeiro().isEmpty())
+        tipoDocumento = QStringLiteral("3");
+
+    const QStringList campos{chave, QStringLiteral("3"), ConvNF::tpAmbToStr(ide.get_tpAmb()),
+                             ide.get_dhEmi().toString(QStringLiteral("dd")),
+                             CppUtility::doubleToStrDecimal(infNFe.total->ICMSTot->get_vNF(), 2),
+                             tipoDocumento, documento};
+    const QString parametros = campos.join(QLatin1Char('|'));
+    QByteArray assinatura;
+    if (!crypto.signature(HashType::sha1, parametros.toUtf8(), true, assinatura) || assinatura.isEmpty())
+    {
+        erro = QStringLiteral("Erro ao assinar o QR Code da NFC-e em contingência.");
+        if (!crypto.get_error().isEmpty())
+            erro += QLatin1Char(' ') + crypto.get_error();
+        return {};
+    }
+
+    const auto uf = ConvNF::intToUF(ide.get_cUF());
+    const auto versao = VersaoQrCodeNF::v300;
+    const QString url = UrlNFe::get_qrCode(uf, ide.get_tpAmb(), versao) + QStringLiteral("?p=") +
+                        parametros + QLatin1Char('|') + QString::fromLatin1(assinatura);
+    QByteArray xml;
+    QXmlStreamWriter writer(&xml);
+    writer.writeStartElement("a");
+    writer.writeStartElement("infNFeSupl");
+    writer.writeTextElement("qrCode", url);
+    writer.writeTextElement("urlChave", UrlNFe::get_urlChave(uf, ide.get_tpAmb(), versao));
+    writer.writeEndElement();
+    writer.writeEndElement();
+    return xml;
 }
 
 QByteArray XmlWrite::get_protNFe(const QString &versao, const QString &Id,
@@ -375,15 +436,17 @@ void XmlWrite::get_dest()
     {
         if (!_dest->get_CNPJ().isEmpty() ||
             !_dest->get_CPF().isEmpty()  ||
+            !_dest->get_idEstrangeiro().isEmpty() ||
             !_dest->get_xNome().isEmpty())
         {
             this->m_xmlw->writeStartElement("dest");//abertura grupo dest
             //cnpj ou cpf não os dois ou nenhum para 65
             if (!_dest->get_CNPJ().isEmpty())
                 this->m_xmlw->writeTextElement("CNPJ", _dest->get_CNPJ());
-            else
-                if (!_dest->get_CPF().isEmpty())
-                    this->m_xmlw->writeTextElement("CPF", _dest->get_CPF());
+            else if (!_dest->get_CPF().isEmpty())
+                this->m_xmlw->writeTextElement("CPF", _dest->get_CPF());
+            else if (!_dest->get_idEstrangeiro().isEmpty())
+                this->m_xmlw->writeTextElement("idEstrangeiro", _dest->get_idEstrangeiro());
             //xNome opcional para a NFC-e->
             if (!_dest->get_xNome().isEmpty())
             {
@@ -2438,42 +2501,37 @@ void XmlWrite::get_infRespTec()
 
 void XmlWrite::get_infNFeSupl_ONLINE()
 {
-    Ide *_ide = this->m_infNFe->ide.get();
-    //infNFeSupl - ZX01
-    //Caso NFCe e Normal, já devolve o xml com o nó infNFeSupl
-     if ((_ide->get_mod() == ModeloDF::NFCe) &&
-         (_ide->get_tpEmis() == TpEmis::Normal))
-     {
-         QString _chave, _versaoQr, _ambiente, _idcsc, _csc, _qrcode, _inputHash;
-         QByteArray _resHash;
-         _chave = QString(this->m_infNFe->get_Id()).right(this->m_infNFe->get_Id().length() - 3); //remove NFe da string
-         _versaoQr = ConvNF::versaoQrCodeNFToStr(this->m_confgNFe->get_VersaoQrCodeNF()).left(1);//apenas o primeiro numero da versão
-         _ambiente = ConvNF::tpAmbToStr(_ide->get_tpAmb());
-         if (!this->m_confgNFe->get_IdCSC().isEmpty()) //não pode ser empty se não daria erro na conversao para inteiro
-           _idcsc = QString::number(this->m_confgNFe->get_IdCSC().toInt());
-         _csc = this->m_confgNFe->get_CSC();
+    const auto &ide = *this->m_infNFe->ide;
+    if (ide.get_mod() != ModeloDF::NFCe)
+        return;
 
-         _qrcode = _chave + QStringLiteral("|") + _versaoQr + QStringLiteral("|") +
-                   _ambiente + QStringLiteral("|") + _idcsc ;
-         _inputHash = _qrcode + _csc;
-         //calc sha1
-         HashType _sha1 = HashType::sha1;
-         if (!CppOpenSSL::digest_s(_sha1, _inputHash.toLocal8Bit(), false, _resHash))
-           qWarning() << "Erro ao gerar hash da tag infNFeSupl";
+    const auto versao = versaoQrCode(*this->m_infNFe, *this->m_confgNFe);
+    if (versao == VersaoQrCodeNF::v300 ? ide.get_tpEmis() == TpEmis::Contingencia_NFCe
+                                     : ide.get_tpEmis() != TpEmis::Normal)
+        return;
 
-         _qrcode += QStringLiteral("|") + QString(_resHash.toHex().toUpper());
-         //url
-         QString _urlqrcode = UrlNFe::get_qrCode(ConvNF::intToUF(_ide->get_cUF()), _ide->get_tpAmb(), this->m_confgNFe->get_VersaoQrCodeNF());
-         QString _urlchave = UrlNFe::get_urlChave(ConvNF::intToUF(_ide->get_cUF()), _ide->get_tpAmb(), this->m_confgNFe->get_VersaoQrCodeNF());
+    const auto uf = ConvNF::intToUF(ide.get_cUF());
+    QString parametros = this->m_infNFe->get_Id().mid(3) + QLatin1Char('|') +
+                         ConvNF::versaoQrCodeNFToStr(versao).left(1) + QLatin1Char('|') +
+                         ConvNF::tpAmbToStr(ide.get_tpAmb());
+    if (versao != VersaoQrCodeNF::v300)
+    {
+        const QString idCSC = this->m_confgNFe->get_IdCSC();
+        parametros += QLatin1Char('|');
+        if (!idCSC.isEmpty())
+            parametros += QString::number(idCSC.toInt());
+        const QString entradaHash = parametros + this->m_confgNFe->get_CSC();
+        QByteArray hash;
+        if (!CppOpenSSL::digest_s(HashType::sha1, entradaHash.toLocal8Bit(), false, hash))
+            qWarning() << "Erro ao gerar hash da tag infNFeSupl";
+        parametros += QLatin1Char('|') + QString::fromLatin1(hash.toHex().toUpper());
+    }
 
-         _qrcode = _urlqrcode + QStringLiteral("?p=") + _qrcode;
-
-
-         this->m_xmlw->writeStartElement("infNFeSupl");//abertura grupo infNFeSupl
-         this->m_xmlw->writeTextElement("qrCode", _qrcode);
-         this->m_xmlw->writeTextElement("urlChave", _urlchave);
-         this->m_xmlw->writeEndElement();//fechamento grupo infNFeSupl
-     }
+    const QString url = UrlNFe::get_qrCode(uf, ide.get_tpAmb(), versao) + QStringLiteral("?p=") + parametros;
+    this->m_xmlw->writeStartElement("infNFeSupl");
+    this->m_xmlw->writeTextElement("qrCode", url);
+    this->m_xmlw->writeTextElement("urlChave", UrlNFe::get_urlChave(uf, ide.get_tpAmb(), versao));
+    this->m_xmlw->writeEndElement();
 }
 
 void XmlWrite::gerarNFE()
@@ -2483,13 +2541,7 @@ void XmlWrite::gerarNFE()
     this->m_xmlw->writeStartElement("NFe");
     this->m_xmlw->writeAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe");
     get_infNFe();
-    //só gera o nó infNFeSupl caso for nfce e normal, a offline só será gerada
-    //após a assinatura da nfce
-    if (this->m_infNFe->ide->get_mod() == ModeloDF::NFCe)
-    {
-        if (this->m_infNFe->ide->get_tpEmis() == TpEmis::Normal)
-            get_infNFeSupl_ONLINE();
-    }
+    get_infNFeSupl_ONLINE();
     this->m_xmlw->writeEndElement(); //fechamento NFe
 }
 

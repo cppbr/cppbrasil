@@ -8,6 +8,18 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### NFC-e e NF-e — NT 2025.001 v1.03
+
+- Selecione `VersaoQrCodeNF::v300` para emitir NFC-e com QR Code versão 3
+  sem CSC. Na contingência, a biblioteca assina os parâmetros do QR Code com
+  o mesmo certificado digital usado no XML.
+- A NFC-e com emitente identificado por CPF usa automaticamente o QR Code
+  versão 3, exceto no Paraná, onde segue a configuração. A versão 2 continua
+  disponível para os demais emitentes. O destinatário da NFC-e pode ser
+  identificado por documento estrangeiro.
+- `TPag::PagamentoPosterior` (`tPag=91`) está disponível na leitura e na
+  geração de NF-e e NFC-e. Informe `vPag=0.00` para essa forma de pagamento.
+
 #### Benefícios fiscais do ICMS — NT 2019.001 v1.70
 
 - Leia e grave até quatro créditos presumidos por item em `Prod::gCred`.
@@ -307,6 +319,11 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
   que permitem escrever `for (auto *x : *container)`.
 
 ### Modificado
+
+#### Autorização — NT 2025.001 v1.03
+
+- Lotes com uma única NF-e ou NFC-e solicitam resposta síncrona
+  automaticamente e tratam o retorno sem consultar recibo.
 
 #### Estrutura do projeto
 

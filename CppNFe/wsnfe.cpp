@@ -169,6 +169,16 @@ WSNFe::~WSNFe()
 
 bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLayout)
 {
+    // O conteúdo do lote é recebido como uma sequência de elementos NFe.
+    QXmlStreamReader notas(QByteArray("<lote>") + xml + "</lote>");
+    IndSinc indSinc = this->confgNFe->get_indicadorSincrono();
+    if (notas.readNextStartElement() && notas.readNextStartElement())
+    {
+        notas.skipCurrentElement();
+        if (!notas.readNextStartElement() && !notas.hasError())
+            indSinc = IndSinc::Sim;
+    }
+
     //versão do layout
     set_verLayout(verLayout);
     StatusRetorno _ret = StatusRetorno::EmProcessamento;
@@ -183,7 +193,7 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
       _timeout = 8000;
 
     //gera xml do lote na var m_msgEnvio
-    if (gerarXMLlote(numLote, xml))
+    if (gerarXMLlote(numLote, xml, indSinc))
     {
         //enviando mensagem
         emit wsChange(WebServicesNF::NFeAutorizacao);
@@ -193,7 +203,7 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
         if (this->get_error().isEmpty())
         {
             //caso seja sincrono, apenas trata o retorno já que o lote vem junto
-            if (this->confgNFe->get_indicadorSincrono() == IndSinc::Sim)
+            if (indSinc == IndSinc::Sim)
             {
                 _ret = tratarRetorno(TipoRetorno::retEnviNFe);
             }
@@ -244,17 +254,21 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
             set_error("Erro ao enviar lote.");
         }
     }
+    else
+    {
+        _ret = StatusRetorno::Erro;
+    }
     emit wsChange(WebServicesNF::None);
     return (_ret == StatusRetorno::Erro) ? false : true;
 }
 
-bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml)
+bool WSNFe::gerarXMLlote(const int &numLote, const QByteArray &xml, IndSinc indSinc)
 {
     //envelop soap
     QString _namespace = get_namespaceBase();
     QString _urlNamespace = get_urlNamespaceWS(WebServicesNF::NFeAutorizacao);
     QString _versao = ConvNF::versaoNFToStr(this->confgNFe->get_VersaoNF());
-    QString _indSinc = ConvNF::indSincToStr(this->confgNFe->get_indicadorSincrono());
+    QString _indSinc = ConvNF::indSincToStr(indSinc);
     QString _env;
     _env += QStringLiteral("<enviNFe xmlns=\"") + get_urlNamespaceBase() + QStringLiteral("\" versao=\"") + _versao + QStringLiteral("\">");
     _env += QStringLiteral("<idLote>") + QString::number(numLote) +  QStringLiteral("</idLote>");
