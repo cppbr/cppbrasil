@@ -50,6 +50,31 @@ int CppUtility::dvModulo11(const QString &str)
     return _dv;
 }
 
+bool CppUtility::cpfValido(const QString &cpf)
+{
+    if (cpf.size() != 11 || cpf == QString(11, cpf.at(0)))
+        return false;
+
+    for (const QChar digito : cpf)
+    {
+        if (digito < QLatin1Char('0') || digito > QLatin1Char('9'))
+            return false;
+    }
+
+    for (int posicao = 9; posicao <= 10; ++posicao)
+    {
+        int soma = 0;
+        for (int i = 0; i < posicao; ++i)
+            soma += cpf.at(i).digitValue() * (posicao + 1 - i);
+
+        const int resto = soma % 11;
+        const int digito = resto < 2 ? 0 : 11 - resto;
+        if (cpf.at(posicao).digitValue() != digito)
+            return false;
+    }
+    return true;
+}
+
 QString CppUtility::insZeroLeft(const QString &value, const int &size)
 {
 //insere zero a esquerda, recebendo a quantidade de zeros em size e retornando string

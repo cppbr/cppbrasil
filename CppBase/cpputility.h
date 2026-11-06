@@ -45,6 +45,7 @@ public:
     CppUtility();
     static void clearDateTime(QDateTime &datetime);
     static int dvModulo11(const QString &str);
+    static bool cpfValido(const QString &cpf);
     static QString insZeroLeft(const QString &value, const int &size);
     static QString dateTimeToStr(const QDateTime &datetime, const DtH &dateReturn);
     static QString doubleToStrDecimal(const double &value, const int &decimalSize);
