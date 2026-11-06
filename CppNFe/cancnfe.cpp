@@ -11,12 +11,6 @@ const QRegularExpression &chaveNumerica()
     return regra;
 }
 
-// Séries a partir de 910 identificam emitente pessoa física na chave.
-bool emitenteCPF(const QString &chave)
-{
-    return chave.mid(22, 3).toInt() >= 910;
-}
-
 int anoMes(const QString &chave)
 {
     return chave.mid(2, 2).toInt() * 12 + chave.mid(4, 2).toInt();
@@ -238,6 +232,8 @@ bool CancNFe::prepararEvento()
         m_error = "Cancelamento exige a versão 1.00.";
     else if (!chaveNumerica().match(m_chNFe).hasMatch())
         m_error = "Informe a chave da NF-e/NFC-e com 44 dígitos numéricos.";
+    else if (CppUtility::dvModulo11(m_chNFe.left(43)) != m_chNFe.right(1).toInt())
+        m_error = "Informe uma chave da NF-e/NFC-e com dígito verificador válido.";
     else if (m_chNFe.mid(20, 2) != "55" && m_chNFe.mid(20, 2) != "65")
         m_error = "Cancelamento exige uma chave de NF-e modelo 55 ou NFC-e modelo 65.";
     else if (m_chNFe.mid(20, 2) != ConvNF::modeloDFToStr(config->get_ModeloDF()))
@@ -246,11 +242,34 @@ bool CancNFe::prepararEvento()
         m_error = "A UF da chave diverge da UF configurada.";
     else if (m_CNPJ.isEmpty() == m_CPF.isEmpty())
         m_error = "Informe o CNPJ ou o CPF do emitente.";
-    else if (!m_CNPJ.isEmpty() && (emitenteCPF(m_chNFe) || m_CNPJ != m_chNFe.mid(6, 14)))
-        m_error = "O CNPJ do autor diverge do emitente da chave.";
-    else if (!m_CPF.isEmpty() && (!emitenteCPF(m_chNFe) || m_CPF != m_chNFe.mid(9, 11)))
-        m_error = "O CPF do autor diverge do emitente da chave.";
-    else if (substituicao())
+
+    if (!m_error.isEmpty())
+        return false;
+
+    const int serie = m_chNFe.mid(22, 3).toInt();
+    const bool nff = m_chNFe.at(34) == QLatin1Char('3');
+    // Na NFF, o quinto dígito do nNF indica o tipo de documento do emitente.
+    const auto tipoDocumentoNff = m_chNFe.at(29);
+    const bool serieCpf = serie >= 910 && serie <= 969;
+    const bool serieCpfOuCnpj = serie >= 890 && serie <= 899;
+    const auto documento = m_chNFe.mid(6, 14);
+
+    if (!m_CPF.isEmpty())
+    {
+        const bool aceitaCpf = nff ? tipoDocumentoNff == QLatin1Char('2') : serieCpf || serieCpfOuCnpj;
+        if (!aceitaCpf || CppUtility::insZeroLeft(m_CPF, 14) != documento)
+            m_error = "O CPF do autor diverge do emitente da chave.";
+        else if (!CppUtility::cpfValido(m_CPF))
+            m_error = "Informe um CPF válido para o autor do cancelamento.";
+    }
+    else
+    {
+        const bool aceitaCnpj = nff ? tipoDocumentoNff == QLatin1Char('1') : !serieCpf;
+        if (!aceitaCnpj || m_CNPJ != documento)
+            m_error = "O CNPJ do autor diverge do emitente da chave.";
+    }
+
+    if (m_error.isEmpty() && substituicao())
         validarSubstituta();
 
     if (!m_error.isEmpty())

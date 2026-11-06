@@ -169,15 +169,41 @@ WSNFe::~WSNFe()
 
 bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLayout)
 {
-    // O conteúdo do lote é recebido como uma sequência de elementos NFe.
+    this->m_msgRetorno.clear();
+    this->retorno->clear();
+
+    // O modelo do XML também identifica NFC-e quando a configuração diverge.
     QXmlStreamReader notas(QByteArray("<lote>") + xml + "</lote>");
-    IndSinc indSinc = this->confgNFe->get_indicadorSincrono();
-    if (notas.readNextStartElement() && notas.readNextStartElement())
+    int quantidade = 0;
+    bool temNFCe = this->confgNFe->get_ModeloDF() == ModeloDF::NFCe;
+    while (!notas.atEnd())
     {
-        notas.skipCurrentElement();
-        if (!notas.readNextStartElement() && !notas.hasError())
-            indSinc = IndSinc::Sim;
+        notas.readNext();
+        if (!notas.isStartElement())
+            continue;
+        if (notas.name() == QStringLiteral("NFe"))
+            ++quantidade;
+        else if (notas.name() == QStringLiteral("ide"))
+        {
+            while (notas.readNextStartElement())
+            {
+                if (notas.name() == QStringLiteral("mod"))
+                    temNFCe |= notas.readElementText() == QStringLiteral("65");
+                else
+                    notas.skipCurrentElement();
+            }
+        }
     }
+
+    if (!notas.hasError() && temNFCe && quantidade > 1)
+    {
+        set_error(QStringLiteral("Envie uma única NFC-e por lote de autorização."));
+        return false;
+    }
+
+    IndSinc indSinc = this->confgNFe->get_indicadorSincrono();
+    if (!notas.hasError() && quantidade == 1)
+        indSinc = IndSinc::Sim;
 
     //versão do layout
     set_verLayout(verLayout);
@@ -197,7 +223,6 @@ bool WSNFe::send(const int &numLote, const QByteArray &xml, const QString &verLa
     {
         //enviando mensagem
         emit wsChange(WebServicesNF::NFeAutorizacao);
-        this->m_msgRetorno.clear();
         this->m_msgRetorno = sendMsg(_url.toLocal8Bit(), this->m_msgEnvio);
         //se não houver erro
         if (this->get_error().isEmpty())

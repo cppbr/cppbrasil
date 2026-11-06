@@ -8,6 +8,15 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Emitente CPF na NFC-e — NT 2023.002 v1.01
+
+- Para emitir NFC-e de produtor rural em aplicativo próprio, informe o CPF
+  com 11 dígitos, a inscrição estadual vinculada, a série de 920 a 969 e
+  configure o e-CPF do emitente. A biblioteca valida o CPF e completa o
+  documento com zeros à esquerda na chave de acesso.
+- A geração aceita o processo de emissão pelo Fisco (`procEmi=1` ou `2`)
+  na NFC-e de Santa Catarina, inclusive em contingência off-line (`tpEmis=9`).
+
 #### NFC-e e NF-e — NT 2025.001 v1.03
 
 - Selecione `VersaoQrCodeNF::v300` para emitir NFC-e com QR Code versão 3
@@ -320,6 +329,11 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### Autorização de NFC-e — NT 2023.002 v1.01
+
+- O envio recusa lotes que contenham uma NFC-e e outro documento antes de
+  chamar o serviço de autorização. Envie cada NFC-e em um lote síncrono.
+
 #### Autorização — NT 2025.001 v1.03
 
 - Lotes com uma única NF-e ou NFC-e solicitam resposta síncrona
@@ -456,6 +470,13 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 - Exemplo legado QtCon-2022, sem manutenção.
 
 ### Corrigido
+
+#### Cancelamento — NT 2023.002 v1.01
+
+- O cancelamento confere o dígito verificador da chave e compara o documento
+  do autor com o documento completo na chave. Para chaves avulsas da série
+  890 a 899, aceita CPF ou CNPJ conforme o autor. Para chaves da NFF, identifica
+  o tipo de documento pelo quinto dígito do número da nota.
 
 - `OrigComb` não era exportada pela biblioteca, o que impedia o uso direto da classe
   por aplicações no Windows.
