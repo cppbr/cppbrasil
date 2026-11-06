@@ -334,6 +334,9 @@ void XmlRead::set_ide_NFref(QXmlStreamReader &xml) const
                nota->infNFe->ide->NFref->obj->set_refNFe(_valor);
         }
 
+        if (xml.name() == QStringLiteral("refNFeSig")) //BA02a
+            nota->infNFe->ide->NFref->obj->set_refNFeSig(xml.readElementText());
+
         if (xml.name() == QStringLiteral("refNF")) //BA03 - refNF
           set_ide_NFref_refNF(xml);
 
@@ -738,8 +741,7 @@ void XmlRead::set_dest(QXmlStreamReader &xml) const
         if (xml.name() == QStringLiteral("idEstrangeiro")) //E03a
         {
             _valor = xml.readElementText();
-            if (!_valor.isEmpty())
-               nota->infNFe->dest->set_idEstrangeiro(_valor);
+            nota->infNFe->dest->set_idEstrangeiro(_valor.isEmpty() ? QStringLiteral("") : _valor);
         }
         if (xml.name() == QStringLiteral("xNome")) //E04
         {
@@ -2084,19 +2086,8 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             //se for partilha do icms
             if (_part)
             {
-               if (_valor == "10")
-               {
-                  _valor  = "Part10";
-               }
-               else
-               {
-                  if (_valor == "90")
-                  {
-                    _valor  = "Part90";
-                  }
-               }
-               //desativando partilha
-               _part = false;
+                _valor.prepend(QStringLiteral("Part"));
+                _part = false;
             }
             //se for ICMS ST
             if (_st)
@@ -2354,8 +2345,7 @@ void XmlRead::set_ICMS(QXmlStreamReader &xml) const
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->imposto->ICMS->set_UFST(_valor);
         }
-        if (xml.name() == QStringLiteral("cBenefRBC") &&
-            nota->infNFe->det->obj->imposto->ICMS->get_CST() == CstICMS::ICMS51)
+        if (xml.name() == QStringLiteral("cBenefRBC"))
         {
             nota->infNFe->det->obj->imposto->ICMS->set_cBenefRBC(xml.readElementText());
         }

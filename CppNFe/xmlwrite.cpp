@@ -465,13 +465,11 @@ void XmlWrite::get_dest()
     if (this->m_infNFe->ide->get_mod() == ModeloDF::NFe)
     {
         this->m_xmlw->writeStartElement("dest");//abertura grupo dest
-        //cnpj ou cpf não os dois, mas um tem que existir
         if (!_dest->get_CNPJ().isEmpty())
             this->m_xmlw->writeTextElement("CNPJ", _dest->get_CNPJ());
-        else
+        else if (!_dest->get_CPF().isEmpty())
             this->m_xmlw->writeTextElement("CPF", _dest->get_CPF());
-
-        if (!_dest->get_idEstrangeiro().isEmpty())
+        else if (!_dest->get_idEstrangeiro().isNull() || this->m_infNFe->ide->get_idDest() == IdDest::Exterior)
             this->m_xmlw->writeTextElement("idEstrangeiro", _dest->get_idEstrangeiro());
 
         if (this->m_infNFe->ide->get_tpAmb() == TpAmb::Homologacao)
@@ -961,7 +959,7 @@ void XmlWrite::get_ICMS(const int &i)
             }
             else
             {
-                if (cst.length() > 4)   //Part10 ou Part90
+                if (cst.startsWith(QStringLiteral("Part")))
                     cab = "ICMSPart";
                 else                    //ST41 ou ST60
                     cab = "ICMSST";
@@ -1229,6 +1227,7 @@ void XmlWrite::get_ICMS(const int &i)
 
             //ICMSPart - N10a
             if (_icms->get_CST() == CstICMS::ICMSPart10 ||
+                _icms->get_CST() == CstICMS::ICMSPart20 ||
                 _icms->get_CST() == CstICMS::ICMSPart90)
             {
                 this->m_xmlw->writeTextElement("modBC", ConvNF::modBCToStr(_icms->get_modBC()));
@@ -1257,6 +1256,14 @@ void XmlWrite::get_ICMS(const int &i)
 
                 this->m_xmlw->writeTextElement("pBCOp", CppUtility::doubleToStrDecimal(_icms->get_pBCOp(), 4));
                 this->m_xmlw->writeTextElement("UFST", _icms->get_UFST());
+
+                if (_icms->get_motDesICMS() != MotDesICMS::None)
+                {
+                    this->m_xmlw->writeTextElement("vICMSDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSDeson(), 2));
+                    this->m_xmlw->writeTextElement("motDesICMS", ConvNF::motDesICMSToStr(_icms->get_motDesICMS()));
+                    if (_icms->get_indDeduzDeson() != IndDeduzDeson::None)
+                        this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
+                }
             }
 
             //ICMS70 - N09
@@ -1310,38 +1317,59 @@ void XmlWrite::get_ICMS(const int &i)
                 }
             }
 
-            //ICMS90 - N10 e ICMSPart - N10a
+            //ICMS90 - N10
             if (_icms->get_CST() == CstICMS::ICMS90)
             {
+                const bool diferimento = _icms->has_vICMSOp() || _icms->has_pDif() || _icms->has_vICMSDif();
+                const bool fcp = _icms->get_vBCFCP() > 0 || _icms->get_pFCP() > 0 || _icms->get_vFCP() > 0;
+                const bool diferimentoFCP = _icms->has_FCPDif();
                 if (_icms->get_modBC() != ModBC::None ||
-                    _icms->get_vBC() > 0    ||
+                    _icms->get_vBC() > 0 ||
                     _icms->get_pRedBC() > 0 ||
-                    _icms->get_pICMS() > 0  ||
-                    _icms->get_vICMS() > 0)
+                    !_icms->get_cBenefRBC().isEmpty() ||
+                    _icms->get_pICMS() > 0 ||
+                    _icms->get_vICMS() > 0 ||
+                    diferimento || fcp || diferimentoFCP)
                 {
                     this->m_xmlw->writeTextElement("modBC", ConvNF::modBCToStr(_icms->get_modBC()));
                     this->m_xmlw->writeTextElement("vBC", CppUtility::doubleToStrDecimal(_icms->get_vBC(), 2));
                     if (_icms->get_pRedBC() > 0)
                         this->m_xmlw->writeTextElement("pRedBC", CppUtility::doubleToStrDecimal(_icms->get_pRedBC(), 4));
+                    if (!_icms->get_cBenefRBC().isEmpty())
+                        this->m_xmlw->writeTextElement("cBenefRBC", _icms->get_cBenefRBC());
                     this->m_xmlw->writeTextElement("pICMS", CppUtility::doubleToStrDecimal(_icms->get_pICMS(), 4));
+                    if (diferimento)
+                    {
+                        this->m_xmlw->writeTextElement("vICMSOp", CppUtility::doubleToStrDecimal(_icms->get_vICMSOp(), 2));
+                        this->m_xmlw->writeTextElement("pDif", CppUtility::doubleToStrDecimal(_icms->get_pDif(), 4));
+                        this->m_xmlw->writeTextElement("vICMSDif", CppUtility::doubleToStrDecimal(_icms->get_vICMSDif(), 2));
+                    }
                     this->m_xmlw->writeTextElement("vICMS", CppUtility::doubleToStrDecimal(_icms->get_vICMS(), 2));
+
+                    if (fcp)
+                    {
+                        this->m_xmlw->writeTextElement("vBCFCP", CppUtility::doubleToStrDecimal(_icms->get_vBCFCP(), 2));
+                        this->m_xmlw->writeTextElement("pFCP", CppUtility::doubleToStrDecimal(_icms->get_pFCP(), 4));
+                        this->m_xmlw->writeTextElement("vFCP", CppUtility::doubleToStrDecimal(_icms->get_vFCP(), 2));
+                    }
+
+                    if (diferimentoFCP)
+                    {
+                        this->m_xmlw->writeTextElement("pFCPDif", CppUtility::doubleToStrDecimal(_icms->get_pFCPDif(), 4));
+                        this->m_xmlw->writeTextElement("vFCPDif", CppUtility::doubleToStrDecimal(_icms->get_vFCPDif(), 2));
+                        if (_icms->has_vFCPEfet())
+                            this->m_xmlw->writeTextElement("vFCPEfet", CppUtility::doubleToStrDecimal(_icms->get_vFCPEfet(), 2));
+                    }
                 }
 
-                if (_icms->get_vBCFCP() > 0 ||
-                    _icms->get_pFCP() > 0   ||
-                    _icms->get_vFCP() > 0)
-                {
-                    this->m_xmlw->writeTextElement("vBCFCP", CppUtility::doubleToStrDecimal(_icms->get_vBCFCP(), 2));
-                    this->m_xmlw->writeTextElement("pFCP", CppUtility::doubleToStrDecimal(_icms->get_pFCP(), 4));
-                    this->m_xmlw->writeTextElement("vFCP", CppUtility::doubleToStrDecimal(_icms->get_vFCP(), 2));
-                }
-
+                const bool fcpST = _icms->get_vBCFCPST() > 0 || _icms->get_pFCPST() > 0 || _icms->get_vFCPST() > 0;
                 if (_icms->get_modBCST() != ModBCST::None ||
                     _icms->get_pMVAST() > 0   ||
                     _icms->get_pRedBCST() > 0 ||
                     _icms->get_vBCST() > 0    ||
                     _icms->get_pICMSST() > 0  ||
-                    _icms->get_vICMSST())
+                    _icms->get_vICMSST() != 0 ||
+                    fcpST)
                 {
                     this->m_xmlw->writeTextElement("modBCST", ConvNF::modBCSTToStr(_icms->get_modBCST()));
                     if (_icms->get_pMVAST() > 0)
@@ -1351,15 +1379,13 @@ void XmlWrite::get_ICMS(const int &i)
                     this->m_xmlw->writeTextElement("vBCST", CppUtility::doubleToStrDecimal(_icms->get_vBCST(), 2));
                     this->m_xmlw->writeTextElement("pICMSST", CppUtility::doubleToStrDecimal(_icms->get_pICMSST(), 4));
                     this->m_xmlw->writeTextElement("vICMSST", CppUtility::doubleToStrDecimal(_icms->get_vICMSST(), 2));
-                }
 
-                if (_icms->get_vBCFCPST() > 0 ||
-                    _icms->get_pFCPST() > 0   ||
-                    _icms->get_vFCPST() > 0)
-                {
-                    this->m_xmlw->writeTextElement("vBCFCPST", CppUtility::doubleToStrDecimal(_icms->get_vBCFCPST(), 2));
-                    this->m_xmlw->writeTextElement("pFCPST", CppUtility::doubleToStrDecimal(_icms->get_pFCPST(), 4));
-                    this->m_xmlw->writeTextElement("vFCPST", CppUtility::doubleToStrDecimal(_icms->get_vFCPST(), 2));
+                    if (fcpST)
+                    {
+                        this->m_xmlw->writeTextElement("vBCFCPST", CppUtility::doubleToStrDecimal(_icms->get_vBCFCPST(), 2));
+                        this->m_xmlw->writeTextElement("pFCPST", CppUtility::doubleToStrDecimal(_icms->get_pFCPST(), 4));
+                        this->m_xmlw->writeTextElement("vFCPST", CppUtility::doubleToStrDecimal(_icms->get_vFCPST(), 2));
+                    }
                 }
 
                 if (_icms->get_motDesICMS() != MotDesICMS::None)
@@ -1370,7 +1396,7 @@ void XmlWrite::get_ICMS(const int &i)
                         this->m_xmlw->writeTextElement("indDeduzDeson", ConvNF::indDeduzDesonToStr(_icms->get_indDeduzDeson()));
                 }
 
-                if (_icms->get_vICMSSTDeson() > 0)
+                if (_icms->get_motDesICMSST() != MotDesICMS::None || _icms->get_vICMSSTDeson() > 0)
                 {
                     this->m_xmlw->writeTextElement("vICMSSTDeson", CppUtility::doubleToStrDecimal(_icms->get_vICMSSTDeson(), 2));
                     this->m_xmlw->writeTextElement("motDesICMSST", ConvNF::motDesICMSToStr(_icms->get_motDesICMSST()));
@@ -2119,10 +2145,10 @@ void XmlWrite::get_transp()
             !_transporta->get_xMun().isEmpty() ||
             !_transporta->get_UF().isEmpty())
         {
-            this->m_xmlw->writeStartElement("transp");//abertura grupo transporta
+            this->m_xmlw->writeStartElement("transporta");//abertura grupo transporta
             if (!_transporta->get_CNPJ().isEmpty())
                 this->m_xmlw->writeTextElement("CNPJ", _transporta->get_CNPJ());
-            if (!_transporta->get_CPF().isEmpty())
+            else if (!_transporta->get_CPF().isEmpty())
                 this->m_xmlw->writeTextElement("CPF", _transporta->get_CPF());
             if (!_transporta->get_xNome().isEmpty())
                 this->m_xmlw->writeTextElement("xNome", _transporta->get_xNome());

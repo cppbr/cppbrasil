@@ -109,7 +109,8 @@ enum class Orig {None = -1, Nacional = 0, EstrangeiraImportacaoDireta = 1,
 
 //cst Tributação do ICMS
 enum class CstICMS{None = -1, ICMS00, ICMS02, ICMS10, ICMS15, ICMS20, ICMS30, ICMS40, ICMS41, ICMS50, ICMS51,
-                   ICMS53, ICMS60, ICMS61, ICMS70, ICMS90, ICMSPart10, ICMSPart90, ICMSST41, ICMSST60};
+                   ICMS53, ICMS60, ICMS61, ICMS70, ICMS90, ICMSPart10, ICMSPart90, ICMSST41, ICMSST60,
+                   ICMSPart20};
 
 //csosn CRT=1 – Simples Nacional
 enum class CsosnICMS{None = -1, ICMSSN101 = 101, ICMSSN102 = 102, ICMSSN103 = 103, ICMSSN201 = 201,
