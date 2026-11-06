@@ -518,7 +518,7 @@ QString ConvNF::cstICMSToStr(const CstICMS &value)
     else
     {
         QList<QString>_r = {"00","02","10","15","20","30","40","41","50","51","53",
-                           "60","61","70","90","Part10", "Part90", "ST41", "ST60"};
+                           "60","61","70","90","Part10", "Part90", "ST41", "ST60", "Part20"};
         return _r[static_cast<int>(value)];
     }
 }
@@ -526,7 +526,7 @@ QString ConvNF::cstICMSToStr(const CstICMS &value)
 CstICMS ConvNF::strToCstICMS(const QString &value)
 {
     QList<QString>_r = {"-1","00","02","10","15","20","30","40","41","50","51","53",
-                             "60","61","70","90","Part10", "Part90", "ST41", "ST60"};
+                             "60","61","70","90","Part10", "Part90", "ST41", "ST60", "Part20"};
 
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())

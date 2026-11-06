@@ -8,6 +8,19 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Diferimento e partilha do ICMS — NT 2022.002 v1.30a
+
+- O CST 90 aceita `cBenefRBC` e os grupos de diferimento de ICMS
+  (`vICMSOp`, `pDif` e `vICMSDif`) e de FCP (`pFCPDif`, `vFCPDif` e
+  `vFCPEfet` opcional), com leitura e geração de valores iguais a zero
+  quando informados.
+- Use `CstICMS::ICMSPart20` para informar o CST 20 no grupo `ICMSPart`.
+  O grupo de partilha aceita `vICMSDeson`, `motDesICMS` e
+  `indDeduzDeson`, incluindo os motivos 10 e 11 para venda de veículos
+  destinados a pessoas com deficiência. Esses motivos também estão
+  disponíveis no grupo `ICMS20`. Recompile a biblioteca e as aplicações
+  devido à alteração na classe `Icms`.
+
 #### Emitente CPF na NFC-e — NT 2023.002 v1.01
 
 - Para emitir NFC-e de produtor rural em aplicativo próprio, informe o CPF
@@ -470,6 +483,19 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 - Exemplo legado QtCon-2022, sem manutenção.
 
 ### Corrigido
+
+#### Destinatário, transporte e referência da NF-e — NT 2022.002 v1.30a
+
+- A NF-e grava um único identificador do destinatário. Em operações com o
+  exterior sem CNPJ ou CPF, grava `idEstrangeiro` mesmo quando o conteúdo
+  está vazio. Nos casos de equiparação à exportação, a biblioteca conserva
+  o documento, o endereço e a indicação de IE fornecidos pela aplicação.
+- O grupo `transporta` é gravado na hierarquia correta quando informado.
+  Na operação presencial com CFOP 7667 e `UFCons=EX`, use `modFrete=9`
+  para indicar ausência de frete e omitir o transportador.
+- A importação preserva `refNFeSig` para a regeneração do XML, inclusive
+  em NF-e de ajuste (`finNFe=3`). Informe a chave já com o código numérico
+  zerado por `NFRef::set_refNFeSig()`.
 
 #### Cancelamento — NT 2023.002 v1.01
 

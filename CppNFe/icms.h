@@ -133,6 +133,8 @@ public:
     void set_vICMSSTDeson(const double &vICMSSTDeson);
     MotDesICMS get_motDesICMSST() const;
     void set_motDesICMSST(const MotDesICMS &motDesICMSST);
+    bool has_FCPDif() const;
+    bool has_vFCPEfet() const;
     double get_pFCPDif() const;
     void set_pFCPDif(const double &pFCPDif);
     double get_vFCPDif() const;
@@ -236,6 +238,8 @@ private:
     double m_vCredICMSSN;
     double m_vICMSSTDeson;
     MotDesICMS m_motDesICMSST;
+    bool m_FCPDifInformado = false;
+    bool m_vFCPEfetInformado = false;
     double m_pFCPDif;
     double m_vFCPDif;
     double m_vFCPEfet;

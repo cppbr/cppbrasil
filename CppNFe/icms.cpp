@@ -105,6 +105,8 @@ void Icms::clear()
     this->m_vCredICMSSN = 0.0;
     this->m_vICMSSTDeson = 0.0;
     this->m_motDesICMSST = MotDesICMS::None;
+    this->m_FCPDifInformado = false;
+    this->m_vFCPEfetInformado = false;
     this->m_pFCPDif = 0.0;
     this->m_vFCPDif = 0.0;
     this->m_vFCPEfet = 0.0;
@@ -649,6 +651,16 @@ void Icms::set_motDesICMSST(const MotDesICMS &motDesICMSST)
     this->m_motDesICMSST = motDesICMSST;
 }
 
+bool Icms::has_FCPDif() const
+{
+    return this->m_FCPDifInformado || this->m_vFCPEfetInformado;
+}
+
+bool Icms::has_vFCPEfet() const
+{
+    return this->m_vFCPEfetInformado;
+}
+
 double Icms::get_pFCPDif() const
 {
     return this->m_pFCPDif;
@@ -657,6 +669,7 @@ double Icms::get_pFCPDif() const
 void Icms::set_pFCPDif(const double &pFCPDif)
 {
     this->m_pFCPDif = pFCPDif;
+    this->m_FCPDifInformado = true;
 }
 
 double Icms::get_vFCPDif() const
@@ -667,6 +680,7 @@ double Icms::get_vFCPDif() const
 void Icms::set_vFCPDif(const double &vFCPDif)
 {
     this->m_vFCPDif = vFCPDif;
+    this->m_FCPDifInformado = true;
 }
 
 double Icms::get_vFCPEfet() const
@@ -677,6 +691,7 @@ double Icms::get_vFCPEfet() const
 void Icms::set_vFCPEfet(const double &vFCPEfet)
 {
     this->m_vFCPEfet = vFCPEfet;
+    this->m_vFCPEfetInformado = true;
 }
 
 double Icms::get_qBCMono() const
