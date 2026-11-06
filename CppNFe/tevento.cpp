@@ -21,7 +21,7 @@ bool fiscoProrrogacao(TpEvento tipo)
 }
 
 // Destaca o detalhe com seu namespace, inclusive quando herdado do envelope.
-QByteArray detalheProrrogacao(const QString &xml)
+QByteArray extrairDetalheEvento(const QString &xml)
 {
     QXmlStreamReader reader(xml);
     QByteArray detalhe;
@@ -861,6 +861,15 @@ void TEvento::assinarXML(const ConfigNFe *config)
 
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schema));
 
+    const TpEvento tipo = infEvento->get_tpEvento();
+    if (!ConvNF::descricaoManifestacao(tipo).isEmpty() &&
+        !_libxml->parseXML(extrairDetalheEvento(m_xml_original),
+                         ("e" + ConvNF::tpEventoToStr(tipo) + "_v1.00.xsd").toUtf8()))
+    {
+        m_error = _libxml->get_error();
+        return;
+    }
+
     //assina o xml
     if (_libxml->signXML(_xmldoc, _sha1, _nodedoc, _nodesign, _uri,
                          _returntype, _xml_assinado))
@@ -886,6 +895,10 @@ void TEvento::gerarXML()
         return;
     }
     if ((pedidoProrrogacao(tipo) || cancelProrrogacao(tipo)) && !validarDadosProrrogacao())
+        return;
+    const QString descricaoManifestacao = ConvNF::descricaoManifestacao(tipo);
+    const bool manifestacao = !descricaoManifestacao.isEmpty();
+    if (manifestacao && !validarDadosManifestacao())
         return;
     if (infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp)
     {
@@ -938,36 +951,44 @@ void TEvento::gerarXML()
     _xmlw.writeStartElement("detEvento"); //abertura do grupo detEvento
     _xmlw.writeAttribute("versao", this->infEvento->get_verEvento());
 
-    //descrição obrigatório para todos
-    _xmlw.writeTextElement("descEvento", this->infEvento->detEvento->get_descEvento());
-    if (this->infEvento->detEvento->get_cOrgaoAutor() > 0)
-        _xmlw.writeTextElement("cOrgaoAutor", QString::number(this->infEvento->detEvento->get_cOrgaoAutor()));
-    if (this->infEvento->detEvento->get_tpAutor() != TpAutor::None)
-        _xmlw.writeTextElement("tpAutor", ConvNF::tpAutorToStr(this->infEvento->detEvento->get_tpAutor()));
-    if (!this->infEvento->detEvento->get_verAplic().isEmpty())
-        _xmlw.writeTextElement("verAplic", this->infEvento->detEvento->get_verAplic());
-    if (cancelProrrogacao(tipo))
-        _xmlw.writeTextElement("idPedidoCancelado", this->infEvento->detEvento->get_idPedidoCancelado());
-    if (!this->infEvento->detEvento->get_nProt().isEmpty())
-        _xmlw.writeTextElement("nProt", this->infEvento->detEvento->get_nProt());
-    if (!this->infEvento->detEvento->get_xJust().isEmpty())
-        _xmlw.writeTextElement("xJust", this->infEvento->detEvento->get_xJust());
-    if (!this->infEvento->detEvento->get_chNFeRef().isEmpty())
-        _xmlw.writeTextElement("chNFeRef", this->infEvento->detEvento->get_chNFeRef());
-
-    //carta de coreção
-    if (this->infEvento->get_tpEvento() == TpEvento::CartaCorrecao)
+    _xmlw.writeTextElement("descEvento", manifestacao ? descricaoManifestacao :
+                         this->infEvento->detEvento->get_descEvento());
+    if (manifestacao)
     {
-        _xmlw.writeTextElement("xCorrecao", this->infEvento->detEvento->get_xCorrecao());
-        _xmlw.writeTextElement("xCondUso", this->infEvento->detEvento->get_xCondUso());
+        if (tipo == TpEvento::OperacaoNaoRealizadaDest)
+            _xmlw.writeTextElement("xJust", infEvento->detEvento->get_xJust());
     }
-    //geral
-    if (!this->infEvento->detEvento->get_dhEmi().isNull())
-        _xmlw.writeTextElement("dhEmi", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhEmi(), DtH::DateTimeUTC));
-    if (this->infEvento->detEvento->get_tpNF() != TpNF::None)
-        _xmlw.writeTextElement("tpNF", ConvNF::tpNFToStr(this->infEvento->detEvento->get_tpNF()));
-    if (!this->infEvento->detEvento->get_IE().isEmpty())
-        _xmlw.writeTextElement("IE", this->infEvento->detEvento->get_IE());
+    else
+    {
+        if (this->infEvento->detEvento->get_cOrgaoAutor() > 0)
+            _xmlw.writeTextElement("cOrgaoAutor", QString::number(this->infEvento->detEvento->get_cOrgaoAutor()));
+        if (this->infEvento->detEvento->get_tpAutor() != TpAutor::None)
+            _xmlw.writeTextElement("tpAutor", ConvNF::tpAutorToStr(this->infEvento->detEvento->get_tpAutor()));
+        if (!this->infEvento->detEvento->get_verAplic().isEmpty())
+            _xmlw.writeTextElement("verAplic", this->infEvento->detEvento->get_verAplic());
+        if (cancelProrrogacao(tipo))
+            _xmlw.writeTextElement("idPedidoCancelado", this->infEvento->detEvento->get_idPedidoCancelado());
+        if (!this->infEvento->detEvento->get_nProt().isEmpty())
+            _xmlw.writeTextElement("nProt", this->infEvento->detEvento->get_nProt());
+        if (!this->infEvento->detEvento->get_xJust().isEmpty())
+            _xmlw.writeTextElement("xJust", this->infEvento->detEvento->get_xJust());
+        if (!this->infEvento->detEvento->get_chNFeRef().isEmpty())
+            _xmlw.writeTextElement("chNFeRef", this->infEvento->detEvento->get_chNFeRef());
+
+        //carta de coreção
+        if (this->infEvento->get_tpEvento() == TpEvento::CartaCorrecao)
+        {
+            _xmlw.writeTextElement("xCorrecao", this->infEvento->detEvento->get_xCorrecao());
+            _xmlw.writeTextElement("xCondUso", this->infEvento->detEvento->get_xCondUso());
+        }
+        //geral
+        if (!this->infEvento->detEvento->get_dhEmi().isNull())
+            _xmlw.writeTextElement("dhEmi", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhEmi(), DtH::DateTimeUTC));
+        if (this->infEvento->detEvento->get_tpNF() != TpNF::None)
+            _xmlw.writeTextElement("tpNF", ConvNF::tpNFToStr(this->infEvento->detEvento->get_tpNF()));
+        if (!this->infEvento->detEvento->get_IE().isEmpty())
+            _xmlw.writeTextElement("IE", this->infEvento->detEvento->get_IE());
+    }
 
     //EPEC
     if (this->infEvento->get_tpEvento() == TpEvento::EPEC)
@@ -1102,6 +1123,36 @@ void TEvento::gerarXML()
     this->m_xml_original.append(_strXML);
 }
 
+bool TEvento::validarDadosManifestacao()
+{
+    static const QRegularExpression formatoChave("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
+    const QString chave = infEvento->get_chNFe();
+    const TpEvento tipo = infEvento->get_tpEvento();
+    const int sequencia = infEvento->get_nSeqEvento();
+    const auto tamanhoJustificativa = infEvento->detEvento->get_xJust().size();
+    if (!formatoChave.match(chave).hasMatch() || chave.mid(20, 2) != "55")
+        m_error = "Informe uma chave de acesso de NF-e modelo 55 com 44 posições.";
+    else if (chave.at(34) < QLatin1Char('1') || chave.at(34) > QLatin1Char('7'))
+        m_error = "A manifestação exige tpEmis de 1 a 7 na chave da NF-e.";
+    else if (infEvento->get_CNPJ().isEmpty() == infEvento->get_CPF().isEmpty())
+        m_error = "Informe o CNPJ ou o CPF do destinatário da NF-e.";
+    else if (!infEvento->get_CPF().isEmpty() && !CppUtility::cpfValido(infEvento->get_CPF()))
+        m_error = "Informe um CPF válido para o destinatário da NF-e.";
+    else if (sequencia != 1 && (sequencia != 2 || tipo == TpEvento::CienciaOperacaoDest))
+        m_error = "Informe nSeqEvento 1 para Ciência da Operação ou 1 a 2 para manifestação conclusiva.";
+    else if (tipo == TpEvento::OperacaoNaoRealizadaDest &&
+             (tamanhoJustificativa < 15 || tamanhoJustificativa > 255))
+        m_error = "Operação não Realizada exige uma justificativa de 15 a 255 caracteres.";
+
+    // O schema comum também aceita chaves com CNPJ alfanumérico.
+    bool cnpjNumerico = false;
+    chave.mid(6, 12).toULongLong(&cnpjNumerico);
+    if (m_error.isEmpty() && cnpjNumerico &&
+        CppUtility::dvModulo11(chave.left(43)) != chave.right(1).toInt())
+        m_error = "Informe uma chave da NF-e com dígito verificador válido.";
+    return m_error.isEmpty();
+}
+
 bool TEvento::validarDadosProrrogacao()
 {
     const TpEvento tipo = infEvento->get_tpEvento();
@@ -1168,7 +1219,7 @@ bool TEvento::validarProrrogacao(const ConfigNFe *config)
         return false;
     }
     CppLibXml2 validador(config->certificado->get_cryptoLib(), config->arquivos->get_caminhoSchema().toUtf8());
-    const QByteArray detalhe = detalheProrrogacao(xml);
+    const QByteArray detalhe = extrairDetalheEvento(xml);
     QXmlStreamReader leitorDetalhe(detalhe);
     leitorDetalhe.readNextStartElement();
     if (leitorDetalhe.attributes().value("versao") != QStringLiteral("1.00"))
