@@ -166,7 +166,10 @@ QString UrlNFe::get_infNFesupl(const TipoInfNFeSupl &tipo, const UF &uf, const T
     QJsonValue  _jv_uf = _jo_uf.value(_sUF);
 
     QJsonObject _jo_versaoQr = _jv_uf.toObject();
-    QJsonValue  _jv_versaoQr = _jo_versaoQr.value(_sVersaoqrcode);;
+    QJsonValue  _jv_versaoQr = _jo_versaoQr.value(_sVersaoqrcode);
+    // A versão 3 usa a mesma URL de consulta quando a UF não tem uma entrada própria.
+    if (_jv_versaoQr.isUndefined() && versaoQrCodeNF == VersaoQrCodeNF::v300)
+        _jv_versaoQr = _jo_versaoQr.value(QStringLiteral("qr_2.00"));
 
     QJsonObject _jo_qrSearch = _jv_versaoQr.toObject();
     QJsonValue  _jv_qrSearch = _jo_qrSearch[_sAmbiente];

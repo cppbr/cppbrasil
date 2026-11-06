@@ -34,7 +34,7 @@ enum class WebServicesNF{None = -1, NFeInutilizacao, NFeConsultaProtocolo,  NFeS
 enum class VersaoNF{None = -1, v400};
 
 //versao QRCode NFe/NFCe
-enum class VersaoQrCodeNF{None = -1, v200};
+enum class VersaoQrCodeNF{None = -1, v200, v300};
 
 //indSinc - indentificador Sincrono
 enum class IndSinc {Nao = 0, Sim = 1};
@@ -178,7 +178,7 @@ enum class TPag {None = -1, Dinheiro = 1, Cheque = 2, CartaoCredito = 3,
                 ValeRefeicao = 11, ValePresente = 12, ValeCombustivel = 13,
                 DuplicataMercanti = 14, BoletoBancario = 15, DepositoBancario = 16,
                 Pix = 17, TranferenciaBancaria = 18, ProgramaFidelidade = 19,
-                SemPagamento = 90, Outros = 99};
+                SemPagamento = 90, PagamentoPosterior = 91, Outros = 99};
 
 //tpIntegra - Tipo de Integração para pagamento
 enum class TpIntegra {None = -1, PagamentoIntegrado = 1, PagamentoNaoIntegrado = 2};

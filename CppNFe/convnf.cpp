@@ -106,6 +106,8 @@ QString ConvNF::versaoQrCodeNFToStr(const VersaoQrCodeNF &value)
 {
     if (value == VersaoQrCodeNF::v200)
         return "2.00";
+    if (value == VersaoQrCodeNF::v300)
+        return "3.00";
     //padrão
     return "";
 }
@@ -114,6 +116,8 @@ VersaoQrCodeNF ConvNF::strToVersaoQrCodeNF(const QString &value)
 {
     if ((value == "2") || (value == "2.00"))
         return VersaoQrCodeNF::v200;
+    if ((value == "3") || (value == "3.00"))
+        return VersaoQrCodeNF::v300;
     //padrão
     return VersaoQrCodeNF::None;
 }
@@ -768,7 +772,7 @@ QString ConvNF::tPagToStr(const TPag &value)
 TPag ConvNF::strToTPag(const QString &value)
 {
     QList<QString> _r = {"-1","01","02","03","04","05","10","11","12",
-                         "13","14","15","16","17","18","19","90","99"};
+                         "13","14","15","16","17","18","19","90","91","99"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TPag::None;

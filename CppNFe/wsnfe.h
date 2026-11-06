@@ -82,7 +82,7 @@ public:
 private:
     enum TipoRetorno {retEnviNFe, retConsReciNFe};
     RetConsReciNFe* retorno;
-    bool gerarXMLlote(const int &numLote, const QByteArray &xml);
+    bool gerarXMLlote(const int &numLote, const QByteArray &xml, IndSinc indSinc);
     bool gerarXMLrecibo();
     StatusRetorno tratarRetorno(const TipoRetorno &tipo);
 

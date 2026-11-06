@@ -62,6 +62,11 @@ public:
 
 
 private:
+    friend class Nfe;
+    static VersaoQrCodeNF versaoQrCode(const InfNFe &infNFe, const ConfigNFe &config);
+    static QByteArray get_infNFeSupl_OFFLINE_V3(const QString &chave, const InfNFe &infNFe,
+                                              CppCrypto &crypto, QString &erro);
+
     const InfNFe *m_infNFe; //ponteiro de fora
     const ConfigNFe *m_confgNFe; //ponteiro de fora
     QXmlStreamWriter *m_xmlw;
