@@ -518,6 +518,9 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 - A validação local com certificado digital cobriu a assinatura e a
   reimportação de NF-e e NFC-e com emitente alfanumérico, o QR Code v3
   on-line e em contingência e a assinatura dos eventos testados.
+- O schema genérico de eventos do PL 010d v1.03 validou os envelopes
+  assinados de cancelamento, cancelamento por substituição e cancelamento
+  de prorrogação com chave alfanumérica.
 
 #### Destinatário, transporte e referência da NF-e — NT 2022.002 v1.30a
 
