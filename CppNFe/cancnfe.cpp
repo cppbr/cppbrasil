@@ -5,9 +5,9 @@
 
 namespace {
 
-const QRegularExpression &chaveNumerica()
+const QRegularExpression &formatoChave()
 {
-    static const QRegularExpression regra("^[0-9]{44}$");
+    static const QRegularExpression regra("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
     return regra;
 }
 
@@ -208,9 +208,9 @@ bool CancNFe::validarSubstituta()
         m_error = "Cancelamento por substituição é exclusivo da NFC-e modelo 65.";
     else if (m_chNFe.mid(34, 1) != "1")
         m_error = "A NFC-e a ser cancelada por substituição deve ter emissão normal.";
-    else if (!chaveNumerica().match(m_chNFeRef).hasMatch() ||
+    else if (!formatoChave().match(m_chNFeRef).hasMatch() ||
              CppUtility::dvModulo11(m_chNFeRef.left(43)) != m_chNFeRef.right(1).toInt())
-        m_error = "Informe a chave substituta com 44 dígitos e dígito verificador válido.";
+        m_error = "Informe a chave substituta com 44 posições e dígito verificador válido.";
     else if (m_chNFeRef == m_chNFe || m_chNFeRef.left(2) != m_chNFe.left(2) ||
              m_chNFeRef.mid(6, 16) != m_chNFe.mid(6, 16) || m_chNFeRef.mid(34, 1) == "1")
         m_error = "Informe uma chave substituta distinta, da mesma UF, emitente e modelo, emitida em contingência.";
@@ -230,8 +230,8 @@ bool CancNFe::prepararEvento()
         m_error = "CancNFe aceita somente cancelamento (110111) ou cancelamento por substituição (110112).";
     else if (m_versao != "1.00")
         m_error = "Cancelamento exige a versão 1.00.";
-    else if (!chaveNumerica().match(m_chNFe).hasMatch())
-        m_error = "Informe a chave da NF-e/NFC-e com 44 dígitos numéricos.";
+    else if (!formatoChave().match(m_chNFe).hasMatch())
+        m_error = "Informe a chave da NF-e/NFC-e com 44 posições, com letras permitidas apenas no CNPJ.";
     else if (CppUtility::dvModulo11(m_chNFe.left(43)) != m_chNFe.right(1).toInt())
         m_error = "Informe uma chave da NF-e/NFC-e com dígito verificador válido.";
     else if (m_chNFe.mid(20, 2) != "55" && m_chNFe.mid(20, 2) != "65")

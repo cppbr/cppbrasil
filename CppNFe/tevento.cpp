@@ -1144,10 +1144,7 @@ bool TEvento::validarDadosManifestacao()
              (tamanhoJustificativa < 15 || tamanhoJustificativa > 255))
         m_error = "Operação não Realizada exige uma justificativa de 15 a 255 caracteres.";
 
-    // O schema comum também aceita chaves com CNPJ alfanumérico.
-    bool cnpjNumerico = false;
-    chave.mid(6, 12).toULongLong(&cnpjNumerico);
-    if (m_error.isEmpty() && cnpjNumerico &&
+    if (m_error.isEmpty() &&
         CppUtility::dvModulo11(chave.left(43)) != chave.right(1).toInt())
         m_error = "Informe uma chave da NF-e com dígito verificador válido.";
     return m_error.isEmpty();
@@ -1156,11 +1153,11 @@ bool TEvento::validarDadosManifestacao()
 bool TEvento::validarDadosProrrogacao()
 {
     const TpEvento tipo = infEvento->get_tpEvento();
-    static const QRegularExpression chave("^[0-9]{44}$");
+    static const QRegularExpression chave("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
     auto *inf = infEvento.get();
     auto *det = inf->detEvento.get();
     if (!chave.match(inf->get_chNFe()).hasMatch() || inf->get_chNFe().mid(20, 2) != "55")
-        m_error = "Prorrogação exige uma chave de NF-e modelo 55 com 44 dígitos numéricos.";
+        m_error = "Prorrogação exige uma chave de acesso de NF-e modelo 55 com 44 posições.";
     else if (m_versao != "1.00" || inf->get_verEvento() != "1.00")
         m_error = "Prorrogação exige a versão 1.00 do evento e do detalhe.";
     else if (inf->get_cOrgao() != inf->get_chNFe().left(2).toInt())
@@ -1171,8 +1168,9 @@ bool TEvento::validarDadosProrrogacao()
     {
         const QString referencia = det->get_idPedidoCancelado();
         const QString prefixo = tipo == TpEvento::CancelPedidoProrrogacao1 ? "ID111500" : "ID111501";
-        static const QRegularExpression id("^ID[0-9]{52}$");
-        if (!id.match(referencia).hasMatch() || !referencia.startsWith(prefixo) ||
+        static const QRegularExpression sequencia("^[0-9]{2}\\z");
+        if (referencia.size() != 54 || !referencia.startsWith(prefixo) ||
+            !sequencia.match(referencia.right(2)).hasMatch() ||
             referencia.mid(8, 44) != inf->get_chNFe() || referencia.right(2) == "00")
             m_error = "idPedidoCancelado deve identificar um pedido do mesmo prazo e da mesma NF-e.";
         else if (!det->itemPedido->isEmpty())

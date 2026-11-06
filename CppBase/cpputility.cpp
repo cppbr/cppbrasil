@@ -34,13 +34,16 @@ int CppUtility::dvModulo11(const QString &str)
 {
     //pesos de 2 a 9, aplicados da direita para a esquerda sobre o tamanho real da string
     //(chave de acesso com 43 posicoes, chave de contingencia FS/FS-DA com 35, ...).
-    //caracteres nao numericos valem 0.
+    //Letras maiúsculas usam o valor ASCII menos 48, conforme a NT Conjunta 2025.001.
     int _soma = 0;
     int _peso = 2;
     for (int i = str.length() - 1; i >= 0; --i)
     {
-        int _ichave = str.at(i).isDigit() ? str.at(i).digitValue() : 0;
-        _soma = _soma + (_ichave * _peso);
+        const QChar caractere = str.at(i);
+        int valor = caractere.isDigit() ? caractere.digitValue() : 0;
+        if (caractere >= QLatin1Char('A') && caractere <= QLatin1Char('Z'))
+            valor = caractere.unicode() - '0';
+        _soma = _soma + (valor * _peso);
         _peso = (_peso == 9) ? 2 : _peso + 1;
     }
     int _resto = _soma % 11;
