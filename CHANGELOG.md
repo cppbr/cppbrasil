@@ -8,6 +8,20 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Manifestação do destinatário — NT 2020.001 v1.60
+
+- Envie Confirmação da Operação (210200), Ciência da Operação (210210),
+  Desconhecimento da Operação (210220) e Operação não Realizada (210240) por
+  `EventoNotaFiscal::envEvento`. Informe a chave da NF-e modelo 55, a data
+  do evento e o CPF ou CNPJ do destinatário, com o certificado correspondente.
+  O lote aceita até 20 manifestações e segue para o Ambiente Nacional.
+- Informe `nSeqEvento=1` na Ciência e `nSeqEvento=1` ou `2` nas manifestações
+  conclusivas. Em Operação não Realizada, preencha `detEvento->set_xJust()`
+  com 15 a 255 caracteres. O XML inclui a justificativa somente nesse tipo.
+- O XML processado fica disponível para os retornos 135 e 136. A SEFAZ
+  verifica o prazo de 10 dias para Ciência e o prazo de 90 dias para a
+  manifestação conclusiva, contados da autorização da NF-e.
+
 #### Diferimento e partilha do ICMS — NT 2022.002 v1.30a
 
 - O CST 90 aceita `cBenefRBC` e os grupos de diferimento de ICMS

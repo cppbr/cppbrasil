@@ -239,6 +239,12 @@ bool EnvEvento::gerarXML(const int &idLote)
 void EnvEvento::updateEvento(int &index)
 {
     const TpEvento tipo = evento->value(index)->infEvento->get_tpEvento();
+    if (!ConvNF::descricaoManifestacao(tipo).isEmpty())
+    {
+        auto *inf = evento->value(index)->infEvento.get();
+        inf->set_cOrgao(91);
+        inf->set_verEvento("1.00");
+    }
     if (tipo == TpEvento::PedidoProrrogacao1 || tipo == TpEvento::PedidoProrrogacao2 ||
         tipo == TpEvento::CancelPedidoProrrogacao1 || tipo == TpEvento::CancelPedidoProrrogacao2)
     {
@@ -312,6 +318,35 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     if (!evento->isEmpty())
     {
         const TpEvento primeiro = evento->value(0)->infEvento->get_tpEvento();
+        int manifestacoes = 0;
+        for (const TEvento *item : *evento)
+            if (!ConvNF::descricaoManifestacao(item->infEvento->get_tpEvento()).isEmpty())
+                ++manifestacoes;
+        if (manifestacoes > 0)
+        {
+            if (manifestacoes != evento->count())
+            {
+                m_error = "Envie manifestações do destinatário em lote separado dos demais eventos.";
+                return false;
+            }
+            if (config->get_ModeloDF() != ModeloDF::NFe || manifestacoes > 20 ||
+                (!m_versao.isEmpty() && m_versao != "1.00"))
+            {
+                m_error = "Manifestação do destinatário exige modelo 55, versão 1.00 e até 20 eventos por lote.";
+                return false;
+            }
+            for (const TEvento *item : *evento)
+            {
+                const TpAmb ambiente = item->infEvento->get_tpAmb();
+                if (ambiente != TpAmb::None && ambiente != config->webservices->get_tpAmb())
+                {
+                    m_error = "O ambiente da manifestação deve ser igual ao ambiente configurado.";
+                    return false;
+                }
+            }
+            servidor = "AN";
+            return true;
+        }
         bool temAtor = false;
         for (const TEvento *item : *evento)
             temAtor = temAtor || item->infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp;
@@ -446,8 +481,24 @@ void EnvEvento::tratarRetorno()
                     (this->retorno->retEvento->value(i)->infEvento->get_tpEvento() ==
                      this->evento->value(j)->infEvento->get_tpEvento()))
                 {
+                    const TpEvento tipo = evento->value(j)->infEvento->get_tpEvento();
+                    const bool manifestacao = !ConvNF::descricaoManifestacao(tipo).isEmpty();
+                    if (manifestacao && (_cStat == 135 || _cStat == 136))
+                    {
+                        auto *ret = retorno->retEvento->value(i);
+                        const auto *enviado = evento->value(j);
+                        const QString processado =
+                            "<procEventoNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"1.00\">" +
+                            CppUtility::extractStr(enviado->get_XMLAssinado(), "<evento", "/evento>") +
+                            ret->get_XML() + "</procEventoNFe>";
+                        ret->set_XML(processado);
+                        if (config->arquivos->get_salvar())
+                            ret->salvarXML(config->arquivos->get_caminhoEvento(),
+                                           enviado->infEvento->get_Id().mid(2) + "-procEventoNFe");
+                        break;
+                    }
                     if (_cStat == 135 || (_cStat == 136 &&
-                        this->evento->value(j)->infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp))
+                        tipo == TpEvento::AtorInteressadoNFeTransp))
                     {
                         QByteArray _procEventoNFe, _xmlOriginal, _retEvento;
                         _procEventoNFe.append(QString("<procEventoNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao =\"" + get_versao() + "\">").toLocal8Bit());

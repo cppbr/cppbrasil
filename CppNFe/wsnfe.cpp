@@ -755,7 +755,10 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
 
     if (_ret == StatusRetorno::Processado)
     {
-        QXmlStreamReader _xml(this->m_msgRetorno);
+        const bool manifestacao = !ConvNF::descricaoManifestacao(m_tpEvento).isEmpty();
+        const QString xmlRetorno = QString::fromUtf8(m_msgRetorno);
+        QXmlStreamReader _xml(xmlRetorno);
+        QXmlStreamNamespaceDeclarations namespacesLote;
         QString _valor;
         //salvar log do retorno
         salvarLogs(TipoArquivo::XML,TipoMsgLog::MsgRetorno ,"retEnvEvento",
@@ -763,6 +766,8 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
         QXmlStreamAttributes attributes;
         while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEnvEvento")))
         {
+            if (manifestacao && _xml.isStartElement() && _xml.name() == QStringLiteral("retEnvEvento"))
+                namespacesLote = _xml.namespaceDeclarations();
             attributes = _xml.attributes();
             if(attributes.hasAttribute("versao"))
             {
@@ -806,8 +811,27 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
                 if (!_valor.isEmpty())
                    this->retorno->set_xMotivo(_valor);
             }
-            if(_xml.name() == QStringLiteral("retEvento"))
+            if(_xml.isStartElement() && _xml.name() == QStringLiteral("retEvento"))
             {
+                const qsizetype inicio = manifestacao
+                    ? xmlRetorno.lastIndexOf(QLatin1Char('<'), _xml.characterOffset() - 1) : 0;
+                QString namespacesHerdados;
+                if (manifestacao)
+                {
+                    const auto namespacesEvento = _xml.namespaceDeclarations();
+                    for (const auto &ns : namespacesLote)
+                    {
+                        if (ns.prefix().isEmpty())
+                            continue; // O XML processado já declara o namespace da NF-e.
+                        bool redeclarado = false;
+                        for (const auto &local : namespacesEvento)
+                            if (local.prefix() == ns.prefix())
+                                redeclarado = true;
+                        if (!redeclarado)
+                            namespacesHerdados += " xmlns:" + ns.prefix().toString() +
+                                                  "=\"" + ns.namespaceUri().toString().toHtmlEscaped() + "\"";
+                    }
+                }
                 //montando xml apenas do retEvento.
                 QByteArray _strXMLRetEvento;
                 QXmlStreamWriter _xmlRetEvento(&_strXMLRetEvento);
@@ -977,7 +1001,15 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
                     _xml.readNext();
                 }
                 _xmlRetEvento.writeEndElement(); //fechamento retEvento
-                this->retorno->retEvento->obj->set_XML(_strXMLRetEvento);
+                // Preserva a assinatura opcional do Fisco e o conteúdo assinado.
+                if (manifestacao)
+                {
+                    QString xmlEvento = xmlRetorno.mid(inicio, _xml.characterOffset() - inicio);
+                    xmlEvento.insert(_xml.qualifiedName().size() + 1, namespacesHerdados);
+                    this->retorno->retEvento->obj->set_XML(xmlEvento);
+                }
+                else
+                    this->retorno->retEvento->obj->set_XML(_strXMLRetEvento);
                 this->retorno->retEvento->add();
             }
 

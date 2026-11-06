@@ -321,6 +321,7 @@ public:
     std::unique_ptr<InfEvento> infEvento;
 
 private:
+    bool validarDadosManifestacao();
     bool validarDadosProrrogacao();
     QString m_versao;
     QString m_xml_original;

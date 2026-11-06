@@ -890,6 +890,18 @@ TpEvento ConvNF::strToTpEvento(const QString &value)
 
 }
 
+QString ConvNF::descricaoManifestacao(TpEvento tipo)
+{
+    switch (tipo)
+    {
+    case TpEvento::ConfirmacaoOperacaoDest: return QStringLiteral("Confirmacao da Operacao");
+    case TpEvento::CienciaOperacaoDest: return QStringLiteral("Ciencia da Operacao");
+    case TpEvento::DesconhecimentoOperacaoDest: return QStringLiteral("Desconhecimento da Operacao");
+    case TpEvento::OperacaoNaoRealizadaDest: return QStringLiteral("Operacao nao Realizada");
+    default: return {};
+    }
+}
+
 QString ConvNF::tpAutorToStr(const TpAutor &value)
 {
     if(value == TpAutor::None)

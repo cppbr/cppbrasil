@@ -326,6 +326,7 @@ public:
     static QString tpAtoToStr(const TpAto &value);
     static TpAto strToTpAto(const QString &value);
     static QString tpEventoToStr(const TpEvento &value);
+    static QString descricaoManifestacao(TpEvento tipo);
     static TpEvento strToTpEvento(const QString &value);
     static QString tpAutorToStr(const TpAutor &value);
     static TpAutor strToTpAutor(const QString &value);
