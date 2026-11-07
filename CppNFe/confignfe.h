@@ -39,6 +39,7 @@ class CPPNFE_EXPORT Certificado: public ConfCertificado
     friend class TEvento;
     friend class ConsSitNFe;
     friend class CancNFe;
+    friend class NFeDistribuicaoDFe;
 public:
      Certificado();
      ~Certificado();

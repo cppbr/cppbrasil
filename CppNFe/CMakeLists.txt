@@ -110,6 +110,8 @@ add_library(CppNFe SHARED
     lacres.cpp
     med.h
     med.cpp
+    nfedistribuicaodfe.h
+    nfedistribuicaodfe.cpp
     nfe.h
     nfe.cpp
     nfref.h

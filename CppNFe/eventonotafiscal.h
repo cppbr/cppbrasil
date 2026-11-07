@@ -31,6 +31,7 @@ limitations under the License.
 #include <CppNFe/envevento.h>
 #include <CppNFe/conssitnfe.h>
 #include <CppNFe/cancnfe.h>
+#include <CppNFe/nfedistribuicaodfe.h>
 
 
 class CPPNFE_EXPORT EventoNotaFiscal : public QObject
@@ -45,6 +46,7 @@ public:
     std::unique_ptr<EnvEvento> envEvento;
     std::unique_ptr<ConsSitNFe> consSitNFe;
     std::unique_ptr<CancNFe> cancNFe;
+    std::unique_ptr<NFeDistribuicaoDFe> nfeDistribuicaoDFe;
 
 signals:
     void errorOccurred(const QString &error);

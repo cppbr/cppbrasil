@@ -8,6 +8,16 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Distribuição de DF-e — NT 2014.002 v1.40
+
+- Consulte o Ambiente Nacional por último NSU, NSU específico ou chave de
+  acesso em `EventoNotaFiscal::nfeDistribuicaoDFe`, com CPF ou CNPJ
+  do interessado, inclusive alfanumérico.
+- Leia o lote em `retDistDFeInt->loteDistDFeInt->docZip`. Cada item
+  expõe o Base64 recebido em `get_zip()` e o XML descompactado em
+  `get_xml()`, com acesso aos resumos, ao evento processado e à NF-e com
+  protocolo.
+
 #### Produtos agropecuários — NT 2024.003 v1.10
 
 - Leia e gere o grupo opcional `agropecuario` da NF-e e da NFC-e em
