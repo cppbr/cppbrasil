@@ -45,12 +45,13 @@ enum class TpNF {None = -1, Entrada = 0, Saida = 1};
 enum class IdDest {None = -1, Interna = 1, Interestadual = 2, Exterior = 3};
 //tpImp - Formato de Impressão do DANFE
 enum class TpImp {None = -1, SemGeracao = 0, Retrato = 1, Paisagem = 2,
-                             Simplificado = 3, NFCe = 4, MsgEletronica = 5};
+                             Simplificado = 3, NFCe = 4, MsgEletronica = 5, SimplificadoTipo2 = 6};
 //tpEmis - Tipo de Emissão da NF-e
 enum class TpEmis {None = -1, Normal = 1, Contingencia_FSIA = 2,
                    RegimeEspecialNFF_NaoUsarEste = 3, //Antes Contingência SCAN desativado na NT 2015/002. Agora Regime Especial NFF (NT 2021.002)
                    Contingencia_EPEC = 4, Contingencia_FSDA = 5, Contingencia_SVCAN = 6,
-                   Contingencia_SVCRS = 7, Contingencia_SVCSP = 8, Contingencia_NFCe = 9};
+                   Contingencia_SVCRS = 7, Contingencia_SVCSP = 8, Contingencia_Offline = 9,
+                   Contingencia_NFCe = Contingencia_Offline};
 //finNFe - Finalidade de emissão da NF-e
 enum class FinNFe {None = -1, Normal = 1, Complementar = 2, Ajuste = 3, Devolucao = 4};
 //indFinal - Indica operação com Consumidor final

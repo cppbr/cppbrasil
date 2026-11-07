@@ -111,6 +111,8 @@ QByteArray XmlWrite::get_infNFeSupl_OFFLINE(const QString &chave, const VersaoQr
 
 VersaoQrCodeNF XmlWrite::versaoQrCode(const InfNFe &infNFe, const ConfigNFe &config)
 {
+    if (infNFe.ide->usaDanfeSimplificadoTipo2())
+        return VersaoQrCodeNF::v300;
     if (!infNFe.emite->get_CPF().isEmpty() && ConvNF::intToUF(infNFe.ide->get_cUF()) != UF::PR)
         return VersaoQrCodeNF::v300;
     return config.get_VersaoQrCodeNF();
@@ -144,7 +146,7 @@ QByteArray XmlWrite::get_infNFeSupl_OFFLINE_V3(const QString &chave, const InfNF
     QByteArray assinatura;
     if (!crypto.signature(HashType::sha1, parametros.toUtf8(), true, assinatura) || assinatura.isEmpty())
     {
-        erro = QStringLiteral("Erro ao assinar o QR Code da NFC-e em contingência.");
+        erro = QStringLiteral("Erro ao assinar o QR Code da nota em contingência off-line.");
         if (!crypto.get_error().isEmpty())
             erro += QLatin1Char(' ') + crypto.get_error();
         return {};
@@ -446,6 +448,7 @@ void XmlWrite::get_dest()
 {   //dest - E01
     Dest *_dest = this->m_infNFe->dest.get();
     EnderDest *_enderDest = _dest->enderDest.get();
+    const auto &ide = *this->m_infNFe->ide;
     //Quando 65 só deverá existir caso algum dos campos abaixo não esteja vazio
     if (this->m_infNFe->ide->get_mod() == ModeloDF::NFCe)
     {
@@ -476,9 +479,13 @@ void XmlWrite::get_dest()
             this->m_xmlw->writeEndElement();//fechamento grupo dest
         }
     }
-    //obgrigatório para 55
-    if (this->m_infNFe->ide->get_mod() == ModeloDF::NFe)
+    if (ide.get_mod() == ModeloDF::NFe)
     {
+        const bool tipo2 = ide.usaDanfeSimplificadoTipo2();
+        if (tipo2 && _dest->get_CNPJ().isEmpty() && _dest->get_CPF().isEmpty() &&
+            _dest->get_idEstrangeiro().isEmpty())
+            return;
+
         this->m_xmlw->writeStartElement("dest");//abertura grupo dest
         if (!_dest->get_CNPJ().isEmpty())
             this->m_xmlw->writeTextElement("CNPJ", _dest->get_CNPJ());
@@ -487,32 +494,40 @@ void XmlWrite::get_dest()
         else if (!_dest->get_idEstrangeiro().isNull() || this->m_infNFe->ide->get_idDest() == IdDest::Exterior)
             this->m_xmlw->writeTextElement("idEstrangeiro", _dest->get_idEstrangeiro());
 
-        if (this->m_infNFe->ide->get_tpAmb() == TpAmb::Homologacao)
-           this->m_xmlw->writeTextElement("xNome", "NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
-        else
-           this->m_xmlw->writeTextElement("xNome", _dest->get_xNome());
+        if (!tipo2 || !_dest->get_xNome().isEmpty())
+        {
+            if (ide.get_tpAmb() == TpAmb::Homologacao)
+                this->m_xmlw->writeTextElement("xNome", "NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
+            else
+                this->m_xmlw->writeTextElement("xNome", _dest->get_xNome());
+        }
 
         //enderDest - E05
-        this->m_xmlw->writeStartElement("enderDest");//abertura grupo enderDest
-        this->m_xmlw->writeTextElement("xLgr", _enderDest->get_xLgr());
-        this->m_xmlw->writeTextElement("nro", QString::number(_enderDest->get_nro()));
-        if (!_enderDest->get_xCpl().isEmpty())
-            this->m_xmlw->writeTextElement("xCpl", _enderDest->get_xCpl());
-        this->m_xmlw->writeTextElement("xBairro", _enderDest->get_xBairro());
-        this->m_xmlw->writeTextElement("cMun", QString::number(_enderDest->get_cMun()));
-        this->m_xmlw->writeTextElement("xMun", _enderDest->get_xMun());
-        this->m_xmlw->writeTextElement("UF", _enderDest->get_UF());
-        if (_enderDest->get_CEP() > 0)
-            this->m_xmlw->writeTextElement("CEP", QString::number(_enderDest->get_CEP()));
-        if (_enderDest->get_cPais() > 0)
-            this->m_xmlw->writeTextElement("cPais", QString::number(_enderDest->get_cPais()));
-        if (!_enderDest->get_xPais().isEmpty())
-            this->m_xmlw->writeTextElement("xPais", _enderDest->get_xPais());
-        if (!_enderDest->get_fone().isEmpty())
-            this->m_xmlw->writeTextElement("fone", _enderDest->get_fone());
-        this->m_xmlw->writeEndElement();//fechamento grupo enderDest
+        if (!tipo2 || !_enderDest->get_xLgr().isEmpty())
+        {
+            this->m_xmlw->writeStartElement("enderDest");//abertura grupo enderDest
+            this->m_xmlw->writeTextElement("xLgr", _enderDest->get_xLgr());
+            this->m_xmlw->writeTextElement("nro", QString::number(_enderDest->get_nro()));
+            if (!_enderDest->get_xCpl().isEmpty())
+                this->m_xmlw->writeTextElement("xCpl", _enderDest->get_xCpl());
+            this->m_xmlw->writeTextElement("xBairro", _enderDest->get_xBairro());
+            this->m_xmlw->writeTextElement("cMun", QString::number(_enderDest->get_cMun()));
+            this->m_xmlw->writeTextElement("xMun", _enderDest->get_xMun());
+            this->m_xmlw->writeTextElement("UF", _enderDest->get_UF());
+            if (_enderDest->get_CEP() > 0)
+                this->m_xmlw->writeTextElement("CEP", QString::number(_enderDest->get_CEP()));
+            if (_enderDest->get_cPais() > 0)
+                this->m_xmlw->writeTextElement("cPais", QString::number(_enderDest->get_cPais()));
+            if (!_enderDest->get_xPais().isEmpty())
+                this->m_xmlw->writeTextElement("xPais", _enderDest->get_xPais());
+            if (!_enderDest->get_fone().isEmpty())
+                this->m_xmlw->writeTextElement("fone", _enderDest->get_fone());
+            this->m_xmlw->writeEndElement();//fechamento grupo enderDest
+        }
 
-        this->m_xmlw->writeTextElement("indIEDest", ConvNF::indIEDestToStr(_dest->get_indIEDest()));
+        const auto indIEDest = tipo2 && _dest->get_indIEDest() == IndIEDest::None
+            ? IndIEDest::NaoContribuinte : _dest->get_indIEDest();
+        this->m_xmlw->writeTextElement("indIEDest", ConvNF::indIEDestToStr(indIEDest));
         if (!_dest->get_IE().isEmpty())
             this->m_xmlw->writeTextElement("IE", _dest->get_IE());
         if (!_dest->get_ISUF().isEmpty())
@@ -659,9 +674,9 @@ void XmlWrite::get_prod(const int &i)
     this->m_xmlw->writeTextElement("cEAN", _prod->get_cEAN());
     if (!_prod->get_cBarra().isEmpty())
         this->m_xmlw->writeTextElement("cBarra", _prod->get_cBarra());
-    //NFCe Homologação o primeiro item deve ter a descrição diferente
-    if ((this->m_infNFe->ide->get_tpAmb() == TpAmb::Homologacao) &&
-        (this->m_infNFe->ide->get_mod() == ModeloDF::NFCe) && (i == 0))
+    const auto &ide = *this->m_infNFe->ide;
+    if (i == 0 && ide.get_tpAmb() == TpAmb::Homologacao &&
+        (ide.get_mod() == ModeloDF::NFCe || ide.usaDanfeSimplificadoTipo2()))
         this->m_xmlw->writeTextElement("xProd", "NOTA FISCAL EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
     else
         this->m_xmlw->writeTextElement("xProd", _prod->get_xProd());
@@ -2574,11 +2589,11 @@ void XmlWrite::get_agropecuario()
 void XmlWrite::get_infNFeSupl_ONLINE()
 {
     const auto &ide = *this->m_infNFe->ide;
-    if (ide.get_mod() != ModeloDF::NFCe)
+    if (ide.get_mod() != ModeloDF::NFCe && !ide.usaDanfeSimplificadoTipo2())
         return;
 
     const auto versao = versaoQrCode(*this->m_infNFe, *this->m_confgNFe);
-    if (versao == VersaoQrCodeNF::v300 ? ide.get_tpEmis() == TpEmis::Contingencia_NFCe
+    if (versao == VersaoQrCodeNF::v300 ? ide.get_tpEmis() == TpEmis::Contingencia_Offline
                                      : ide.get_tpEmis() != TpEmis::Normal)
         return;
 

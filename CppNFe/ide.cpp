@@ -183,6 +183,11 @@ void Ide::set_tpImp(const TpImp &tpImp)
   this->m_tpImp = tpImp;
 }
 
+bool Ide::usaDanfeSimplificadoTipo2() const
+{
+    return m_mod == ModeloDF::NFe && m_tpImp == TpImp::SimplificadoTipo2;
+}
+
 TpEmis Ide::get_tpEmis() const
 {
   return this->m_tpEmis;

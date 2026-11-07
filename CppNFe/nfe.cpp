@@ -55,6 +55,28 @@ QString validarEmissaoNFCe(const InfNFe &infNFe)
     return {};
 }
 
+QString validarEmissaoTipo2(const InfNFe &infNFe)
+{
+    const auto &ide = *infNFe.ide;
+    if (ide.get_dhSaiEnt().isValid())
+        return QStringLiteral("NF-e com DANFE Simplificado Tipo 2 não admite data de entrada/saída (B10-10).");
+    if (ide.get_tpNF() != TpNF::Saida || ide.get_idDest() != IdDest::Interna)
+        return QStringLiteral("NF-e com DANFE Simplificado Tipo 2 exige operação interna de saída (B11-10 e B11a-10).");
+    if (ide.get_finNFe() != FinNFe::Normal || ide.get_indFinal() != IndFinal::ConsumidorFinal)
+        return QStringLiteral("NF-e com DANFE Simplificado Tipo 2 exige finalidade normal e consumidor final (B25-20 e B25a-10).");
+
+    const auto presenca = ide.get_indPres();
+    if (presenca != IndPres::Presencial && presenca != IndPres::EntregaDomicilio &&
+        presenca != IndPres::PresencialForaEstabelecimento)
+        return QStringLiteral("Indicador de presença incompatível com DANFE Simplificado Tipo 2 (B25b-20).");
+    if (presenca == IndPres::EntregaDomicilio && infNFe.dest->get_CNPJ().isEmpty() &&
+        infNFe.dest->get_CPF().isEmpty() && infNFe.dest->get_idEstrangeiro().isEmpty())
+        return QStringLiteral("Identifique o destinatário na operação com entrega (E01-20).");
+    if (ide.NFref->count() > 0)
+        return QStringLiteral("NF-e com DANFE Simplificado Tipo 2 não pode referenciar documento fiscal (BA01-10).");
+    return {};
+}
+
 } // namespace
 
 Nfe::Nfe(): infNFe(new InfNFe), protNFe(new ProtNFe), infNFeSupl(new InfNFeSupl)
@@ -116,11 +138,11 @@ void Nfe::assinarXML(const ConfigNFe *config)
     }
 
     const auto &ide = *this->infNFe->ide;
-    const bool nfce = ide.get_mod() == ModeloDF::NFCe;
+    const bool usaQrCode = ide.get_mod() == ModeloDF::NFCe || ide.usaDanfeSimplificadoTipo2();
     const auto versaoQr = XmlWrite::versaoQrCode(*this->infNFe, *config);
-    const bool offline = nfce && (versaoQr == VersaoQrCodeNF::v300
-                                      ? ide.get_tpEmis() == TpEmis::Contingencia_NFCe
-                                      : ide.get_tpEmis() != TpEmis::Normal);
+    const bool offline = usaQrCode && (versaoQr == VersaoQrCodeNF::v300
+                                           ? ide.get_tpEmis() == TpEmis::Contingencia_Offline
+                                           : ide.get_tpEmis() != TpEmis::Normal);
     CppLibXml2 libxml(crypto, config->arquivos->get_caminhoSchema().toLocal8Bit());
     QByteArray xml = this->m_xml_original.toLocal8Bit();
     const QByteArray uri = QByteArray("NFe") + this->m_chaveacesso.toLocal8Bit();
@@ -167,7 +189,7 @@ void Nfe::assinarXML(const ConfigNFe *config)
     }
 
     this->m_xml_assinado = QString::fromLocal8Bit(resultado);
-    if (nfce)
+    if (usaQrCode)
     {
         this->infNFeSupl->setFromNode(CppUtility::extractStr(this->m_xml_assinado,
                                                             QStringLiteral("<infNFeSupl>"),
@@ -239,12 +261,17 @@ void Nfe::gerarChaveAcesso()
     this->m_chaveacesso.clear();
     this->infNFe->set_Id(QString());
     this->infNFe->ide->set_cDV(QString());
-    if (this->infNFe->ide->get_mod() == ModeloDF::NFCe)
-    {
+    const auto &ide = *this->infNFe->ide;
+    if (ide.usaDanfeSimplificadoTipo2())
+        this->m_error = validarEmissaoTipo2(*this->infNFe);
+    else if (ide.get_tpImp() == TpImp::SimplificadoTipo2)
+        this->m_error = QStringLiteral("DANFE Simplificado Tipo 2 é exclusivo da NF-e modelo 55.");
+    else if (ide.get_mod() == ModeloDF::NFe && ide.get_tpEmis() == TpEmis::Contingencia_Offline)
+        this->m_error = QStringLiteral("NF-e em contingência off-line exige DANFE Simplificado Tipo 2 (B22-10).");
+    else if (ide.get_mod() == ModeloDF::NFCe)
         this->m_error = validarEmissaoNFCe(*this->infNFe);
-        if (!this->m_error.isEmpty())
-            return;
-    }
+    if (!this->m_error.isEmpty())
+        return;
 
     QString cUF = QString::number(this->infNFe->ide->get_cUF());  //Código da UF do emitente do Documento Fiscal
     cUF = CppUtility::insZeroLeft(cUF, 2);

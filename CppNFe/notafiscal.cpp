@@ -201,8 +201,8 @@ void NotaFiscal::tratarRetorno()
                 if (this->NFe->value(j)->get_chNFe() == _chNFe)
                 {
                     //montando xml com retorno
-                    //100-uso autorizado, 150-uso autorizado fora de prazo
-                    if (_cStat == 100 || _cStat == 150)
+                    // Uso autorizado, com alerta ou fora de prazo.
+                    if (_cStat == 100 || _cStat == 120 || _cStat == 150)
                     {
                         _xmlOriginal.append("<a>");
                         _xmlOriginal.append(CppUtility::extractStr(this->NFe->value(j)->get_XMLAssinado(),
