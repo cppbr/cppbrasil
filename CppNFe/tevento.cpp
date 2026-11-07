@@ -900,6 +900,37 @@ void TEvento::gerarXML()
     const bool manifestacao = !descricaoManifestacao.isEmpty();
     if (manifestacao && !validarDadosManifestacao())
         return;
+    const bool epec = tipo == TpEvento::EPEC;
+    const auto *det = infEvento->detEvento.get();
+    const auto *dest = det->dest.get();
+    QString ufDest;
+    if (epec)
+    {
+        const QString chave = infEvento->get_chNFe();
+        const int codigoUF = dest->get_UF();
+        ufDest = codigoUF == 99 ? QStringLiteral("EX") : ConvNF::ufToStr(ConvNF::intToUF(codigoUF));
+        const int documentos = !dest->get_CNPJ().isEmpty() + !dest->get_CPF().isEmpty() +
+                               !dest->get_idEstrangeiro().isEmpty();
+        static const QRegularExpression formatoChave("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
+        if (!formatoChave.match(chave).hasMatch() || chave.mid(20, 2) != "55" || chave.at(34) != '4')
+            m_error = "EPEC exige uma chave de acesso de NF-e modelo 55 com tpEmis=4.";
+        else if (infEvento->get_nSeqEvento() != 1)
+            m_error = "EPEC exige nSeqEvento=1.";
+        else if (infEvento->get_CNPJ().isEmpty() == infEvento->get_CPF().isEmpty())
+            m_error = "Informe o CNPJ ou o CPF do emitente no EPEC.";
+        else if (!infEvento->get_dhEvento().isValid() || !det->get_dhEmi().isValid() ||
+                 det->get_verAplic().trimmed().isEmpty() || det->get_verAplic().size() > 20 ||
+                 (det->get_tpNF() != TpNF::Entrada && det->get_tpNF() != TpNF::Saida) ||
+                 det->get_IE().trimmed().isEmpty())
+            m_error = "EPEC exige dhEvento, dhEmi, verAplic, tpNF e IE do emitente.";
+        else if (ufDest.size() != 2)
+            m_error = "Informe o código IBGE da UF do destinatário do EPEC ou 99 para o exterior.";
+        else if ((codigoUF == 99 && (!dest->get_CNPJ().isEmpty() || !dest->get_CPF().isEmpty())) ||
+                 (codigoUF != 99 && documentos != 1))
+            m_error = "Informe um único documento do destinatário do EPEC. Para UF EX, use idEstrangeiro.";
+        if (!m_error.isEmpty())
+            return;
+    }
     if (infEvento->get_tpEvento() == TpEvento::AtorInteressadoNFeTransp)
     {
         const auto autor = infEvento->detEvento->get_tpAutor();
@@ -953,7 +984,34 @@ void TEvento::gerarXML()
 
     _xmlw.writeTextElement("descEvento", manifestacao ? descricaoManifestacao :
                          this->infEvento->detEvento->get_descEvento());
-    if (manifestacao)
+    if (epec)
+    {
+        _xmlw.writeTextElement("cOrgaoAutor", infEvento->get_chNFe().left(2));
+        _xmlw.writeTextElement("tpAutor", "1");
+        _xmlw.writeTextElement("verAplic", det->get_verAplic());
+        _xmlw.writeTextElement("dhEmi", CppUtil::dateTimeToStr(det->get_dhEmi(), DtH::DateTimeUTC));
+        _xmlw.writeTextElement("tpNF", ConvNF::tpNFToStr(det->get_tpNF()));
+        _xmlw.writeTextElement("IE", det->get_IE());
+
+        _xmlw.writeStartElement("dest");
+        _xmlw.writeTextElement("UF", ufDest);
+        if (!dest->get_CNPJ().isEmpty())
+            _xmlw.writeTextElement("CNPJ", dest->get_CNPJ());
+        else if (!dest->get_CPF().isEmpty())
+            _xmlw.writeTextElement("CPF", dest->get_CPF());
+        else
+            _xmlw.writeTextElement("idEstrangeiro", dest->get_idEstrangeiro());
+
+        const QString ieDest = dest->get_IE().trimmed();
+        if (ufDest != "EX" && !ieDest.isEmpty() && ieDest.compare("ISENTO", Qt::CaseInsensitive) != 0)
+            _xmlw.writeTextElement("IE", ieDest);
+        _xmlw.writeEndElement();
+
+        _xmlw.writeTextElement("vNF", CppUtility::doubleToStrDecimal(det->get_vNF(), 2));
+        _xmlw.writeTextElement("vICMS", CppUtility::doubleToStrDecimal(det->get_vICMS(), 2));
+        _xmlw.writeTextElement("vST", CppUtility::doubleToStrDecimal(det->get_vST(), 2));
+    }
+    else if (manifestacao)
     {
         if (tipo == TpEvento::OperacaoNaoRealizadaDest)
             _xmlw.writeTextElement("xJust", infEvento->detEvento->get_xJust());
@@ -990,26 +1048,6 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("IE", this->infEvento->detEvento->get_IE());
     }
 
-    //EPEC
-    if (this->infEvento->get_tpEvento() == TpEvento::EPEC)
-    {
-        _xmlw.writeStartElement("dest"); //abertura do grupo dest
-        if (this->infEvento->detEvento->dest->get_UF() > 0)
-            _xmlw.writeTextElement("UF", QString::number(this->infEvento->detEvento->dest->get_UF()));
-        if (!this->infEvento->detEvento->dest->get_CNPJ().isEmpty())
-            _xmlw.writeTextElement("CNPJ", this->infEvento->detEvento->dest->get_CNPJ());
-        if (!this->infEvento->detEvento->dest->get_CPF().isEmpty())
-            _xmlw.writeTextElement("CPF", this->infEvento->detEvento->dest->get_CPF());
-        if (!this->infEvento->detEvento->dest->get_idEstrangeiro().isEmpty())
-            _xmlw.writeTextElement("idEstrangeiro", this->infEvento->detEvento->dest->get_idEstrangeiro());
-        if (!this->infEvento->detEvento->dest->get_IE().isEmpty())
-            _xmlw.writeTextElement("IE", this->infEvento->detEvento->dest->get_IE());
-        _xmlw.writeEndElement(); //fechamento dest
-
-        _xmlw.writeTextElement("vNF", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->get_vNF(), 2));
-        _xmlw.writeTextElement("vICMS", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->get_vICMS(), 2));
-        _xmlw.writeTextElement("vST", CppUtility::doubleToStrDecimal(this->infEvento->detEvento->get_vST(), 2));
-    }
     //Pedido de Prorrogação
     if (pedidoProrrogacao(tipo))
     {

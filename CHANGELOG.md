@@ -518,6 +518,16 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Corrigido
 
+#### EPEC da NF-e — NT 2014.001 v1.41
+
+- Gere o evento 110140 pelo `EventoNotaFiscal::envEvento`, em lote
+  exclusivo para o Ambiente Nacional. Use a chave da NF-e modelo 55 com
+  `tpEmis=4` e informe CPF ou CNPJ do emitente.
+- O detalhe grava a sigla da UF do destinatário a partir do código IBGE,
+  com `99` para `EX`. Para destinatário no exterior, a identificação
+  estrangeira pode ser vazia. A IE do destinatário é omitida para isentos
+  e operações com o exterior. Os totais são gravados após o grupo `dest`.
+
 #### Chave de acesso com CNPJ alfanumérico — NT 2026.004 v1.01
 
 - A geração da chave da NF-e e da NFC-e aceita letras nas 12 primeiras
