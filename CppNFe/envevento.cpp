@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "envevento.h"
 #include "urlnfe.h"
+#include <QSet>
 
 EnvEvento::EnvEvento(ConfigNFe *confgNFe, NotaFiscal *notafiscal): evento(new Container<TEvento>),
    retorno(new RetEnvEvento()), config(confgNFe), notafiscal(notafiscal)
@@ -155,6 +156,7 @@ bool EnvEvento::gerarXML(const int &idLote)
     this->m_error.clear();
     this->m_xml.clear();
     bool prorrogacao = false;
+    int epec = 0;
     for (const TEvento *item : *evento)
     {
         const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
@@ -170,6 +172,33 @@ bool EnvEvento::gerarXML(const int &idLote)
             return false;
         }
         prorrogacao = prorrogacao || (tipo >= 111500 && tipo <= 111503);
+        if (item->infEvento->get_tpEvento() == TpEvento::EPEC)
+            ++epec;
+    }
+    if (epec > 0)
+    {
+        if (epec != evento->count() || config->get_ModeloDF() != ModeloDF::NFe ||
+            idLote < 0 || epec > 20 || (!m_versao.isEmpty() && m_versao != "1.00"))
+        {
+            m_error = "EPEC exige lote separado, modelo 55, versão 1.00, idLote não negativo e até 20 eventos.";
+            return false;
+        }
+        QSet<QString> chaves;
+        for (const TEvento *item : *evento)
+        {
+            const auto *inf = item->infEvento.get();
+            if (inf->get_tpAmb() != TpAmb::None && inf->get_tpAmb() != config->webservices->get_tpAmb())
+            {
+                m_error = "O ambiente do EPEC deve ser igual ao ambiente configurado.";
+                return false;
+            }
+            if (chaves.contains(inf->get_chNFe()))
+            {
+                m_error = "O lote aceita um EPEC por chave de acesso.";
+                return false;
+            }
+            chaves.insert(inf->get_chNFe());
+        }
     }
     if (prorrogacao)
     {
@@ -239,6 +268,15 @@ bool EnvEvento::gerarXML(const int &idLote)
 void EnvEvento::updateEvento(int &index)
 {
     const TpEvento tipo = evento->value(index)->infEvento->get_tpEvento();
+    if (tipo == TpEvento::EPEC)
+    {
+        auto *inf = evento->value(index)->infEvento.get();
+        inf->set_cOrgao(91);
+        inf->set_verEvento("1.00");
+        inf->detEvento->set_descEvento("EPEC");
+        if (inf->get_nSeqEvento() == 0)
+            inf->set_nSeqEvento(1);
+    }
     if (!ConvNF::descricaoManifestacao(tipo).isEmpty())
     {
         auto *inf = evento->value(index)->infEvento.get();
@@ -318,6 +356,11 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     if (!evento->isEmpty())
     {
         const TpEvento primeiro = evento->value(0)->infEvento->get_tpEvento();
+        if (primeiro == TpEvento::EPEC)
+        {
+            servidor = "AN";
+            return true;
+        }
         int manifestacoes = 0;
         for (const TEvento *item : *evento)
             if (!ConvNF::descricaoManifestacao(item->infEvento->get_tpEvento()).isEmpty())

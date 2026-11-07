@@ -37,7 +37,7 @@ QString ConvDF::ufToStr(const UF &value)
                           "RJ", "SP", "PR", "SC", "RS", "MS", "MT", "GO", "DF"};
 
     int _i = _ir.indexOf(static_cast<int>(value));
-    return _sr[_i];
+    return _sr.value(_i);
 }
 
 UF ConvDF::strToUF(const QString &value)

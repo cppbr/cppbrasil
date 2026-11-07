@@ -110,7 +110,7 @@ public:
     ~DestEPEC();
     void clear();
     int get_UF() const;
-    void set_UF(const int &uf);
+    void set_UF(const int &uf); // Código IBGE da UF ou 99 para o exterior.
     QString get_CNPJ() const;
     void set_CNPJ(const QString &CNPJ);
     QString get_CPF() const;
