@@ -22,6 +22,8 @@ void ConsSitNFe::clear()
 
 bool ConsSitNFe::consultar(const QString &chNFe, const bool &salvarXMLNota, const bool &vincularEvento)
 {
+    this->retorno->clear();
+    this->m_error.clear();
     bool _ret = true;
     if (gerarXML(chNFe))
     {
@@ -36,7 +38,7 @@ bool ConsSitNFe::consultar(const QString &chNFe, const bool &salvarXMLNota, cons
             connect(_ws.get(), &WSConsultaProtocolo::wsChange, this, &ConsSitNFe::wsChange);
             connect(_ws.get(), &WSConsultaProtocolo::errorOccurred, this, &ConsSitNFe::onError);
 
-            bool _ret = _ws->send(this->m_xml.toLocal8Bit(),
+            _ret = _ws->send(this->m_xml.toLocal8Bit(),
                                   ConvNF::versaoLayout(WebServicesNF::NFeConsultaProtocolo));
 
             if (_ret)
@@ -82,7 +84,7 @@ bool ConsSitNFe::gerarXML(const QString &chNFe)
     if (this->m_versao.isEmpty())
       this->m_versao = "4.00";
 
-    this->m_xml += "<consSitNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\""+ this->m_versao +"\">";
+    this->m_xml = "<consSitNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\""+ this->m_versao +"\">";
     this->m_xml += "<tpAmb>" + ConvNF::tpAmbToStr(config->webservices->get_tpAmb()) + "</tpAmb>";
     this->m_xml += "<xServ>CONSULTAR</xServ>";
     this->m_xml += "<chNFe>" + chNFe + "</chNFe>";
@@ -126,8 +128,8 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
     int _cStat = this->retorno->get_cStat();
 
     //salvando nota
-    // 100 ou 150-Autorizado o Uso, 101-Cancelamento de NF-e Homologado, 110-Uso Denegado
-    if (_cStat == 100 || _cStat == 101 || _cStat == 110 || _cStat == 150)
+    // Uso autorizado (inclusive com alerta ou fora de prazo), cancelado ou denegado.
+    if (_cStat == 100 || _cStat == 101 || _cStat == 110 || _cStat == 120 || _cStat == 150)
     {
         for (int i = 0; i < this->notafiscal->NFe->count(); ++i)
         {
@@ -135,8 +137,10 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
             {
                 _xml.clear();
                 _xml.append("<a>");
-                _xml.append(CppUtility::extractStr(this->notafiscal->NFe->value(i)->get_XMLOriginal(),
-                                                   "<NFe xmlns", "</NFe>").toLocal8Bit());
+                auto *nota = this->notafiscal->NFe->value(i);
+                const auto xmlAssinado = nota->get_XMLAssinado();
+                const auto xmlNota = xmlAssinado.isEmpty() ? nota->get_XMLOriginal() : xmlAssinado;
+                _xml.append(CppUtility::extractStr(xmlNota, "<NFe xmlns", "</NFe>").toLocal8Bit());
                 _xml.append("</a>");
                 //montando xml
                 _nfeProc = XmlWrite::get_nfeProc(this->retorno->get_versao());
@@ -152,7 +156,8 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
                         //atualiza o xml de protNFe da classe Retorno
                         this->retorno->protNFe->set_xml(_nfeProc);
                         //atualiza xml de NFe
-                        this->notafiscal->NFe->value(i)->set_XMLAutorizado(_nfeProc);
+                        nota->set_XMLAutorizado(_nfeProc);
+                        *nota->protNFe = *this->retorno->protNFe;
                     }
                 }
 
@@ -173,7 +178,8 @@ void ConsSitNFe::tratarRetorno(const bool &salvarXMLNota, const bool &vincularEv
                             //atualiza o xml de protNFe da classe Retorno
                             this->retorno->protNFe->set_xml(_xmlDFe);
                             //atualiza xml de NFe
-                            this->notafiscal->NFe->value(i)->set_XMLAutorizado(_xmlDFe);
+                            nota->set_XMLAutorizado(_xmlDFe);
+                            nota->protNFe->set_xml(_xmlDFe);
                         }
                     }
                 }

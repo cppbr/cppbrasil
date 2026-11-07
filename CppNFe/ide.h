@@ -61,6 +61,7 @@ public:
     void set_cMunFG(const int &cMunFG);
     TpImp get_tpImp() const;
     void set_tpImp(const TpImp &tpImp);
+    bool usaDanfeSimplificadoTipo2() const;
     TpEmis get_tpEmis() const;
     void set_tpEmis(const TpEmis &tpEmis);
     QString get_cDV() const;

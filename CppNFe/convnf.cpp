@@ -186,7 +186,7 @@ QString ConvNF::tpImpToStr(const TpImp &value)
 
 TpImp ConvNF::strToTpImp(const QString &value)
 {
-    QList<QString> _r = {"-1","0","1","2","3","4","5"};
+    QList<QString> _r = {"-1","0","1","2","3","4","5","6"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpImp::None;

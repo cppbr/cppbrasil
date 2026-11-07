@@ -72,6 +72,15 @@ bool XmlRead::nfe() const
                  if (_xml.name() == QStringLiteral("infNFeSupl")) //ZX01
                    set_infNFeSupl(_xml);
 
+                 if (_xml.isStartElement() && _xml.name() == QStringLiteral("Signature") &&
+                     _xml.namespaceUri() == QStringLiteral("http://www.w3.org/2000/09/xmldsig#") &&
+                     nota->infNFe->ide->usaDanfeSimplificadoTipo2() &&
+                     nota->infNFe->ide->get_tpEmis() == TpEmis::Contingencia_Offline)
+                 {
+                     nota->m_xml_assinado = nota->get_XMLOriginal();
+                     _xml.skipCurrentElement();
+                 }
+
                  _xml.readNext();
             }
         }

@@ -8,6 +8,15 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### XML da NF-e com DANFE Simplificado Tipo 2 — NT 2026.002 v1.11
+
+- Use `TpImp::SimplificadoTipo2` (`tpImp=6`) na NF-e modelo 55.
+  A geração usa QR Code v3 e permite omitir o destinatário nas operações
+  presenciais quando aplicável. Informe o destinatário na operação com entrega.
+- Use `TpEmis::Contingencia_Offline` (`tpEmis=9`) para assinar o XML e o QR
+  Code em contingência. O XML assinado pode ser reimportado e enviado depois
+  pelo serviço de autorização da NF-e modelo 55.
+
 #### Distribuição de DF-e — NT 2014.002 v1.40
 
 - Consulte o Ambiente Nacional por último NSU, NSU específico ou chave de
@@ -375,6 +384,12 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
   que permitem escrever `for (auto *x : *container)`.
 
 ### Modificado
+
+#### Autorização com alerta — NT 2026.002 v1.11
+
+- O status `120` é tratado como autorização na emissão e na consulta de
+  protocolo. O XML processado preserva a sequência de até cinco mensagens
+  da SEFAZ, disponível em `ProtNFe::get_mensagens()`.
 
 #### Acesso aos dados da NF-e
 
