@@ -84,7 +84,10 @@ void ProtNFe::lerXML(QXmlStreamReader &xml)
                 codigoMsg = valor;
             else if (campo == QStringLiteral("xMsg"))
             {
-                m_mensagens.append(MensagemSefaz{codigoMsg, valor});
+                MensagemSefaz mensagem;
+                mensagem.set_codigo(codigoMsg);
+                mensagem.set_texto(valor);
+                m_mensagens.append(mensagem);
                 codigoMsg.clear();
             }
         }
@@ -198,26 +201,26 @@ QList<ProtNFe::MensagemSefaz> ProtNFe::get_mensagens() const
 
 int ProtNFe::get_cMsg() const
 {
-    return this->m_mensagens.isEmpty() ? 0 : this->m_mensagens.constLast().codigo.toInt();
+    return this->m_mensagens.isEmpty() ? 0 : this->m_mensagens.constLast().get_codigo().toInt();
 }
 
 void ProtNFe::set_cMsg(const int &cMsg)
 {
     if (this->m_mensagens.isEmpty())
         this->m_mensagens.append(MensagemSefaz{});
-    this->m_mensagens.last().codigo = cMsg == 0 ? QString() : QString::number(cMsg);
+    this->m_mensagens.last().set_codigo(cMsg == 0 ? QString() : QString::number(cMsg));
 }
 
 QString ProtNFe::get_xMsg() const
 {
-    return this->m_mensagens.isEmpty() ? QString() : this->m_mensagens.constLast().texto;
+    return this->m_mensagens.isEmpty() ? QString() : this->m_mensagens.constLast().get_texto();
 }
 
 void ProtNFe::set_xMsg(const QString &xMsg)
 {
     if (this->m_mensagens.isEmpty())
         this->m_mensagens.append(MensagemSefaz{});
-    this->m_mensagens.last().texto = xMsg;
+    this->m_mensagens.last().set_texto(xMsg);
 }
 
 QString ProtNFe::get_xml() const

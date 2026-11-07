@@ -210,11 +210,13 @@ QByteArray XmlWrite::get_protNFe(const ProtNFe &protocolo)
     writer.writeTextElement("xMotivo", protocolo.get_xMotivo());
     for (const auto &mensagem : protocolo.get_mensagens())
     {
-        if (mensagem.texto.isEmpty())
+        const QString texto = mensagem.get_texto();
+        if (texto.isEmpty())
             continue;
-        if (!mensagem.codigo.isEmpty())
-            writer.writeTextElement("cMsg", mensagem.codigo);
-        writer.writeTextElement("xMsg", mensagem.texto);
+        const QString codigo = mensagem.get_codigo();
+        if (!codigo.isEmpty())
+            writer.writeTextElement("cMsg", codigo);
+        writer.writeTextElement("xMsg", texto);
     }
     writer.writeEndElement(); // infProt
     writer.writeEndElement(); // protNFe

@@ -41,10 +41,32 @@ limitations under the License.
 class CPPNFE_EXPORT ProtNFe
 {
 public:
-    struct MensagemSefaz
+    class MensagemSefaz
     {
-        QString codigo;
-        QString texto;
+    public:
+        QString get_codigo() const
+        {
+            return m_codigo;
+        }
+
+        void set_codigo(const QString &codigo)
+        {
+            m_codigo = codigo;
+        }
+
+        QString get_texto() const
+        {
+            return m_texto;
+        }
+
+        void set_texto(const QString &texto)
+        {
+            m_texto = texto;
+        }
+
+    private:
+        QString m_codigo;
+        QString m_texto;
     };
 
     ProtNFe();

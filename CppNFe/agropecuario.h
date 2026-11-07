@@ -45,7 +45,7 @@ public:
     void clear();
     bool isEmpty() const;
     int get_tpGuia() const;
-    void set_tpGuia(int tpGuia);
+    void set_tpGuia(const int &tpGuia);
     QString get_UFGuia() const;
     void set_UFGuia(const QString &UFGuia);
     QString get_serieGuia() const;
