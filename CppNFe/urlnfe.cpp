@@ -43,10 +43,11 @@ QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &
 {
     QString _uf, _ambiente, _modelo, _versao, _server;
 
+    const bool distribuicao = webServicesNF == WebServicesNF::NFeDistribuicaoDFe;
     _uf = ConvDF::ufToStr(uf);
     _ambiente = (tpAmb == TpAmb::Producao) ? "producao" : "homologacao";
-    _modelo = (modelodf == ModeloDF::NFe) ? "nfe" : "nfce";
-    _versao =  ConvNF::versaoNFToStr(versaoNF);
+    _modelo = (distribuicao || modelodf == ModeloDF::NFe) ? "nfe" : "nfce";
+    _versao = distribuicao ? QStringLiteral("1.00") : ConvNF::versaoNFToStr(versaoNF);
     Q_INIT_RESOURCE(resourcenfe);
     QFile _file;
     _file.setFileName(":/resnfe/urlnfe.json");
@@ -78,7 +79,11 @@ QString UrlNFe::get_urlServidor(const UF &uf, const TpAmb &tpAmb, const TpEmis &
     //caso seja informado o servidor, ele será usado independente da UF. Ex: SVRS, AN.
     //Isso acontece em eventos que possuem um único ambiente autorizador, como o
     //Insucesso na Entrega da NF-e (NT 2023.005), autorizado somente pela SVRS.
-    if (!servidor.isEmpty())
+    if (distribuicao)
+    {
+        _server = (tpAmb == TpAmb::Producao) ? "WP_AN" : "WH_AN";
+    }
+    else if (!servidor.isEmpty())
     {
         _server =  (tpAmb == TpAmb::Homologacao) ? "WH_" : "WP_";
         _server += servidor;

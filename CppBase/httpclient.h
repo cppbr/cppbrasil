@@ -47,6 +47,7 @@ public:
     QByteArray get_lastData() const;
     virtual QByteArray send(const QByteArray &host, const QByteArray &data);
 
+    void set_contentType(const QByteArray &contentType) { m_contentType = contentType; }
     void set_crypto(const CppCrypto* crypto);
     void set_proxy(const QNetworkProxy &proxy);
     void set_protocolo(const QSsl::SslProtocol &protocol);
@@ -60,6 +61,7 @@ protected:
     HttpClient(const CppCrypto* crypto, const QNetworkProxy &proxy,
                const QSsl::SslProtocol &protocol, const int &timeout = 0,
                const bool &verifyMode = true);
+    QByteArray m_contentType = "text/xml; charset=utf-8";
     QByteArray m_data;
     const CppCrypto *m_crypto;
     QNetworkProxy m_proxy;

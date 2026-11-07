@@ -89,6 +89,11 @@ bool WebServices::get_soapEnvelop(const QByteArray &dados, const QByteArray &Nam
 
 QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
 {
+    return sendMsg(host, data, "text/xml; charset=utf-8");
+}
+
+QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data, const QByteArray &contentType)
+{
     this->m_error.clear();
     QByteArray _output;
     std::unique_ptr<HttpClient> _http;
@@ -102,6 +107,7 @@ QByteArray WebServices::sendMsg(const QByteArray &host, const QByteArray &data)
     }
 
     connect(_http.get(), &HttpClient::errorOccurred, this, &WebServices::onError);
+    _http->set_contentType(contentType);
     _output.append(_http->send(host, data));
 
     return _output;

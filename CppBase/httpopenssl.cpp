@@ -289,7 +289,7 @@ QByteArray HttpOpenSSL::getCommand(const QByteArray &host, const QByteArray &dat
 
     _http.append("POST " + getHostName(host, THost::server) + " HTTP/1.1\r\n");
     _http.append("Host: " + getHostName(host, THost::host) + "\r\n");
-    _http.append("Content-Type: text/xml; charset=utf-8\r\n");
+    _http.append("Content-Type: " + m_contentType + "\r\n");
     _http.append("Content-Length: " + QByteArray::number(data.size()) + "\r\n");
     _http.append("Connection: close\r\n\r\n");
     _http.append(data);

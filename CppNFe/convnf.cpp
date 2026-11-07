@@ -49,6 +49,8 @@ QString ConvNF::webServicesNFToMetodo(const WebServicesNF &value)
         case WebServicesNF::NFeStatusServico :
             return "NFeStatusServico";
             break;
+        case WebServicesNF::NFeDistribuicaoDFe:
+            return "NFeDistribuicaoDFe";
         default: return "";
     }
 }
@@ -79,7 +81,7 @@ QString ConvNF::versaoLayout(const WebServicesNF &value)
             return "4.00";
             break;
         case WebServicesNF::NFeDistribuicaoDFe :
-            return "9.99";
+            return "1.01";
             break;
         default: return "";
     }

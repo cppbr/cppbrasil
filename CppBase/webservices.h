@@ -52,6 +52,7 @@ protected:
                                const QByteArray &urlNamespace, QByteArray &output);
 
     QByteArray sendMsg(const QByteArray &host, const QByteArray &data);
+    QByteArray sendMsg(const QByteArray &host, const QByteArray &data, const QByteArray &contentType);
 
 private slots:
     void onError(const QString &error);
