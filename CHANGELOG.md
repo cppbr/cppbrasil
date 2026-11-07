@@ -376,6 +376,13 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### Acesso aos dados da NF-e
+
+- Use os métodos `get_codigo()`, `set_codigo()`, `get_texto()` e
+  `set_texto()` de `ProtNFe::MensagemSefaz` para acessar os campos de cada
+  mensagem do protocolo. `GuiaTransito::set_tpGuia()` passa a receber
+  `const int &`. Recompile a biblioteca e as aplicações.
+
 #### Autorização de NFC-e — NT 2023.002 v1.01
 
 - O envio recusa lotes que contenham uma NFC-e e outro documento antes de

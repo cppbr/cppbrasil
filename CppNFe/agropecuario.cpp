@@ -64,7 +64,7 @@ int GuiaTransito::get_tpGuia() const
     return m_tpGuia;
 }
 
-void GuiaTransito::set_tpGuia(int tpGuia)
+void GuiaTransito::set_tpGuia(const int &tpGuia)
 {
     m_tpGuia = tpGuia;
 }
