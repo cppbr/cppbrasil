@@ -25,7 +25,7 @@ Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as
 - Android
 
 ## Requisitos
-- Qt >= 5.15.2
+- Qt >= 6.5 (o Qt 5 não é mais suportado)
 - OpenSSL >= 1.1.1 (recomendado 3.x)
 - LibXML2 (testada com 2.12 e 2.15; recomendado **2.13 ou superior**, ver abaixo)
 - ZLib

@@ -49,8 +49,8 @@ target_include_directories(CppBase PUBLIC
 )
 
 target_link_libraries(CppBase PUBLIC
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
+    Qt6::Core
+    Qt6::Network
 )
 
 #caso necessário, informe os diretórios das libs openssl, libxml2, zlib e libIconv(caso esteja no windows).

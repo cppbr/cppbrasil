@@ -24,9 +24,6 @@ limitations under the License.
 #include <QString>
 #include <QByteArray>
 #include <QXmlStreamWriter>
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    #include <QTextCodec>
-#endif
 #include <QFile>
 #include <QDebug>
 #include <CppBase/cppbrasil_global.h>

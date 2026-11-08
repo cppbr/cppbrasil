@@ -537,6 +537,8 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   zlib 1.3 e libiconv. As versões novas serão distribuídas como pacotes compactados.
   Até lá, o instalador MSVC e os exemplos precisam de ajustes nas referências às dependências.
 - Exemplo legado QtCon-2022, sem manutenção.
+- Suporte ao Qt 5, cujo suporte oficial terminou em 2025. A biblioteca e os
+  exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
 

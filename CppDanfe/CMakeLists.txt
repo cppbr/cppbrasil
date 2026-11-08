@@ -1,4 +1,4 @@
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Svg Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Gui Svg Widgets)
 
 set(cppdanfe_HEADERS
     code128.h
@@ -19,9 +19,9 @@ target_compile_definitions(CppDanfe PRIVATE CPPDANFE_LIBRARY)
 
 target_link_libraries(CppDanfe PUBLIC
     CppNFe
-    Qt${QT_VERSION_MAJOR}::Gui
-    Qt${QT_VERSION_MAJOR}::Svg
-    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt6::Gui
+    Qt6::Svg
+    Qt6::Widgets
 )
 
 install(TARGETS CppDanfe)

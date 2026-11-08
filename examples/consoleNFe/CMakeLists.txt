@@ -11,8 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Network)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 if (CMAKE_SYSTEM MATCHES "Linux")
@@ -32,8 +31,8 @@ add_executable(consoleNFe
 )
 
 target_link_libraries(consoleNFe 
-   PRIVATE Qt${QT_VERSION_MAJOR}::Core 
-   PRIVATE Qt${QT_VERSION_MAJOR}::Network
+   PRIVATE Qt6::Core 
+   PRIVATE Qt6::Network
 )
 
 if (CMAKE_SYSTEM MATCHES "Linux")

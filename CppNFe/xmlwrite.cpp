@@ -2624,7 +2624,6 @@ void XmlWrite::get_infNFeSupl_ONLINE()
 void XmlWrite::gerarNFE()
 {
     //cabeçalho
-    //this->m_xmlw->setCodec(QTextCodec::codecForName("UTF-8"));
     this->m_xmlw->writeStartElement("NFe");
     this->m_xmlw->writeAttribute("xmlns", "http://www.portalfiscal.inf.br/nfe");
     get_infNFe();

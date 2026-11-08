@@ -133,11 +133,7 @@ QDateTime CppOpenSSL::asn1_to_QDateTime(const ASN1_TIME *aTime)
     QString _sTime = QString("%1%2%3%4%5").arg(_t.mid(8, 2), ":", _t.mid(10, 2),
                                              ":", _t.mid(12, 2));
     QTime _resTime(QTime::fromString(_sTime,"hh:mm:ss"));
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     QDateTime _result(_resDate, _resTime, QTimeZone::UTC);
-#else
-    QDateTime _result(_resDate, _resTime, Qt::UTC);
-#endif
     ASN1_GENERALIZEDTIME_free(_gt);
     return _result;
 }
@@ -382,11 +378,7 @@ bool CppOpenSSL::razaoSocial()
     try{
         QString _text(CppUtility::extractStr(get_subjectName(),"CN=", ","));
         int _index;
-        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            _index = _text.indexOf(QRegExp(":"));
-        #else
-            _index = _text.indexOf(QRegularExpression(":"));
-        #endif
+        _index = _text.indexOf(QRegularExpression(":"));
 
         QString _razao(_text.mid(3, _index - 4)); // - 4 = 3 para o início e 1 para a virgura ","
         set_razaoSocial(_razao);
@@ -404,11 +396,7 @@ bool CppOpenSSL::cnpj()
     try{
         QString _text(CppUtility::extractStr(get_subjectName(),"CN=", ","));
         int _index;
-        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            _index = _text.indexOf(QRegExp(":"));
-        #else
-            _index = _text.indexOf(QRegularExpression(":"));
-        #endif
+        _index = _text.indexOf(QRegularExpression(":"));
 
         QString _cnpj(_text.mid(_index + 1, _text.length() - (_index + 2))); // _index + 1 remove ":" e _index + 2 remove ","
         set_cnpj(_cnpj);

@@ -124,11 +124,7 @@ QString CppUtility::doubleToStrDecimal(const double &value, const int &decimalSi
 QString CppUtility::extractStr(const QString &str, const QString &beginStr, const QString &endStr)
 {
     int _ibegin;
-    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        _ibegin = str.indexOf(QRegExp(beginStr));
-    #else
-        _ibegin = str.indexOf(QRegularExpression(beginStr));
-    #endif
+    _ibegin = str.indexOf(QRegularExpression(beginStr));
 
 
     QString _result(str.mid(_ibegin, str.length() - _ibegin));
@@ -137,11 +133,7 @@ QString CppUtility::extractStr(const QString &str, const QString &beginStr, cons
     if (endStr.isEmpty())
         _iend = _result.length();
     else
-        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            _iend = _result.indexOf(QRegExp(endStr)) + endStr.length();
-        #else
-            _iend = _result.indexOf(QRegularExpression(endStr)) + endStr.length();
-        #endif
+        _iend = _result.indexOf(QRegularExpression(endStr)) + endStr.length();
 
     _result = _result.left(_iend);
     return _result;
@@ -159,11 +151,7 @@ QByteArray CppUtility::extractStr(const QByteArray &str, const QByteArray &begin
 int CppUtility::findString(const QString &str, const QString &strValue)
 {
     int _pos;
-    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        _pos = str.indexOf(QRegExp(strValue));
-    #else
-        _pos = str.indexOf(QRegularExpression(strValue));
-    #endif
+    _pos = str.indexOf(QRegularExpression(strValue));
 
     return _pos;
 }
@@ -304,11 +292,7 @@ int CppUtility::random(const int &digitos)
         }
         else
         {
-            #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                _max = _sDig.left(digitos).toInt();
-            #else
-                _max = QStringView{_sDig}.left(_iDig).toInt();
-            #endif
+            _max = QStringView{_sDig}.left(_iDig).toInt();
         }
 
     int _ran, i = 0, _lenDig;
