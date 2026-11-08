@@ -31,6 +31,7 @@ limitations under the License.
 #include <CppNFe/envevento.h>
 #include <CppNFe/conssitnfe.h>
 #include <CppNFe/cancnfe.h>
+#include <CppNFe/inutnfe.h>
 #include <CppNFe/nfedistribuicaodfe.h>
 
 
@@ -46,6 +47,7 @@ public:
     std::unique_ptr<EnvEvento> envEvento;
     std::unique_ptr<ConsSitNFe> consSitNFe;
     std::unique_ptr<CancNFe> cancNFe;
+    std::unique_ptr<InutNFe> inutNFe;
     std::unique_ptr<NFeDistribuicaoDFe> nfeDistribuicaoDFe;
 
 signals:

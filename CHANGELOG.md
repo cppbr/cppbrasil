@@ -8,6 +8,21 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Inutilização de numeração de NF-e e NFC-e
+
+- `EventoNotaFiscal::inutNFe` disponibiliza `InutNFe`, `InfInut` e
+  `RetInutNFe`, com campos encapsulados. Pedido e retorno usam instâncias
+  distintas de `InfInut`, reunindo os campos dos dois grupos.
+- Use `inutNFe->infInut->inutilizar()` para gerar, assinar, validar e enviar
+  o pedido pelo serviço próprio de inutilização, de forma síncrona e
+  independente do lote de eventos. Consulte o resultado em
+  `inutNFe->retInutNFe->infInut`.
+- O envio valida ano, série, justificativa e faixa de até 10.000 números.
+  A confirmação `cStat=102` gera o XML processado após conferir os dados
+  do pedido assinado, preservando a assinatura opcional do retorno.
+  Rejeições ficam disponíveis para consulta, incluindo o protocolo
+  anterior quando informado na duplicidade `563`.
+
 #### XML da NF-e com DANFE Simplificado Tipo 2 — NT 2026.002 v1.11
 
 - Use `TpImp::SimplificadoTipo2` (`tpImp=6`) na NF-e modelo 55.
@@ -541,6 +556,12 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
+
+#### Descarregamento do certificado digital
+
+- O descarregamento limpa os ponteiros das estruturas do OpenSSL para
+  evitar liberação duplicada ao descarregar novamente ou destruir o objeto.
+  A inutilização recusa a geração com certificado ausente ou descarregado.
 
 #### EPEC da NF-e — NT 2014.001 v1.41
 

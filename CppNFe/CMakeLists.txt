@@ -100,6 +100,8 @@ add_library(CppNFe SHARED
     infnfesupl.cpp
     infresptec.h
     infresptec.cpp
+    inutnfe.h
+    inutnfe.cpp
     ipi.h
     ipi.cpp
     issqn.h

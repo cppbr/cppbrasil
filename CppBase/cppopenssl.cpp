@@ -670,10 +670,13 @@ bool CppOpenSSL::unloadOpenssl()
         //const char *m_pass - ponteiro de fora
         if (m_pkey != NULL)
             EVP_PKEY_free(m_pkey);
+        m_pkey = NULL;
         if (m_cert != NULL)
             X509_free(m_cert);
+        m_cert = NULL;
         if (m_ca != NULL)
             sk_X509_pop_free(m_ca, X509_free);
+        m_ca = NULL;
 
         return true;
 
