@@ -61,6 +61,8 @@ void Prod::clear()
     this->m_indEscala = IndEscala::None;
     this->m_CNPJFab.clear();
     this->m_cBenef.clear();
+    this->m_tpCredPresIBSZFM = TpCredPresIBSZFM::None;
+    this->m_indBemMovelUsado = IndBemMovelUsado::None;
     this->m_xPed.clear();
     this->m_nItemPed = 0;
     this->m_nFCI.clear();
@@ -385,4 +387,24 @@ QString Prod::get_nRECOPI() const
 void Prod::set_nRECOPI(const QString &nRECOPI)
 {
     this->m_nRECOPI = nRECOPI;
+}
+
+TpCredPresIBSZFM Prod::get_tpCredPresIBSZFM() const
+{
+    return this->m_tpCredPresIBSZFM;
+}
+
+void Prod::set_tpCredPresIBSZFM(const TpCredPresIBSZFM &tpCredPresIBSZFM)
+{
+    this->m_tpCredPresIBSZFM = tpCredPresIBSZFM;
+}
+
+IndBemMovelUsado Prod::get_indBemMovelUsado() const
+{
+    return this->m_indBemMovelUsado;
+}
+
+void Prod::set_indBemMovelUsado(const IndBemMovelUsado &indBemMovelUsado)
+{
+    this->m_indBemMovelUsado = indBemMovelUsado;
 }

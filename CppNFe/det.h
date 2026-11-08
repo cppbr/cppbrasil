@@ -28,6 +28,7 @@ limitations under the License.
 #include <CppNFe/imposto.h>
 #include <CppNFe/impostodevol.h>
 #include <CppNFe/obsitem.h>
+#include <CppNFe/dfereferenciado.h>
 
 class CPPNFE_EXPORT Det
 {
@@ -37,14 +38,18 @@ public:
     void clear();
     QString get_infAdProd() const;
     void set_infAdProd(const QString &infAdProd);
+    double get_vItem() const;
+    void set_vItem(const double &vItem);
 
     std::unique_ptr<Prod> prod;
     std::unique_ptr<Imposto> imposto;
     std::unique_ptr<ImpostoDevol> impostoDevol;
     std::unique_ptr<ObsItem> obsItem;
+    std::unique_ptr<DfeReferenciado> DFeReferenciado; //VC01
 
 private:
     QString m_infAdProd; //V01 abaixo de impostoDevol
+    double m_vItem = 0.0; //VB01
 };
 
 #endif // DET_H

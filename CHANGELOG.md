@@ -8,6 +8,34 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Reforma Tributária: IBS, CBS e IS no XML da NF-e e NFC-e — NT 2025.002 v1.53
+
+- Informe em `Ide` a data de previsão de entrega (`dPrevEntrega`, somente
+  NF-e modelo 55), o município do fato gerador do IBS/CBS (`cMunFGIBS`),
+  as finalidades `FinNFe::NotaCredito` e `FinNFe::NotaDebito` com
+  `tpNFDebito` ou `tpNFCredito` e o indicador do local da operação
+  (`cIndOp`). Os grupos `gCompraGov` (compras governamentais) e
+  `gPagAntecipado` (notas de antecipação de pagamento) ficam em `Ide`.
+- Informe `ISUFEmit` em `Emit` e `tpCredPresIBSZFM` e `indBemMovelUsado`
+  em `Prod`.
+- Preencha o Imposto Seletivo em `Imposto::IS` e o IBS/CBS em
+  `Imposto::IBSCBS`. Cada grupo do leiaute tem objeto próprio, com os nomes
+  do XML: `gIBSCBS` (com `gIBSUF`, `gIBSMun`, `gCBS`, `gDif`, `gDevTrib`,
+  `gRed`, `gALCZFMCBS`, `gTribRegular` e `gTribCompraGov`), `gIBSCBSMono`
+  no leiaute de monofasia da v1.50 (AdRem ou AdValorem por tributo),
+  `gTransfCred`, `gAjusteCompet`, `gEstornoCred`, `gCredPresOper` e
+  `gCredPresIBSZFM`.
+- Os grupos são gerados quando preenchidos. Dentro de um grupo emitido, os
+  campos obrigatórios saem mesmo com valor zero. A geração recusa a nota
+  quando o item informa mais de um grupo mutuamente exclusivo, como
+  `gIBSCBS` e `gTransfCred`, ou valores do IBS/CBS sem o `CST`.
+- Informe `vItem` e `DFeReferenciado` em `Det` e os totais `ISTot`,
+  `IBSCBSTot` e `vNFTot` em `Total`. Os totais são preenchidos pela
+  aplicação, como os demais totais da nota.
+- A leitura do XML importa todos os campos e grupos acima. Recompile a
+  biblioteca e as aplicações devido às alterações em `Ide`, `Emit`,
+  `Prod`, `Det`, `Imposto` e `Total`.
+
 #### Inutilização de numeração de NF-e e NFC-e
 
 - `EventoNotaFiscal::inutNFe` disponibiliza `InutNFe`, `InfInut` e
@@ -556,6 +584,12 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
+
+#### Ordem do ISSQN no XML da NF-e
+
+- O grupo `ISSQN` do item passa a ser gerado antes do `PIS`, na ordem
+  exigida pelo schema. Antes ele era gerado após o `ICMSUFDest`, o que
+  tornava inválida a nota com serviço tributado pelo ISSQN.
 
 #### Descarregamento do certificado digital
 

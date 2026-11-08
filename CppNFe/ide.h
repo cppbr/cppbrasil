@@ -23,9 +23,12 @@ limitations under the License.
 
 #include <memory>
 #include <QString>
+#include <QDate>
 #include <QDateTime>
 #include <CppBase/cppbrasil_global.h>
 #include <CppNFe/nfref.h>
+#include <CppNFe/compragov.h>
+#include <CppNFe/pagantecipado.h>
 #include <CppNFe/convnf.h>
 #include <CppBase/container.h>
 #include <CppBase/cpputility.h>
@@ -53,12 +56,16 @@ public:
     void set_dhEmi(const QDateTime &dhEmi);
     QDateTime get_dhSaiEnt() const;
     void set_dhSaiEnt(const QDateTime &dhSaiEnt);
+    QDate get_dPrevEntrega() const;
+    void set_dPrevEntrega(const QDate &dPrevEntrega);
     TpNF get_tpNF() const;
     void set_tpNF(const TpNF &tpNF);
     IdDest get_idDest() const;
     void set_idDest(const IdDest &idDest);
     int get_cMunFG() const;
     void set_cMunFG(const int &cMunFG);
+    int get_cMunFGIBS() const;
+    void set_cMunFGIBS(const int &cMunFGIBS);
     TpImp get_tpImp() const;
     void set_tpImp(const TpImp &tpImp);
     bool usaDanfeSimplificadoTipo2() const;
@@ -70,12 +77,18 @@ public:
     void set_tpAmb(const TpAmb &tpAmb);
     FinNFe get_finNFe() const;
     void set_finNFe(const FinNFe &finNFe);
+    TpNFDebito get_tpNFDebito() const;
+    void set_tpNFDebito(const TpNFDebito &tpNFDebito);
+    TpNFCredito get_tpNFCredito() const;
+    void set_tpNFCredito(const TpNFCredito &tpNFCredito);
     IndFinal get_indFinal() const;
     void set_indFinal(const IndFinal &indFinal);
     IndPres get_indPres() const;
     void set_indPres(const IndPres &indPres);
     IndIntermed get_indIntermed() const;
     void set_indIntermed(const IndIntermed &indIntermed);
+    QString get_cIndOp() const;
+    void set_cIndOp(const QString &cIndOp);
     ProcEmi get_procEmi() const;
     void set_procEmi(const ProcEmi &procEmi);
     QString get_verProc() const;
@@ -86,6 +99,8 @@ public:
     void set_xJust(const QString &xJust);
 
     std::unique_ptr<Container<NFRef>> NFref;
+    std::unique_ptr<GCompraGov> gCompraGov; //BB01
+    std::unique_ptr<GPagAntecipado> gPagAntecipado; //BC01
 
 private:
     int m_cUF;
@@ -96,17 +111,22 @@ private:
     int m_nNF;
     QDateTime m_dhEmi;
     QDateTime m_dhSaiEnt;
+    QDate m_dPrevEntrega; //B10a
     TpNF m_tpNF;
     IdDest m_idDest;
     int m_cMunFG;
+    int m_cMunFGIBS; //B12a
     TpImp m_tpImp;
     TpEmis m_tpEmis;
     QString m_cDV;
     TpAmb m_tpAmb;
     FinNFe m_finNFe;
+    TpNFDebito m_tpNFDebito; //B25.1
+    TpNFCredito m_tpNFCredito; //B25.2
     IndFinal m_indFinal;
     IndPres m_indPres;
     IndIntermed m_indIntermed;
+    QString m_cIndOp; //B25d
     ProcEmi m_procEmi;
     QString m_verProc;
     QDateTime m_dhCont;

@@ -20,7 +20,8 @@ limitations under the License.
 
 #include "total.h"
 
-Total::Total(): ICMSTot(new IcmsTot), ISSQNtot(new IssQNtot), retTrib(new RetTrib)
+Total::Total(): ICMSTot(new IcmsTot), ISSQNtot(new IssQNtot), retTrib(new RetTrib),
+    ISTot(new IsTot), IBSCBSTot(new IbsCbsTot)
 {
 }
 
@@ -33,4 +34,17 @@ void Total::clear()
     this->ICMSTot->clear();
     this->ISSQNtot->clear();
     this->retTrib->clear();
+    this->ISTot->clear();
+    this->IBSCBSTot->clear();
+    this->m_vNFTot = 0.0;
+}
+
+double Total::get_vNFTot() const
+{
+    return this->m_vNFTot;
+}
+
+void Total::set_vNFTot(const double &vNFTot)
+{
+    this->m_vNFTot = vNFTot;
 }

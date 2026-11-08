@@ -103,6 +103,14 @@ private:
     void get_cana();
     void get_infRespTec();
     void get_agropecuario();
+    void get_IS(const int &i);
+    void get_IBSCBS(const int &i);
+    void get_gIBSCBS(const GIBSCBS &gIBSCBS);
+    void get_gDifDevTribRed(const GDif &gDif, const GDevTrib &gDevTrib, const GRed &gRed);
+    void get_gIBSCBSMono(const GIBSCBSMono &gIBSCBSMono);
+    void get_gCredPres(const QString &grupo, const GCredPres &gCredPres);
+    void get_ISTot_IBSCBSTot();
+    bool validarRTC() const;
     void get_infNFeSupl_ONLINE();
     void gerarNFE();
 };

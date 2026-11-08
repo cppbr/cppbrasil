@@ -26,6 +26,7 @@ limitations under the License.
 #include <CppNFe/icmstot.h>
 #include <CppNFe/issqntot.h>
 #include <CppNFe/rettrib.h>
+#include <CppNFe/ibscbstot.h>
 
 class CPPNFE_EXPORT Total
 {
@@ -33,10 +34,17 @@ public:
     Total();
     ~Total();
     void clear();
+    double get_vNFTot() const;
+    void set_vNFTot(const double &vNFTot);
 
     std::unique_ptr<IcmsTot> ICMSTot;
     std::unique_ptr<IssQNtot> ISSQNtot;
     std::unique_ptr<RetTrib> retTrib;
+    std::unique_ptr<IsTot> ISTot; //W31
+    std::unique_ptr<IbsCbsTot> IBSCBSTot; //W34
+
+private:
+    double m_vNFTot = 0.0; //W60
 };
 
 #endif // TOTAL_H

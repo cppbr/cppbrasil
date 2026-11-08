@@ -95,6 +95,10 @@ public:
     void set_CNPJFab(const QString &CNPJFab);
     QString get_cBenef() const;
     void set_cBenef(const QString &cBenef);
+    TpCredPresIBSZFM get_tpCredPresIBSZFM() const;
+    void set_tpCredPresIBSZFM(const TpCredPresIBSZFM &tpCredPresIBSZFM);
+    IndBemMovelUsado get_indBemMovelUsado() const;
+    void set_indBemMovelUsado(const IndBemMovelUsado &indBemMovelUsado);
     QString get_xPed() const;
     void set_xPed(const QString &xPed);
     int get_nItemPed() const;
@@ -141,6 +145,8 @@ private:
     IndEscala m_indEscala;
     QString m_CNPJFab;
     QString m_cBenef;
+    TpCredPresIBSZFM m_tpCredPresIBSZFM = TpCredPresIBSZFM::None; //I05k
+    IndBemMovelUsado m_indBemMovelUsado = IndBemMovelUsado::None; //I17c
     //abaixo de detExpor
     QString m_xPed;
     int m_nItemPed;

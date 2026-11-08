@@ -20,6 +20,698 @@ limitations under the License.
 
 #include "xmlread.h"
 
+//Leitura dos grupos da Reforma Tributária (NT 2025.002). Cada função é chamada com o
+//leitor posicionado na abertura do grupo e termina no fechamento do mesmo grupo.
+namespace {
+double lerDouble(QXmlStreamReader &xml)
+{
+    return xml.readElementText().toDouble();
+}
+
+QDate lerCompetencia(QXmlStreamReader &xml)
+{
+    return QDate::fromString(xml.readElementText(), QStringLiteral("yyyy-MM"));
+}
+
+void lerGCompraGov(QXmlStreamReader &xml, GCompraGov &grupo)
+{   //BB01
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("tpEnteGov"))
+            grupo.set_tpEnteGov(ConvNF::strToTpEnteGov(xml.readElementText()));
+        else if (xml.name() == QStringLiteral("pRedutor"))
+            grupo.set_pRedutor(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("tpOperGov"))
+            grupo.set_tpOperGov(ConvNF::strToTpOperGov(xml.readElementText()));
+        else if (xml.name() == QStringLiteral("refDFeAnt"))
+            grupo.add_refDFeAnt(xml.readElementText());
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGPagAntecipado(QXmlStreamReader &xml, GPagAntecipado &grupo)
+{   //BC01
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("refNFe"))
+            grupo.add_refNFe(xml.readElementText());
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerDFeReferenciado(QXmlStreamReader &xml, DfeReferenciado &grupo)
+{   //VC01
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("chaveAcesso"))
+            grupo.set_chaveAcesso(xml.readElementText());
+        else if (xml.name() == QStringLiteral("nItem"))
+            grupo.set_nItem(xml.readElementText().toInt());
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerIS(QXmlStreamReader &xml, Is &grupo)
+{   //UB01
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("CSTIS"))
+            grupo.set_CSTIS(xml.readElementText());
+        else if (xml.name() == QStringLiteral("cClassTribIS"))
+            grupo.set_cClassTribIS(xml.readElementText());
+        else if (xml.name() == QStringLiteral("vBCIS"))
+            grupo.set_vBCIS(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("pIS"))
+            grupo.set_pIS(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("adRemIS"))
+            grupo.set_adRemIS(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("uTrib"))
+            grupo.set_uTrib(xml.readElementText());
+        else if (xml.name() == QStringLiteral("qTrib"))
+            grupo.set_qTrib(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("vIS"))
+            grupo.set_vIS(lerDouble(xml));
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+//gDif, gDevTrib e gRed são comuns a gIBSUF, gIBSMun e gCBS
+bool lerDifDevTribRed(QXmlStreamReader &xml, GDif &gDif, GDevTrib &gDevTrib, GRed &gRed)
+{
+    if (xml.name() == QStringLiteral("gDif"))
+    {
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("pDif"))
+                gDif.set_pDif(lerDouble(xml));
+            else if (xml.name() == QStringLiteral("vDif"))
+                gDif.set_vDif(lerDouble(xml));
+            else
+                xml.skipCurrentElement();
+        }
+        return true;
+    }
+    if (xml.name() == QStringLiteral("gDevTrib"))
+    {
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("pDevTrib"))
+                gDevTrib.set_pDevTrib(lerDouble(xml));
+            else if (xml.name() == QStringLiteral("vDevTrib"))
+                gDevTrib.set_vDevTrib(lerDouble(xml));
+            else
+                xml.skipCurrentElement();
+        }
+        return true;
+    }
+    if (xml.name() == QStringLiteral("gRed"))
+    {
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("pRedAliq"))
+                gRed.set_pRedAliq(lerDouble(xml));
+            else if (xml.name() == QStringLiteral("pAliqEfet"))
+                gRed.set_pAliqEfet(lerDouble(xml));
+            else
+                xml.skipCurrentElement();
+        }
+        return true;
+    }
+    return false;
+}
+
+void lerGIBSCBS(QXmlStreamReader &xml, GIBSCBS &grupo)
+{   //UB15
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("vBC"))
+            grupo.set_vBC(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("vIBS"))
+            grupo.set_vIBS(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("gIBSUF"))
+        {
+            GIBSUF &uf = *grupo.gIBSUF;
+            while (xml.readNextStartElement())
+            {
+                if (lerDifDevTribRed(xml, *uf.gDif, *uf.gDevTrib, *uf.gRed))
+                    continue;
+                if (xml.name() == QStringLiteral("pIBSUF"))
+                    uf.set_pIBSUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSUF"))
+                    uf.set_vIBSUF(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gIBSMun"))
+        {
+            GIBSMun &mun = *grupo.gIBSMun;
+            while (xml.readNextStartElement())
+            {
+                if (lerDifDevTribRed(xml, *mun.gDif, *mun.gDevTrib, *mun.gRed))
+                    continue;
+                if (xml.name() == QStringLiteral("pIBSMun"))
+                    mun.set_pIBSMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMun"))
+                    mun.set_vIBSMun(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gCBS"))
+        {
+            GCBS &cbs = *grupo.gCBS;
+            while (xml.readNextStartElement())
+            {
+                if (lerDifDevTribRed(xml, *cbs.gDif, *cbs.gDevTrib, *cbs.gRed))
+                    continue;
+                if (xml.name() == QStringLiteral("pCBS"))
+                    cbs.set_pCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBS"))
+                    cbs.set_vCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("gALCZFMCBS"))
+                {
+                    GALCZFMCBS &alc = *cbs.gALCZFMCBS;
+                    while (xml.readNextStartElement())
+                    {
+                        if (xml.name() == QStringLiteral("tpALCZFMCBS"))
+                            alc.set_tpALCZFMCBS(ConvNF::strToTpALCZFMCBS(xml.readElementText()));
+                        else if (xml.name() == QStringLiteral("nProcSuframa"))
+                            alc.set_nProcSuframa(xml.readElementText());
+                        else if (xml.name() == QStringLiteral("pAliqEfetRegCBS"))
+                            alc.set_pAliqEfetRegCBS(lerDouble(xml));
+                        else if (xml.name() == QStringLiteral("vTribRegCBS"))
+                            alc.set_vTribRegCBS(lerDouble(xml));
+                        else
+                            xml.skipCurrentElement();
+                    }
+                }
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gTribRegular"))
+        {
+            GTribRegular &reg = *grupo.gTribRegular;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("CSTReg"))
+                    reg.set_CSTReg(xml.readElementText());
+                else if (xml.name() == QStringLiteral("cClassTribReg"))
+                    reg.set_cClassTribReg(xml.readElementText());
+                else if (xml.name() == QStringLiteral("pAliqEfetRegIBSUF"))
+                    reg.set_pAliqEfetRegIBSUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribRegIBSUF"))
+                    reg.set_vTribRegIBSUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqEfetRegIBSMun"))
+                    reg.set_pAliqEfetRegIBSMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribRegIBSMun"))
+                    reg.set_vTribRegIBSMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqEfetRegCBS"))
+                    reg.set_pAliqEfetRegCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribRegCBS"))
+                    reg.set_vTribRegCBS(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gTribCompraGov"))
+        {
+            GTribCompraGov &gov = *grupo.gTribCompraGov;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("pAliqIBSUF"))
+                    gov.set_pAliqIBSUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribIBSUF"))
+                    gov.set_vTribIBSUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqIBSMun"))
+                    gov.set_pAliqIBSMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribIBSMun"))
+                    gov.set_vTribIBSMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqCBS"))
+                    gov.set_pAliqCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vTribCBS"))
+                    gov.set_vTribCBS(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+//gMonoRet e gpBioDiferenca têm o mesmo leiaute nos grupos AdRem e AdValorem de cada tributo
+template <class MonoRet, class BioDif, class SetRet, class SetBioDif>
+bool lerMonoRetBio(QXmlStreamReader &xml, MonoRet &ret, BioDif &bio,
+                   const QString &campoRet, SetRet setRet, const QString &campoDif, SetBioDif setDif)
+{
+    if (xml.name() == QStringLiteral("gMonoRet"))
+    {
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == campoRet)
+                (ret.*setRet)(lerDouble(xml));
+            else
+                xml.skipCurrentElement();
+        }
+        return true;
+    }
+    if (xml.name() == QStringLiteral("gpBioDiferenca"))
+    {
+        while (xml.readNextStartElement())
+        {
+            if (xml.name() == QStringLiteral("qBCBioComb"))
+                bio.set_qBCBioComb(lerDouble(xml));
+            else if (xml.name() == campoDif)
+                (bio.*setDif)(lerDouble(xml));
+            else
+                xml.skipCurrentElement();
+        }
+        return true;
+    }
+    return false;
+}
+
+void lerGIBSMonoAdRem(QXmlStreamReader &xml, GIBSMonoAdRem &grupo)
+{   //UB85a
+    while (xml.readNextStartElement())
+    {
+        if (lerMonoRetBio(xml, *grupo.gMonoRet, *grupo.gpBioDiferenca,
+                          QStringLiteral("vIBSMonoRet"), &GIBSMonoRet::set_vIBSMonoRet,
+                          QStringLiteral("vIBSDiferenca"), &GIBSpBioDiferenca::set_vIBSDiferenca))
+            continue;
+        if (xml.name() == QStringLiteral("gMonoPadrao"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("qBCMono"))
+                    grupo.gMonoPadrao->set_qBCMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("adRemIBS"))
+                    grupo.gMonoPadrao->set_adRemIBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMono"))
+                    grupo.gMonoPadrao->set_vIBSMono(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gMonoReten"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("qBCMonoReten"))
+                    grupo.gMonoReten->set_qBCMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("adRemIBSReten"))
+                    grupo.gMonoReten->set_adRemIBSReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoReten"))
+                    grupo.gMonoReten->set_vIBSMonoReten(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGIBSMonoAdValorem(QXmlStreamReader &xml, GIBSMonoAdValorem &grupo)
+{   //UB90
+    while (xml.readNextStartElement())
+    {
+        if (lerMonoRetBio(xml, *grupo.gMonoRet, *grupo.gpBioDiferenca,
+                          QStringLiteral("vIBSMonoRet"), &GIBSMonoRet::set_vIBSMonoRet,
+                          QStringLiteral("vIBSDiferenca"), &GIBSpBioDiferenca::set_vIBSDiferenca))
+            continue;
+        if (xml.name() == QStringLiteral("gMonoPadrao"))
+        {
+            GIBSMonoPadraoAdValorem &p = *grupo.gMonoPadrao;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vBCMono"))
+                    p.set_vBCMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqMonoUF"))
+                    p.set_pAliqMonoUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoUF"))
+                    p.set_vIBSMonoUF(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqMonoMun"))
+                    p.set_pAliqMonoMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoMun"))
+                    p.set_vIBSMonoMun(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMono"))
+                    p.set_vIBSMono(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gMonoReten"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vBCMonoReten"))
+                    grupo.gMonoReten->set_vBCMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqMonoReten"))
+                    grupo.gMonoReten->set_pAliqMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoReten"))
+                    grupo.gMonoReten->set_vIBSMonoReten(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGCBSMonoAdRem(QXmlStreamReader &xml, GCBSMonoAdRem &grupo)
+{   //UB95a
+    while (xml.readNextStartElement())
+    {
+        if (lerMonoRetBio(xml, *grupo.gMonoRet, *grupo.gpBioDiferenca,
+                          QStringLiteral("vCBSMonoRet"), &GCBSMonoRet::set_vCBSMonoRet,
+                          QStringLiteral("vCBSDiferenca"), &GCBSpBioDiferenca::set_vCBSDiferenca))
+            continue;
+        if (xml.name() == QStringLiteral("gMonoPadrao"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("qBCMono"))
+                    grupo.gMonoPadrao->set_qBCMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("adRemCBS"))
+                    grupo.gMonoPadrao->set_adRemCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMono"))
+                    grupo.gMonoPadrao->set_vCBSMono(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gMonoReten"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("qBCMonoReten"))
+                    grupo.gMonoReten->set_qBCMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("adRemCBSReten"))
+                    grupo.gMonoReten->set_adRemCBSReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMonoReten"))
+                    grupo.gMonoReten->set_vCBSMonoReten(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGCBSMonoAdValorem(QXmlStreamReader &xml, GCBSMonoAdValorem &grupo)
+{   //UB100
+    while (xml.readNextStartElement())
+    {
+        if (lerMonoRetBio(xml, *grupo.gMonoRet, *grupo.gpBioDiferenca,
+                          QStringLiteral("vCBSMonoRet"), &GCBSMonoRet::set_vCBSMonoRet,
+                          QStringLiteral("vCBSDiferenca"), &GCBSpBioDiferenca::set_vCBSDiferenca))
+            continue;
+        if (xml.name() == QStringLiteral("gMonoPadrao"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vBCMono"))
+                    grupo.gMonoPadrao->set_vBCMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqMonoCBS"))
+                    grupo.gMonoPadrao->set_pAliqMonoCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMono"))
+                    grupo.gMonoPadrao->set_vCBSMono(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gMonoReten"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vBCMonoReten"))
+                    grupo.gMonoReten->set_vBCMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("pAliqMonoReten"))
+                    grupo.gMonoReten->set_pAliqMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMonoReten"))
+                    grupo.gMonoReten->set_vCBSMonoReten(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGIBSCBSMono(QXmlStreamReader &xml, GIBSCBSMono &grupo)
+{   //UB84
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("gIBSMonoAdRem"))
+            lerGIBSMonoAdRem(xml, *grupo.gIBSMonoAdRem);
+        else if (xml.name() == QStringLiteral("gIBSMonoAdValorem"))
+            lerGIBSMonoAdValorem(xml, *grupo.gIBSMonoAdValorem);
+        else if (xml.name() == QStringLiteral("gCBSMonoAdRem"))
+            lerGCBSMonoAdRem(xml, *grupo.gCBSMonoAdRem);
+        else if (xml.name() == QStringLiteral("gCBSMonoAdValorem"))
+            lerGCBSMonoAdValorem(xml, *grupo.gCBSMonoAdValorem);
+        else if (xml.name() == QStringLiteral("vTotIBSMonoItem"))
+            grupo.set_vTotIBSMonoItem(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("vTotCBSMonoItem"))
+            grupo.set_vTotCBSMonoItem(lerDouble(xml));
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerGCredPres(QXmlStreamReader &xml, GCredPres &grupo)
+{   //UB123 / UB127
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("pCredPres"))
+            grupo.set_pCredPres(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("vCredPres"))
+            grupo.set_vCredPres(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("vCredPresCondSus"))
+            grupo.set_vCredPresCondSus(lerDouble(xml));
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerIBSCBS(QXmlStreamReader &xml, IbsCbs &grupo)
+{   //UB12
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("CST"))
+            grupo.set_CST(xml.readElementText());
+        else if (xml.name() == QStringLiteral("cClassTrib"))
+            grupo.set_cClassTrib(xml.readElementText());
+        else if (xml.name() == QStringLiteral("indDoacao"))
+            grupo.set_indDoacao(ConvNF::strToIndDoacao(xml.readElementText()));
+        else if (xml.name() == QStringLiteral("gIBSCBS"))
+            lerGIBSCBS(xml, *grupo.gIBSCBS);
+        else if (xml.name() == QStringLiteral("gIBSCBSMono"))
+            lerGIBSCBSMono(xml, *grupo.gIBSCBSMono);
+        else if (xml.name() == QStringLiteral("gTransfCred"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vIBS"))
+                    grupo.gTransfCred->set_vIBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBS"))
+                    grupo.gTransfCred->set_vCBS(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gAjusteCompet"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("competApur"))
+                    grupo.gAjusteCompet->set_competApur(lerCompetencia(xml));
+                else if (xml.name() == QStringLiteral("vIBS"))
+                    grupo.gAjusteCompet->set_vIBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBS"))
+                    grupo.gAjusteCompet->set_vCBS(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gEstornoCred"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vIBSEstCred"))
+                    grupo.gEstornoCred->set_vIBSEstCred(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSEstCred"))
+                    grupo.gEstornoCred->set_vCBSEstCred(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gCredPresOper"))
+        {
+            GCredPresOper &cp = *grupo.gCredPresOper;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vBCCredPres"))
+                    cp.set_vBCCredPres(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("cCredPres"))
+                    cp.set_cCredPres(xml.readElementText());
+                else if (xml.name() == QStringLiteral("gIBSCredPres"))
+                    lerGCredPres(xml, *cp.gIBSCredPres);
+                else if (xml.name() == QStringLiteral("gCBSCredPres"))
+                    lerGCredPres(xml, *cp.gCBSCredPres);
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gCredPresIBSZFM"))
+        {
+            GCredPresIBSZFM &zfm = *grupo.gCredPresIBSZFM;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("competApur"))
+                    zfm.set_competApur(lerCompetencia(xml));
+                else if (xml.name() == QStringLiteral("tpCredPresIBSZFM"))
+                    zfm.set_tpCredPresIBSZFM(ConvNF::strToTpCredPresIBSZFM(xml.readElementText()));
+                else if (xml.name() == QStringLiteral("vCredPresIBSZFM"))
+                    zfm.set_vCredPresIBSZFM(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerISTot(QXmlStreamReader &xml, IsTot &grupo)
+{   //W31
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("vIS"))
+            grupo.set_vIS(lerDouble(xml));
+        else
+            xml.skipCurrentElement();
+    }
+}
+
+void lerIBSCBSTot(QXmlStreamReader &xml, IbsCbsTot &grupo)
+{   //W34
+    while (xml.readNextStartElement())
+    {
+        if (xml.name() == QStringLiteral("vBCIBSCBS"))
+            grupo.set_vBCIBSCBS(lerDouble(xml));
+        else if (xml.name() == QStringLiteral("gIBS"))
+        {
+            GIBSTot &ibs = *grupo.gIBS;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("gIBSUF"))
+                {
+                    while (xml.readNextStartElement())
+                    {
+                        if (xml.name() == QStringLiteral("vDif"))
+                            ibs.gIBSUF->set_vDif(lerDouble(xml));
+                        else if (xml.name() == QStringLiteral("vDevTrib"))
+                            ibs.gIBSUF->set_vDevTrib(lerDouble(xml));
+                        else if (xml.name() == QStringLiteral("vIBSUF"))
+                            ibs.gIBSUF->set_vIBSUF(lerDouble(xml));
+                        else
+                            xml.skipCurrentElement();
+                    }
+                }
+                else if (xml.name() == QStringLiteral("gIBSMun"))
+                {
+                    while (xml.readNextStartElement())
+                    {
+                        if (xml.name() == QStringLiteral("vDif"))
+                            ibs.gIBSMun->set_vDif(lerDouble(xml));
+                        else if (xml.name() == QStringLiteral("vDevTrib"))
+                            ibs.gIBSMun->set_vDevTrib(lerDouble(xml));
+                        else if (xml.name() == QStringLiteral("vIBSMun"))
+                            ibs.gIBSMun->set_vIBSMun(lerDouble(xml));
+                        else
+                            xml.skipCurrentElement();
+                    }
+                }
+                else if (xml.name() == QStringLiteral("vIBS"))
+                    ibs.set_vIBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCredPres"))
+                    ibs.set_vCredPres(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCredPresCondSus"))
+                    ibs.set_vCredPresCondSus(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gCBS"))
+        {
+            GCBSTot &cbs = *grupo.gCBS;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vDif"))
+                    cbs.set_vDif(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vDevTrib"))
+                    cbs.set_vDevTrib(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBS"))
+                    cbs.set_vCBS(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCredPres"))
+                    cbs.set_vCredPres(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCredPresCondSus"))
+                    cbs.set_vCredPresCondSus(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gMono"))
+        {
+            GMonoTot &mono = *grupo.gMono;
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vIBSMono"))
+                    mono.set_vIBSMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMono"))
+                    mono.set_vCBSMono(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoReten"))
+                    mono.set_vIBSMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMonoReten"))
+                    mono.set_vCBSMonoReten(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vIBSMonoRet"))
+                    mono.set_vIBSMonoRet(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSMonoRet"))
+                    mono.set_vCBSMonoRet(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else if (xml.name() == QStringLiteral("gEstornoCred"))
+        {
+            while (xml.readNextStartElement())
+            {
+                if (xml.name() == QStringLiteral("vIBSEstCred"))
+                    grupo.gEstornoCred->set_vIBSEstCred(lerDouble(xml));
+                else if (xml.name() == QStringLiteral("vCBSEstCred"))
+                    grupo.gEstornoCred->set_vCBSEstCred(lerDouble(xml));
+                else
+                    xml.skipCurrentElement();
+            }
+        }
+        else
+            xml.skipCurrentElement();
+    }
+}
+} // namespace
+
+
 XmlRead::XmlRead(Nfe *NFe, const QByteArray &xml): nota(NFe), m_xml(xml)
 {
 }
@@ -237,6 +929,12 @@ void XmlRead::set_ide(QXmlStreamReader &xml) const
                nota->infNFe->ide->set_dhSaiEnt(QDateTime::fromString(_valor, Qt::ISODate));
 
         }
+        if (xml.name() == QStringLiteral("dPrevEntrega")) //B10a
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->ide->set_dPrevEntrega(QDate::fromString(_valor, Qt::ISODate));
+        }
         if (xml.name() == QStringLiteral("tpNF")) //B11
         {
             _valor = xml.readElementText();
@@ -330,6 +1028,36 @@ void XmlRead::set_ide(QXmlStreamReader &xml) const
         //Grupo BA. Documento Fiscal Referenciado
         if (xml.name() == QStringLiteral("NFref")) //BA01 - NFref
           set_ide_NFref(xml);
+        if (xml.name() == QStringLiteral("cMunFGIBS")) //B12a
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->ide->set_cMunFGIBS(_valor.toInt());
+        }
+        if (xml.name() == QStringLiteral("tpNFDebito")) //B25.1
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->ide->set_tpNFDebito(ConvNF::strToTpNFDebito(_valor));
+        }
+        if (xml.name() == QStringLiteral("tpNFCredito")) //B25.2
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->ide->set_tpNFCredito(ConvNF::strToTpNFCredito(_valor));
+        }
+        if (xml.name() == QStringLiteral("cIndOp")) //B25d
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->ide->set_cIndOp(_valor);
+        }
+        //Grupo BB. Compras governamentais
+        if (xml.isStartElement() && xml.name() == QStringLiteral("gCompraGov")) //BB01
+            lerGCompraGov(xml, *nota->infNFe->ide->gCompraGov);
+        //Grupo BC. Notas de antecipação de pagamento
+        if (xml.isStartElement() && xml.name() == QStringLiteral("gPagAntecipado")) //BC01
+            lerGPagAntecipado(xml, *nota->infNFe->ide->gPagAntecipado);
 
         xml.readNext();
     }
@@ -574,6 +1302,12 @@ void XmlRead::set_emite(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->emite->set_CRT(ConvNF::strToCrt(_valor));
+        }
+        if (xml.name() == QStringLiteral("ISUFEmit")) //C22
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->emite->set_ISUFEmit(_valor);
         }
 
         xml.readNext();
@@ -1157,6 +1891,17 @@ void XmlRead::set_det(QXmlStreamReader &xml) const
         if (xml.name() == QStringLiteral("obsItem")) //UA01
           set_obsItem(xml);
 
+        //Grupo VB. Total do item
+        if (xml.name() == QStringLiteral("vItem")) //VB01
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->det->obj->set_vItem(_valor.toDouble());
+        }
+        //Grupo VC. Referenciamento de item de outro DF-e
+        if (xml.isStartElement() && xml.name() == QStringLiteral("DFeReferenciado")) //VC01
+            lerDFeReferenciado(xml, *nota->infNFe->det->obj->DFeReferenciado);
+
         xml.readNext();
     }
     nota->infNFe->det->add();
@@ -1231,6 +1976,12 @@ void XmlRead::set_prod(QXmlStreamReader &xml) const
         }
         if (xml.isStartElement() && xml.name() == QStringLiteral("gCred")) //I05g
             set_prod_gCred(xml);
+        if (xml.name() == QStringLiteral("tpCredPresIBSZFM")) //I05k
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->det->obj->prod->set_tpCredPresIBSZFM(ConvNF::strToTpCredPresIBSZFM(_valor));
+        }
 
         if (xml.name() == QStringLiteral("EXTIPI")) //I06
         {
@@ -1327,6 +2078,12 @@ void XmlRead::set_prod(QXmlStreamReader &xml) const
             _valor = xml.readElementText();
             if (!_valor.isEmpty())
                nota->infNFe->det->obj->prod->set_indTot(ConvNF::strToIndTot(_valor));
+        }
+        if (xml.name() == QStringLiteral("indBemMovelUsado")) //I17c
+        {
+            _valor = xml.readElementText();
+            if (!_valor.isEmpty())
+               nota->infNFe->det->obj->prod->set_indBemMovelUsado(ConvNF::strToIndBemMovelUsado(_valor));
         }
         //Grupo I01. Produtos e Serviços / Declaração de Importação
         if (xml.name() == QStringLiteral("DI")) //I18
@@ -2065,6 +2822,12 @@ void XmlRead::set_imposto(QXmlStreamReader &xml) const
         //Grupo U. ISSQN
         if (xml.name() == QStringLiteral("ISSQN")) //U01
           set_ISSQN(xml);
+
+        //Grupo UB. IBS, CBS e Imposto Seletivo
+        if (xml.isStartElement() && xml.name() == QStringLiteral("IS")) //UB01
+            lerIS(xml, *nota->infNFe->det->obj->imposto->IS);
+        if (xml.isStartElement() && xml.name() == QStringLiteral("IBSCBS")) //UB12
+            lerIBSCBS(xml, *nota->infNFe->det->obj->imposto->IBSCBS);
 
         xml.readNext();
     }
@@ -3055,6 +3818,13 @@ void XmlRead::set_total(QXmlStreamReader &xml) const
 
         if (xml.name() == QStringLiteral("retTrib")) //W23
           set_retTrib(xml);
+
+        if (xml.isStartElement() && xml.name() == QStringLiteral("ISTot")) //W31
+            lerISTot(xml, *nota->infNFe->total->ISTot);
+        if (xml.isStartElement() && xml.name() == QStringLiteral("IBSCBSTot")) //W34
+            lerIBSCBSTot(xml, *nota->infNFe->total->IBSCBSTot);
+        if (xml.isStartElement() && xml.name() == QStringLiteral("vNFTot")) //W60
+            nota->infNFe->total->set_vNFTot(xml.readElementText().toDouble());
 
         xml.readNext();
     }

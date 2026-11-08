@@ -51,6 +51,8 @@ public:
     void set_CNAE(const QString &CNAE);
     Crt get_CRT() const;
     void set_CRT(const Crt &CRT);
+    QString get_ISUFEmit() const;
+    void set_ISUFEmit(const QString &ISUFEmit);
 
     std::unique_ptr<EnderEmit> enderEmit;
 
@@ -64,6 +66,7 @@ private:
     QString m_IM;
     QString m_CNAE;
     Crt m_CRT;
+    QString m_ISUFEmit; //C22
 };
 
 #endif // EMIT_H

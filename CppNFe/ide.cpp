@@ -20,10 +20,12 @@ limitations under the License.
 
 #include "ide.h"
 
-Ide::Ide(): NFref(new Container<NFRef>), m_cUF(0), m_cNF(0), m_mod(ModeloDF::NFe),
+Ide::Ide(): NFref(new Container<NFRef>), gCompraGov(new GCompraGov),
+    gPagAntecipado(new GPagAntecipado), m_cUF(0), m_cNF(0), m_mod(ModeloDF::NFe),
     m_serie(0), m_nNF(0), m_tpNF(TpNF::None), m_idDest(IdDest::None),
-    m_cMunFG(0), m_tpImp(TpImp::None), m_tpEmis(TpEmis::None),
+    m_cMunFG(0), m_cMunFGIBS(0), m_tpImp(TpImp::None), m_tpEmis(TpEmis::None),
     m_tpAmb(TpAmb::None), m_finNFe(FinNFe::None),
+    m_tpNFDebito(TpNFDebito::None), m_tpNFCredito(TpNFCredito::None),
     m_indFinal(IndFinal::None), m_indPres(IndPres::None),
     m_indIntermed(IndIntermed::None), m_procEmi(ProcEmi::None)
 
@@ -44,23 +46,30 @@ void Ide::clear()
     this->m_nNF = 0;
     CppUtility::clearDateTime(this->m_dhEmi);
     CppUtility::clearDateTime(this->m_dhSaiEnt);
+    this->m_dPrevEntrega = QDate();
     this->m_tpNF = TpNF::None;
     this->m_idDest = IdDest::None;
     this->m_cMunFG = 0;
+    this->m_cMunFGIBS = 0;
     this->m_tpImp = TpImp::None;
     this->m_tpEmis = TpEmis::None;
     this->m_cDV.clear();
     this->m_tpAmb = TpAmb::None;
     this->m_finNFe = FinNFe::None;
+    this->m_tpNFDebito = TpNFDebito::None;
+    this->m_tpNFCredito = TpNFCredito::None;
     this->m_indFinal = IndFinal::None;
     this->m_indPres = IndPres::None;
     this->m_indIntermed = IndIntermed::None;
+    this->m_cIndOp.clear();
     this->m_procEmi = ProcEmi::None;
     this->m_verProc.clear();
     CppUtility::clearDateTime(this->m_dhCont);
     this->m_xJust.clear();
 
     this->NFref->clear();
+    this->gCompraGov->clear();
+    this->gPagAntecipado->clear();
 }
 
 int Ide::get_cUF() const
@@ -298,5 +307,52 @@ void Ide::set_xJust(const QString &xJust)
   this->m_xJust = xJust;
 }
 
+QDate Ide::get_dPrevEntrega() const
+{
+    return this->m_dPrevEntrega;
+}
 
+void Ide::set_dPrevEntrega(const QDate &dPrevEntrega)
+{
+    this->m_dPrevEntrega = dPrevEntrega;
+}
 
+int Ide::get_cMunFGIBS() const
+{
+    return this->m_cMunFGIBS;
+}
+
+void Ide::set_cMunFGIBS(const int &cMunFGIBS)
+{
+    this->m_cMunFGIBS = cMunFGIBS;
+}
+
+TpNFDebito Ide::get_tpNFDebito() const
+{
+    return this->m_tpNFDebito;
+}
+
+void Ide::set_tpNFDebito(const TpNFDebito &tpNFDebito)
+{
+    this->m_tpNFDebito = tpNFDebito;
+}
+
+TpNFCredito Ide::get_tpNFCredito() const
+{
+    return this->m_tpNFCredito;
+}
+
+void Ide::set_tpNFCredito(const TpNFCredito &tpNFCredito)
+{
+    this->m_tpNFCredito = tpNFCredito;
+}
+
+QString Ide::get_cIndOp() const
+{
+    return this->m_cIndOp;
+}
+
+void Ide::set_cIndOp(const QString &cIndOp)
+{
+    this->m_cIndOp = cIndOp;
+}

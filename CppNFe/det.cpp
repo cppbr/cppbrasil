@@ -20,7 +20,8 @@ limitations under the License.
 
 #include "det.h"
 
-Det::Det(): prod(new Prod), imposto(new Imposto), impostoDevol(new ImpostoDevol), obsItem(new ObsItem)
+Det::Det(): prod(new Prod), imposto(new Imposto), impostoDevol(new ImpostoDevol), obsItem(new ObsItem),
+    DFeReferenciado(new DfeReferenciado)
 {
 }
 
@@ -31,11 +32,13 @@ Det::~Det()
 void Det::clear()
 {
     this->m_infAdProd.clear();
+    this->m_vItem = 0.0;
 
     this->prod->clear();
     this->imposto->clear();
     this->impostoDevol->clear();
     this->obsItem->clear();
+    this->DFeReferenciado->clear();
 }
 
 QString Det::get_infAdProd() const
@@ -48,3 +51,12 @@ void Det::set_infAdProd(const QString &infAdProd)
     this->m_infAdProd = infAdProd;
 }
 
+double Det::get_vItem() const
+{
+    return this->m_vItem;
+}
+
+void Det::set_vItem(const double &vItem)
+{
+    this->m_vItem = vItem;
+}

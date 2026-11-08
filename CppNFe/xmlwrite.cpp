@@ -45,6 +45,8 @@ bool XmlWrite::gerarXML(QByteArray *output)
         qWarning() << "Informe defensivos ou guia de trânsito no grupo agropecuario.";
         return false;
     }
+    if (!validarRTC())
+        return false;
 
     try{
         gerarNFE();
@@ -280,18 +282,29 @@ void XmlWrite::get_ide()
     if (_ide->get_mod() == ModeloDF::NFe && _ide->get_dhSaiEnt().isValid())
         this->m_xmlw->writeTextElement("dhSaiEnt", CppUtility::dateTimeToStr(_ide->get_dhSaiEnt(),
                                                                           DtH::DateTimeUTC));
+    //B10a - não informar para a NFC-e
+    if (_ide->get_mod() == ModeloDF::NFe && _ide->get_dPrevEntrega().isValid())
+        this->m_xmlw->writeTextElement("dPrevEntrega", _ide->get_dPrevEntrega().toString(Qt::ISODate));
     this->m_xmlw->writeTextElement("tpNF", ConvNF::tpNFToStr(_ide->get_tpNF()));
     this->m_xmlw->writeTextElement("idDest", ConvNF::idDestToStr(_ide->get_idDest()));
     this->m_xmlw->writeTextElement("cMunFG", QString::number(_ide->get_cMunFG()));
+    if (_ide->get_cMunFGIBS() > 0) //B12a
+        this->m_xmlw->writeTextElement("cMunFGIBS", QString::number(_ide->get_cMunFGIBS()));
     this->m_xmlw->writeTextElement("tpImp", ConvNF::tpImpToStr(_ide->get_tpImp()));
     this->m_xmlw->writeTextElement("tpEmis", ConvNF::tpEmisToStr(_ide->get_tpEmis()));
     this->m_xmlw->writeTextElement("cDV", _ide->get_cDV());
     this->m_xmlw->writeTextElement("tpAmb", ConvNF::tpAmbToStr(_ide->get_tpAmb()));
     this->m_xmlw->writeTextElement("finNFe", ConvNF::finNFeToStr(_ide->get_finNFe()));
+    if (_ide->get_tpNFDebito() != TpNFDebito::None) //B25.1
+        this->m_xmlw->writeTextElement("tpNFDebito", ConvNF::tpNFDebitoToStr(_ide->get_tpNFDebito()));
+    if (_ide->get_tpNFCredito() != TpNFCredito::None) //B25.2
+        this->m_xmlw->writeTextElement("tpNFCredito", ConvNF::tpNFCreditoToStr(_ide->get_tpNFCredito()));
     this->m_xmlw->writeTextElement("indFinal", ConvNF::indFinalToStr(_ide->get_indFinal()));
     this->m_xmlw->writeTextElement("indPres", ConvNF::indPresToStr(_ide->get_indPres()));
     if (_ide->get_indIntermed() != IndIntermed::None)
         this->m_xmlw->writeTextElement("indIntermed", ConvNF::indIntermedToStr(_ide->get_indIntermed()));
+    if (!_ide->get_cIndOp().isEmpty()) //B25d
+        this->m_xmlw->writeTextElement("cIndOp", _ide->get_cIndOp());
     this->m_xmlw->writeTextElement("procEmi", ConvNF::procEmiToStr(_ide->get_procEmi()));
     this->m_xmlw->writeTextElement("verProc", _ide->get_verProc());
 
@@ -303,6 +316,27 @@ void XmlWrite::get_ide()
     }
     //grupo Documento fiscal referenciado
     get_NFref();
+
+    //gCompraGov - BB01
+    const GCompraGov *_compraGov = _ide->gCompraGov.get();
+    if (!_compraGov->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gCompraGov");
+        this->m_xmlw->writeTextElement("tpEnteGov", ConvNF::tpEnteGovToStr(_compraGov->get_tpEnteGov()));
+        this->m_xmlw->writeTextElement("pRedutor", CppUtility::doubleToStrDecimal(_compraGov->get_pRedutor(), 4));
+        this->m_xmlw->writeTextElement("tpOperGov", ConvNF::tpOperGovToStr(_compraGov->get_tpOperGov()));
+        for (const QString &chave : _compraGov->get_refDFeAnt())
+            this->m_xmlw->writeTextElement("refDFeAnt", chave);
+        this->m_xmlw->writeEndElement();
+    }
+    //gPagAntecipado - BC01
+    if (!_ide->gPagAntecipado->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gPagAntecipado");
+        for (const QString &chave : _ide->gPagAntecipado->get_refNFe())
+            this->m_xmlw->writeTextElement("refNFe", chave);
+        this->m_xmlw->writeEndElement();
+    }
     this->m_xmlw->writeEndElement();//fechamento grupo ide
 }
 
@@ -411,6 +445,8 @@ void XmlWrite::get_emit()
             this->m_xmlw->writeTextElement("CNAE", _emit->get_CNAE());
     }
     this->m_xmlw->writeTextElement("CRT", ConvNF::crtToStr(_emit->get_CRT()));
+    if (!_emit->get_ISUFEmit().isEmpty()) //C22
+        this->m_xmlw->writeTextElement("ISUFEmit", _emit->get_ISUFEmit());
 
     this->m_xmlw->writeEndElement();//fechamento grupo emit
 }
@@ -654,6 +690,18 @@ void XmlWrite::get_det()
             this->m_xmlw->writeTextElement("infAdProd", this->m_infNFe->det->value(i)->get_infAdProd());
 
         get_obsItem(i);
+
+        const Det *_det = this->m_infNFe->det->value(i);
+        if (_det->get_vItem() > 0) //VB01
+            this->m_xmlw->writeTextElement("vItem", CppUtility::doubleToStrDecimal(_det->get_vItem(), 2));
+        if (!_det->DFeReferenciado->get_chaveAcesso().isEmpty()) //VC01
+        {
+            this->m_xmlw->writeStartElement("DFeReferenciado");
+            this->m_xmlw->writeTextElement("chaveAcesso", _det->DFeReferenciado->get_chaveAcesso());
+            if (_det->DFeReferenciado->get_nItem() > 0)
+                this->m_xmlw->writeTextElement("nItem", QString::number(_det->DFeReferenciado->get_nItem()));
+            this->m_xmlw->writeEndElement();
+        }
         this->m_xmlw->writeEndElement();//fechamento grupo det
     }//fim for det
 }
@@ -700,6 +748,8 @@ void XmlWrite::get_prod(const int &i)
         this->m_xmlw->writeTextElement("vCredPresumido", CppUtility::doubleToStrDecimal(credito->get_vCredPresumido(), 2));
         this->m_xmlw->writeEndElement();
     }
+    if (_prod->get_tpCredPresIBSZFM() != TpCredPresIBSZFM::None) //I05k
+        this->m_xmlw->writeTextElement("tpCredPresIBSZFM", ConvNF::tpCredPresIBSZFMToStr(_prod->get_tpCredPresIBSZFM()));
     if (!_prod->get_EXTIPI().isEmpty())
         this->m_xmlw->writeTextElement("EXTIPI", _prod->get_EXTIPI());
     this->m_xmlw->writeTextElement("CFOP", _prod->get_CFOP());
@@ -722,6 +772,8 @@ void XmlWrite::get_prod(const int &i)
     if (_prod->get_vOutro() > 0)
         this->m_xmlw->writeTextElement("vOutro", CppUtility::doubleToStrDecimal(_prod->get_vOutro(), 2));
     this->m_xmlw->writeTextElement("indTot", ConvNF::indTotToStr(_prod->get_indTot()));
+    if (_prod->get_indBemMovelUsado() != IndBemMovelUsado::None) //I17c
+        this->m_xmlw->writeTextElement("indBemMovelUsado", ConvNF::indBemMovelUsadoToStr(_prod->get_indBemMovelUsado()));
 
     //DI - I18 - container 0-100
     if (_prod->DI->count() > 0)
@@ -957,12 +1009,14 @@ void XmlWrite::get_imposto(const int &i)
     get_ICMS(i);
     get_IPI(i);
     get_II(i);
+    get_ISSQN(i);
     get_PIS(i);
     get_PISST(i);
     get_COFINS(i);
     get_COFINSST(i);
     get_ICMSUFDest(i);
-    get_ISSQN(i);
+    get_IS(i);
+    get_IBSCBS(i);
     this->m_xmlw->writeEndElement();//fechamento grupo imposto
 }
 
@@ -2152,6 +2206,7 @@ void XmlWrite::get_total()
         this->m_xmlw->writeEndElement();//fechamento grupo retTrib
     }
 
+    get_ISTot_IBSCBSTot();
     this->m_xmlw->writeEndElement();//fechamento grupo total
 }
 
@@ -2584,6 +2639,522 @@ void XmlWrite::get_agropecuario()
         m_xmlw->writeEndElement();
     }
     m_xmlw->writeEndElement();
+}
+
+namespace {
+QString dec2(const double &valor)
+{
+    return CppUtility::doubleToStrDecimal(valor, 2);
+}
+
+QString dec4(const double &valor)
+{
+    return CppUtility::doubleToStrDecimal(valor, 4);
+}
+} // namespace
+
+bool XmlWrite::validarRTC() const
+{
+    for (int i = 0; i < this->m_infNFe->det->count(); ++i)
+    {
+        const Imposto *_imposto = this->m_infNFe->det->value(i)->imposto.get();
+        const int nItem = this->m_infNFe->det->value(i)->prod->get_nItem();
+        const Is *_is = _imposto->IS.get();
+        if (_is->get_CSTIS().isEmpty() && !_is->isEmpty())
+        {
+            qWarning() << "Item" << nItem << ": informe o CSTIS do grupo IS.";
+            return false;
+        }
+
+        const IbsCbs *_ibscbs = _imposto->IBSCBS.get();
+        if (_ibscbs->isEmpty())
+            continue;
+        if (_ibscbs->get_CST().isEmpty())
+        {
+            qWarning() << "Item" << nItem << ": informe o CST do grupo IBSCBS.";
+            return false;
+        }
+        const int grupos = (_ibscbs->gIBSCBS->isEmpty() ? 0 : 1) +
+                           (_ibscbs->gIBSCBSMono->isEmpty() ? 0 : 1) +
+                           (_ibscbs->gTransfCred->isEmpty() ? 0 : 1) +
+                           (_ibscbs->gAjusteCompet->isEmpty() ? 0 : 1);
+        if (grupos > 1)
+        {
+            qWarning() << "Item" << nItem << ": informe apenas um dos grupos gIBSCBS, gIBSCBSMono,"
+                       << "gTransfCred ou gAjusteCompet.";
+            return false;
+        }
+        if (!_ibscbs->gCredPresOper->isEmpty() && !_ibscbs->gCredPresIBSZFM->isEmpty())
+        {
+            qWarning() << "Item" << nItem << ": informe apenas um dos grupos gCredPresOper ou gCredPresIBSZFM.";
+            return false;
+        }
+        const GIBSCBSMono *_mono = _ibscbs->gIBSCBSMono.get();
+        if ((!_mono->gIBSMonoAdRem->isEmpty() && !_mono->gIBSMonoAdValorem->isEmpty()) ||
+            (!_mono->gCBSMonoAdRem->isEmpty() && !_mono->gCBSMonoAdValorem->isEmpty()))
+        {
+            qWarning() << "Item" << nItem << ": informe apenas um dos grupos AdRem ou AdValorem"
+                       << "da monofasia para cada tributo.";
+            return false;
+        }
+        if (!_ibscbs->gAjusteCompet->isEmpty() && !_ibscbs->gAjusteCompet->get_competApur().isValid())
+        {
+            qWarning() << "Item" << nItem << ": informe competApur do grupo gAjusteCompet.";
+            return false;
+        }
+        const GCredPresIBSZFM *_zfm = _ibscbs->gCredPresIBSZFM.get();
+        if (!_zfm->isEmpty() && (!_zfm->get_competApur().isValid() ||
+                                 _zfm->get_tpCredPresIBSZFM() == TpCredPresIBSZFM::None))
+        {
+            qWarning() << "Item" << nItem << ": informe competApur e tpCredPresIBSZFM do grupo gCredPresIBSZFM.";
+            return false;
+        }
+        const GCredPresOper *_credPres = _ibscbs->gCredPresOper.get();
+        for (const GCredPres *_cp : {_credPres->gIBSCredPres.get(), _credPres->gCBSCredPres.get()})
+        {
+            if (_cp->get_vCredPres() > 0 && _cp->get_vCredPresCondSus() > 0)
+            {
+                qWarning() << "Item" << nItem << ": informe vCredPres ou vCredPresCondSus, não ambos.";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void XmlWrite::get_IS(const int &i)
+{   //IS - UB01
+    const Is *_is = this->m_infNFe->det->value(i)->imposto->IS.get();
+    if (_is->get_CSTIS().isEmpty())
+        return;
+
+    this->m_xmlw->writeStartElement("IS");
+    this->m_xmlw->writeTextElement("CSTIS", _is->get_CSTIS());
+    this->m_xmlw->writeTextElement("cClassTribIS", _is->get_cClassTribIS());
+    if (!qFuzzyIsNull(_is->get_vBCIS()) || !qFuzzyIsNull(_is->get_pIS()) ||
+        !qFuzzyIsNull(_is->get_adRemIS()) || !_is->get_uTrib().isEmpty() ||
+        !qFuzzyIsNull(_is->get_qTrib()) || !qFuzzyIsNull(_is->get_vIS()))
+    {
+        this->m_xmlw->writeTextElement("vBCIS", dec2(_is->get_vBCIS()));
+        this->m_xmlw->writeTextElement("pIS", dec4(_is->get_pIS()));
+        if (_is->get_adRemIS() > 0)
+            this->m_xmlw->writeTextElement("adRemIS", dec4(_is->get_adRemIS()));
+        if (!_is->get_uTrib().isEmpty())
+        {
+            this->m_xmlw->writeTextElement("uTrib", _is->get_uTrib());
+            this->m_xmlw->writeTextElement("qTrib", dec4(_is->get_qTrib()));
+        }
+        this->m_xmlw->writeTextElement("vIS", dec2(_is->get_vIS()));
+    }
+    this->m_xmlw->writeEndElement();//fechamento grupo IS
+}
+
+void XmlWrite::get_IBSCBS(const int &i)
+{   //IBSCBS - UB12
+    const IbsCbs *_ibscbs = this->m_infNFe->det->value(i)->imposto->IBSCBS.get();
+    if (_ibscbs->get_CST().isEmpty())
+        return;
+
+    this->m_xmlw->writeStartElement("IBSCBS");
+    this->m_xmlw->writeTextElement("CST", _ibscbs->get_CST());
+    this->m_xmlw->writeTextElement("cClassTrib", _ibscbs->get_cClassTrib());
+    if (_ibscbs->get_indDoacao() != IndDoacao::None)
+        this->m_xmlw->writeTextElement("indDoacao", ConvNF::indDoacaoToStr(_ibscbs->get_indDoacao()));
+
+    //grupos mutuamente exclusivos, verificados em validarRTC()
+    if (!_ibscbs->gIBSCBS->isEmpty())
+        get_gIBSCBS(*_ibscbs->gIBSCBS);
+    else if (!_ibscbs->gIBSCBSMono->isEmpty())
+        get_gIBSCBSMono(*_ibscbs->gIBSCBSMono);
+    else if (!_ibscbs->gTransfCred->isEmpty())
+    {   //gTransfCred - UB106
+        this->m_xmlw->writeStartElement("gTransfCred");
+        this->m_xmlw->writeTextElement("vIBS", dec2(_ibscbs->gTransfCred->get_vIBS()));
+        this->m_xmlw->writeTextElement("vCBS", dec2(_ibscbs->gTransfCred->get_vCBS()));
+        this->m_xmlw->writeEndElement();
+    }
+    else if (!_ibscbs->gAjusteCompet->isEmpty())
+    {   //gAjusteCompet - UB112
+        this->m_xmlw->writeStartElement("gAjusteCompet");
+        this->m_xmlw->writeTextElement("competApur", _ibscbs->gAjusteCompet->get_competApur().toString("yyyy-MM"));
+        this->m_xmlw->writeTextElement("vIBS", dec2(_ibscbs->gAjusteCompet->get_vIBS()));
+        this->m_xmlw->writeTextElement("vCBS", dec2(_ibscbs->gAjusteCompet->get_vCBS()));
+        this->m_xmlw->writeEndElement();
+    }
+
+    if (!_ibscbs->gEstornoCred->isEmpty())
+    {   //gEstornoCred - UB116
+        this->m_xmlw->writeStartElement("gEstornoCred");
+        this->m_xmlw->writeTextElement("vIBSEstCred", dec2(_ibscbs->gEstornoCred->get_vIBSEstCred()));
+        this->m_xmlw->writeTextElement("vCBSEstCred", dec2(_ibscbs->gEstornoCred->get_vCBSEstCred()));
+        this->m_xmlw->writeEndElement();
+    }
+
+    if (!_ibscbs->gCredPresOper->isEmpty())
+    {   //gCredPresOper - UB120
+        const GCredPresOper *_credPres = _ibscbs->gCredPresOper.get();
+        this->m_xmlw->writeStartElement("gCredPresOper");
+        this->m_xmlw->writeTextElement("vBCCredPres", dec2(_credPres->get_vBCCredPres()));
+        this->m_xmlw->writeTextElement("cCredPres", _credPres->get_cCredPres());
+        if (!_credPres->gIBSCredPres->isEmpty())
+            get_gCredPres(QStringLiteral("gIBSCredPres"), *_credPres->gIBSCredPres);
+        if (!_credPres->gCBSCredPres->isEmpty())
+            get_gCredPres(QStringLiteral("gCBSCredPres"), *_credPres->gCBSCredPres);
+        this->m_xmlw->writeEndElement();
+    }
+    else if (!_ibscbs->gCredPresIBSZFM->isEmpty())
+    {   //gCredPresIBSZFM - UB131
+        const GCredPresIBSZFM *_zfm = _ibscbs->gCredPresIBSZFM.get();
+        this->m_xmlw->writeStartElement("gCredPresIBSZFM");
+        this->m_xmlw->writeTextElement("competApur", _zfm->get_competApur().toString("yyyy-MM"));
+        this->m_xmlw->writeTextElement("tpCredPresIBSZFM", ConvNF::tpCredPresIBSZFMToStr(_zfm->get_tpCredPresIBSZFM()));
+        this->m_xmlw->writeTextElement("vCredPresIBSZFM", dec2(_zfm->get_vCredPresIBSZFM()));
+        this->m_xmlw->writeEndElement();
+    }
+
+    this->m_xmlw->writeEndElement();//fechamento grupo IBSCBS
+}
+
+void XmlWrite::get_gIBSCBS(const GIBSCBS &gIBSCBS)
+{   //gIBSCBS - UB15
+    this->m_xmlw->writeStartElement("gIBSCBS");
+    this->m_xmlw->writeTextElement("vBC", dec2(gIBSCBS.get_vBC()));
+
+    const GIBSUF *_uf = gIBSCBS.gIBSUF.get();
+    this->m_xmlw->writeStartElement("gIBSUF"); //UB17
+    this->m_xmlw->writeTextElement("pIBSUF", dec4(_uf->get_pIBSUF()));
+    get_gDifDevTribRed(*_uf->gDif, *_uf->gDevTrib, *_uf->gRed);
+    this->m_xmlw->writeTextElement("vIBSUF", dec2(_uf->get_vIBSUF()));
+    this->m_xmlw->writeEndElement();
+
+    const GIBSMun *_mun = gIBSCBS.gIBSMun.get();
+    this->m_xmlw->writeStartElement("gIBSMun"); //UB36
+    this->m_xmlw->writeTextElement("pIBSMun", dec4(_mun->get_pIBSMun()));
+    get_gDifDevTribRed(*_mun->gDif, *_mun->gDevTrib, *_mun->gRed);
+    this->m_xmlw->writeTextElement("vIBSMun", dec2(_mun->get_vIBSMun()));
+    this->m_xmlw->writeEndElement();
+
+    this->m_xmlw->writeTextElement("vIBS", dec2(gIBSCBS.get_vIBS()));
+
+    const GCBS *_cbs = gIBSCBS.gCBS.get();
+    this->m_xmlw->writeStartElement("gCBS"); //UB55
+    this->m_xmlw->writeTextElement("pCBS", dec4(_cbs->get_pCBS()));
+    get_gDifDevTribRed(*_cbs->gDif, *_cbs->gDevTrib, *_cbs->gRed);
+    if (!_cbs->gALCZFMCBS->isEmpty())
+    {   //gALCZFMCBS - UB66a
+        const GALCZFMCBS *_alc = _cbs->gALCZFMCBS.get();
+        this->m_xmlw->writeStartElement("gALCZFMCBS");
+        this->m_xmlw->writeTextElement("tpALCZFMCBS", ConvNF::tpALCZFMCBSToStr(_alc->get_tpALCZFMCBS()));
+        if (!_alc->get_nProcSuframa().isEmpty())
+            this->m_xmlw->writeTextElement("nProcSuframa", _alc->get_nProcSuframa());
+        this->m_xmlw->writeTextElement("pAliqEfetRegCBS", dec4(_alc->get_pAliqEfetRegCBS()));
+        this->m_xmlw->writeTextElement("vTribRegCBS", dec2(_alc->get_vTribRegCBS()));
+        this->m_xmlw->writeEndElement();
+    }
+    this->m_xmlw->writeTextElement("vCBS", dec2(_cbs->get_vCBS()));
+    this->m_xmlw->writeEndElement();
+
+    const GTribRegular *_reg = gIBSCBS.gTribRegular.get();
+    if (!_reg->isEmpty())
+    {   //gTribRegular - UB68
+        this->m_xmlw->writeStartElement("gTribRegular");
+        this->m_xmlw->writeTextElement("CSTReg", _reg->get_CSTReg());
+        this->m_xmlw->writeTextElement("cClassTribReg", _reg->get_cClassTribReg());
+        this->m_xmlw->writeTextElement("pAliqEfetRegIBSUF", dec4(_reg->get_pAliqEfetRegIBSUF()));
+        this->m_xmlw->writeTextElement("vTribRegIBSUF", dec2(_reg->get_vTribRegIBSUF()));
+        this->m_xmlw->writeTextElement("pAliqEfetRegIBSMun", dec4(_reg->get_pAliqEfetRegIBSMun()));
+        this->m_xmlw->writeTextElement("vTribRegIBSMun", dec2(_reg->get_vTribRegIBSMun()));
+        this->m_xmlw->writeTextElement("pAliqEfetRegCBS", dec4(_reg->get_pAliqEfetRegCBS()));
+        this->m_xmlw->writeTextElement("vTribRegCBS", dec2(_reg->get_vTribRegCBS()));
+        this->m_xmlw->writeEndElement();
+    }
+
+    const GTribCompraGov *_gov = gIBSCBS.gTribCompraGov.get();
+    if (!_gov->isEmpty())
+    {   //gTribCompraGov - UB82a
+        this->m_xmlw->writeStartElement("gTribCompraGov");
+        this->m_xmlw->writeTextElement("pAliqIBSUF", dec4(_gov->get_pAliqIBSUF()));
+        this->m_xmlw->writeTextElement("vTribIBSUF", dec2(_gov->get_vTribIBSUF()));
+        this->m_xmlw->writeTextElement("pAliqIBSMun", dec4(_gov->get_pAliqIBSMun()));
+        this->m_xmlw->writeTextElement("vTribIBSMun", dec2(_gov->get_vTribIBSMun()));
+        this->m_xmlw->writeTextElement("pAliqCBS", dec4(_gov->get_pAliqCBS()));
+        this->m_xmlw->writeTextElement("vTribCBS", dec2(_gov->get_vTribCBS()));
+        this->m_xmlw->writeEndElement();
+    }
+    this->m_xmlw->writeEndElement();//fechamento grupo gIBSCBS
+}
+
+void XmlWrite::get_gDifDevTribRed(const GDif &gDif, const GDevTrib &gDevTrib, const GRed &gRed)
+{
+    if (!gDif.isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gDif");
+        this->m_xmlw->writeTextElement("pDif", dec4(gDif.get_pDif()));
+        this->m_xmlw->writeTextElement("vDif", dec2(gDif.get_vDif()));
+        this->m_xmlw->writeEndElement();
+    }
+    if (!gDevTrib.isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gDevTrib");
+        if (gDevTrib.get_pDevTrib() > 0)
+            this->m_xmlw->writeTextElement("pDevTrib", dec4(gDevTrib.get_pDevTrib()));
+        this->m_xmlw->writeTextElement("vDevTrib", dec2(gDevTrib.get_vDevTrib()));
+        this->m_xmlw->writeEndElement();
+    }
+    if (!gRed.isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gRed");
+        this->m_xmlw->writeTextElement("pRedAliq", dec4(gRed.get_pRedAliq()));
+        this->m_xmlw->writeTextElement("pAliqEfet", dec4(gRed.get_pAliqEfet()));
+        this->m_xmlw->writeEndElement();
+    }
+}
+
+void XmlWrite::get_gIBSCBSMono(const GIBSCBSMono &gIBSCBSMono)
+{   //gIBSCBSMono - UB84
+    this->m_xmlw->writeStartElement("gIBSCBSMono");
+
+    //IBS: AdRem (UB85a) ou AdValorem (UB90)
+    const GIBSMonoAdRem *_ibsAdRem = gIBSCBSMono.gIBSMonoAdRem.get();
+    const GIBSMonoAdValorem *_ibsAdVal = gIBSCBSMono.gIBSMonoAdValorem.get();
+    const GIBSMonoRet *_ibsRet = nullptr;
+    const GIBSpBioDiferenca *_ibsBio = nullptr;
+    if (!_ibsAdRem->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gIBSMonoAdRem");
+        if (!_ibsAdRem->gMonoPadrao->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoPadrao");
+            this->m_xmlw->writeTextElement("qBCMono", dec4(_ibsAdRem->gMonoPadrao->get_qBCMono()));
+            this->m_xmlw->writeTextElement("adRemIBS", dec4(_ibsAdRem->gMonoPadrao->get_adRemIBS()));
+            this->m_xmlw->writeTextElement("vIBSMono", dec2(_ibsAdRem->gMonoPadrao->get_vIBSMono()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_ibsAdRem->gMonoReten->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoReten");
+            this->m_xmlw->writeTextElement("qBCMonoReten", dec4(_ibsAdRem->gMonoReten->get_qBCMonoReten()));
+            this->m_xmlw->writeTextElement("adRemIBSReten", dec4(_ibsAdRem->gMonoReten->get_adRemIBSReten()));
+            this->m_xmlw->writeTextElement("vIBSMonoReten", dec2(_ibsAdRem->gMonoReten->get_vIBSMonoReten()));
+            this->m_xmlw->writeEndElement();
+        }
+        _ibsRet = _ibsAdRem->gMonoRet.get();
+        _ibsBio = _ibsAdRem->gpBioDiferenca.get();
+    }
+    else if (!_ibsAdVal->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gIBSMonoAdValorem");
+        if (!_ibsAdVal->gMonoPadrao->isEmpty())
+        {
+            const GIBSMonoPadraoAdValorem *_p = _ibsAdVal->gMonoPadrao.get();
+            this->m_xmlw->writeStartElement("gMonoPadrao");
+            this->m_xmlw->writeTextElement("vBCMono", dec2(_p->get_vBCMono()));
+            this->m_xmlw->writeTextElement("pAliqMonoUF", dec4(_p->get_pAliqMonoUF()));
+            this->m_xmlw->writeTextElement("vIBSMonoUF", dec2(_p->get_vIBSMonoUF()));
+            this->m_xmlw->writeTextElement("pAliqMonoMun", dec4(_p->get_pAliqMonoMun()));
+            this->m_xmlw->writeTextElement("vIBSMonoMun", dec2(_p->get_vIBSMonoMun()));
+            this->m_xmlw->writeTextElement("vIBSMono", dec2(_p->get_vIBSMono()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_ibsAdVal->gMonoReten->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoReten");
+            this->m_xmlw->writeTextElement("vBCMonoReten", dec2(_ibsAdVal->gMonoReten->get_vBCMonoReten()));
+            this->m_xmlw->writeTextElement("pAliqMonoReten", dec4(_ibsAdVal->gMonoReten->get_pAliqMonoReten()));
+            this->m_xmlw->writeTextElement("vIBSMonoReten", dec2(_ibsAdVal->gMonoReten->get_vIBSMonoReten()));
+            this->m_xmlw->writeEndElement();
+        }
+        _ibsRet = _ibsAdVal->gMonoRet.get();
+        _ibsBio = _ibsAdVal->gpBioDiferenca.get();
+    }
+    if (_ibsRet)
+    {
+        if (!_ibsRet->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoRet");
+            this->m_xmlw->writeTextElement("vIBSMonoRet", dec2(_ibsRet->get_vIBSMonoRet()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_ibsBio->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gpBioDiferenca");
+            this->m_xmlw->writeTextElement("qBCBioComb", dec4(_ibsBio->get_qBCBioComb()));
+            this->m_xmlw->writeTextElement("vIBSDiferenca", dec2(_ibsBio->get_vIBSDiferenca()));
+            this->m_xmlw->writeEndElement();
+        }
+        this->m_xmlw->writeEndElement();//fechamento gIBSMonoAdRem/gIBSMonoAdValorem
+    }
+
+    //CBS: AdRem (UB95a) ou AdValorem (UB100)
+    const GCBSMonoAdRem *_cbsAdRem = gIBSCBSMono.gCBSMonoAdRem.get();
+    const GCBSMonoAdValorem *_cbsAdVal = gIBSCBSMono.gCBSMonoAdValorem.get();
+    const GCBSMonoRet *_cbsRet = nullptr;
+    const GCBSpBioDiferenca *_cbsBio = nullptr;
+    if (!_cbsAdRem->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gCBSMonoAdRem");
+        if (!_cbsAdRem->gMonoPadrao->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoPadrao");
+            this->m_xmlw->writeTextElement("qBCMono", dec4(_cbsAdRem->gMonoPadrao->get_qBCMono()));
+            this->m_xmlw->writeTextElement("adRemCBS", dec4(_cbsAdRem->gMonoPadrao->get_adRemCBS()));
+            this->m_xmlw->writeTextElement("vCBSMono", dec2(_cbsAdRem->gMonoPadrao->get_vCBSMono()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_cbsAdRem->gMonoReten->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoReten");
+            this->m_xmlw->writeTextElement("qBCMonoReten", dec4(_cbsAdRem->gMonoReten->get_qBCMonoReten()));
+            this->m_xmlw->writeTextElement("adRemCBSReten", dec4(_cbsAdRem->gMonoReten->get_adRemCBSReten()));
+            this->m_xmlw->writeTextElement("vCBSMonoReten", dec2(_cbsAdRem->gMonoReten->get_vCBSMonoReten()));
+            this->m_xmlw->writeEndElement();
+        }
+        _cbsRet = _cbsAdRem->gMonoRet.get();
+        _cbsBio = _cbsAdRem->gpBioDiferenca.get();
+    }
+    else if (!_cbsAdVal->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("gCBSMonoAdValorem");
+        if (!_cbsAdVal->gMonoPadrao->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoPadrao");
+            this->m_xmlw->writeTextElement("vBCMono", dec2(_cbsAdVal->gMonoPadrao->get_vBCMono()));
+            this->m_xmlw->writeTextElement("pAliqMonoCBS", dec4(_cbsAdVal->gMonoPadrao->get_pAliqMonoCBS()));
+            this->m_xmlw->writeTextElement("vCBSMono", dec2(_cbsAdVal->gMonoPadrao->get_vCBSMono()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_cbsAdVal->gMonoReten->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoReten");
+            this->m_xmlw->writeTextElement("vBCMonoReten", dec2(_cbsAdVal->gMonoReten->get_vBCMonoReten()));
+            this->m_xmlw->writeTextElement("pAliqMonoReten", dec4(_cbsAdVal->gMonoReten->get_pAliqMonoReten()));
+            this->m_xmlw->writeTextElement("vCBSMonoReten", dec2(_cbsAdVal->gMonoReten->get_vCBSMonoReten()));
+            this->m_xmlw->writeEndElement();
+        }
+        _cbsRet = _cbsAdVal->gMonoRet.get();
+        _cbsBio = _cbsAdVal->gpBioDiferenca.get();
+    }
+    if (_cbsRet)
+    {
+        if (!_cbsRet->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gMonoRet");
+            this->m_xmlw->writeTextElement("vCBSMonoRet", dec2(_cbsRet->get_vCBSMonoRet()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (!_cbsBio->isEmpty())
+        {
+            this->m_xmlw->writeStartElement("gpBioDiferenca");
+            this->m_xmlw->writeTextElement("qBCBioComb", dec4(_cbsBio->get_qBCBioComb()));
+            this->m_xmlw->writeTextElement("vCBSDiferenca", dec2(_cbsBio->get_vCBSDiferenca()));
+            this->m_xmlw->writeEndElement();
+        }
+        this->m_xmlw->writeEndElement();//fechamento gCBSMonoAdRem/gCBSMonoAdValorem
+    }
+
+    this->m_xmlw->writeTextElement("vTotIBSMonoItem", dec2(gIBSCBSMono.get_vTotIBSMonoItem()));
+    this->m_xmlw->writeTextElement("vTotCBSMonoItem", dec2(gIBSCBSMono.get_vTotCBSMonoItem()));
+    this->m_xmlw->writeEndElement();//fechamento grupo gIBSCBSMono
+}
+
+void XmlWrite::get_gCredPres(const QString &grupo, const GCredPres &gCredPres)
+{   //gIBSCredPres - UB123 / gCBSCredPres - UB127
+    this->m_xmlw->writeStartElement(grupo);
+    this->m_xmlw->writeTextElement("pCredPres", dec4(gCredPres.get_pCredPres()));
+    if (gCredPres.get_vCredPresCondSus() > 0)
+        this->m_xmlw->writeTextElement("vCredPresCondSus", dec2(gCredPres.get_vCredPresCondSus()));
+    else
+        this->m_xmlw->writeTextElement("vCredPres", dec2(gCredPres.get_vCredPres()));
+    this->m_xmlw->writeEndElement();
+}
+
+void XmlWrite::get_ISTot_IBSCBSTot()
+{
+    //os grupos de totais acompanham os grupos informados nos itens
+    bool temIS = false, temIBSCBS = false, temGIBSCBS = false, temMono = false, temEstorno = false;
+    for (const auto *_det : *this->m_infNFe->det)
+    {
+        const Imposto *_imposto = _det->imposto.get();
+        temIS = temIS || !_imposto->IS->get_CSTIS().isEmpty();
+        const IbsCbs *_ibscbs = _imposto->IBSCBS.get();
+        if (_ibscbs->get_CST().isEmpty())
+            continue;
+        temIBSCBS = true;
+        temGIBSCBS = temGIBSCBS || !_ibscbs->gIBSCBS->isEmpty() || !_ibscbs->gCredPresOper->isEmpty();
+        temMono = temMono || !_ibscbs->gIBSCBSMono->isEmpty();
+        temEstorno = temEstorno || !_ibscbs->gEstornoCred->isEmpty();
+    }
+
+    const Total *_total = this->m_infNFe->total.get();
+    //ISTot - W31
+    if (temIS || !_total->ISTot->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("ISTot");
+        this->m_xmlw->writeTextElement("vIS", dec2(_total->ISTot->get_vIS()));
+        this->m_xmlw->writeEndElement();
+    }
+
+    //IBSCBSTot - W34
+    const IbsCbsTot *_tot = _total->IBSCBSTot.get();
+    if (temIBSCBS || !_tot->isEmpty())
+    {
+        this->m_xmlw->writeStartElement("IBSCBSTot");
+        this->m_xmlw->writeTextElement("vBCIBSCBS", dec2(_tot->get_vBCIBSCBS()));
+        if (temGIBSCBS || !_tot->gIBS->isEmpty())
+        {   //gIBS - W36
+            const GIBSTot *_ibs = _tot->gIBS.get();
+            this->m_xmlw->writeStartElement("gIBS");
+            this->m_xmlw->writeStartElement("gIBSUF");
+            this->m_xmlw->writeTextElement("vDif", dec2(_ibs->gIBSUF->get_vDif()));
+            this->m_xmlw->writeTextElement("vDevTrib", dec2(_ibs->gIBSUF->get_vDevTrib()));
+            this->m_xmlw->writeTextElement("vIBSUF", dec2(_ibs->gIBSUF->get_vIBSUF()));
+            this->m_xmlw->writeEndElement();
+            this->m_xmlw->writeStartElement("gIBSMun");
+            this->m_xmlw->writeTextElement("vDif", dec2(_ibs->gIBSMun->get_vDif()));
+            this->m_xmlw->writeTextElement("vDevTrib", dec2(_ibs->gIBSMun->get_vDevTrib()));
+            this->m_xmlw->writeTextElement("vIBSMun", dec2(_ibs->gIBSMun->get_vIBSMun()));
+            this->m_xmlw->writeEndElement();
+            this->m_xmlw->writeTextElement("vIBS", dec2(_ibs->get_vIBS()));
+            this->m_xmlw->writeTextElement("vCredPres", dec2(_ibs->get_vCredPres()));
+            this->m_xmlw->writeTextElement("vCredPresCondSus", dec2(_ibs->get_vCredPresCondSus()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (temGIBSCBS || !_tot->gCBS->isEmpty())
+        {   //gCBS - W50
+            const GCBSTot *_cbs = _tot->gCBS.get();
+            this->m_xmlw->writeStartElement("gCBS");
+            this->m_xmlw->writeTextElement("vDif", dec2(_cbs->get_vDif()));
+            this->m_xmlw->writeTextElement("vDevTrib", dec2(_cbs->get_vDevTrib()));
+            this->m_xmlw->writeTextElement("vCBS", dec2(_cbs->get_vCBS()));
+            this->m_xmlw->writeTextElement("vCredPres", dec2(_cbs->get_vCredPres()));
+            this->m_xmlw->writeTextElement("vCredPresCondSus", dec2(_cbs->get_vCredPresCondSus()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (temMono || !_tot->gMono->isEmpty())
+        {   //gMono - W57
+            const GMonoTot *_mono = _tot->gMono.get();
+            this->m_xmlw->writeStartElement("gMono");
+            this->m_xmlw->writeTextElement("vIBSMono", dec2(_mono->get_vIBSMono()));
+            this->m_xmlw->writeTextElement("vCBSMono", dec2(_mono->get_vCBSMono()));
+            this->m_xmlw->writeTextElement("vIBSMonoReten", dec2(_mono->get_vIBSMonoReten()));
+            this->m_xmlw->writeTextElement("vCBSMonoReten", dec2(_mono->get_vCBSMonoReten()));
+            this->m_xmlw->writeTextElement("vIBSMonoRet", dec2(_mono->get_vIBSMonoRet()));
+            this->m_xmlw->writeTextElement("vCBSMonoRet", dec2(_mono->get_vCBSMonoRet()));
+            this->m_xmlw->writeEndElement();
+        }
+        if (temEstorno || !_tot->gEstornoCred->isEmpty())
+        {   //gEstornoCred - W59e
+            this->m_xmlw->writeStartElement("gEstornoCred");
+            this->m_xmlw->writeTextElement("vIBSEstCred", dec2(_tot->gEstornoCred->get_vIBSEstCred()));
+            this->m_xmlw->writeTextElement("vCBSEstCred", dec2(_tot->gEstornoCred->get_vCBSEstCred()));
+            this->m_xmlw->writeEndElement();
+        }
+        this->m_xmlw->writeEndElement();//fechamento grupo IBSCBSTot
+    }
+
+    //vNFTot - W60
+    if (_total->get_vNFTot() > 0)
+        this->m_xmlw->writeTextElement("vNFTot", dec2(_total->get_vNFTot()));
 }
 
 void XmlWrite::get_infNFeSupl_ONLINE()

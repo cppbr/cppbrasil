@@ -53,7 +53,33 @@ enum class TpEmis {None = -1, Normal = 1, Contingencia_FSIA = 2,
                    Contingencia_SVCRS = 7, Contingencia_SVCSP = 8, Contingencia_Offline = 9,
                    Contingencia_NFCe = Contingencia_Offline};
 //finNFe - Finalidade de emissão da NF-e
-enum class FinNFe {None = -1, Normal = 1, Complementar = 2, Ajuste = 3, Devolucao = 4};
+enum class FinNFe {None = -1, Normal = 1, Complementar = 2, Ajuste = 3, Devolucao = 4,
+                   NotaCredito = 5, NotaDebito = 6};
+//tpNFDebito - Tipo de Nota de Débito (NT 2025.002)
+enum class TpNFDebito {None = -1, TransfCreditoCooperativa = 1, AnulacaoCreditoSaidasImunesIsentas = 2,
+                       DebitoNotasNaoProcessadas = 3, MultaJuros = 4, TransfCreditoSucessao = 5,
+                       PagamentoAntecipado = 6, PerdaEstoque = 7, DesenquadramentoSN = 8};
+//tpNFCredito - Tipo de Nota de Crédito (NT 2025.002)
+enum class TpNFCredito {None = -1, MultaJuros = 1, ApropriacaoCredPresIBSZFM = 2,
+                        RetornoRecusaTotalEntrega = 3, ReducaoValores = 4,
+                        TransfCreditoSucessao = 5, RetornoRecusaParcialEntrega = 6};
+//tpEnteGov - Tipo de ente governamental (NT 2025.002)
+enum class TpEnteGov {None = -1, Uniao = 1, Estado = 2, DistritoFederal = 3, Municipio = 4,
+                      ConsorcioPublico = 5, ComiteGestorIBS = 6};
+//tpOperGov - Tipo de operação com o ente governamental (NT 2025.002)
+enum class TpOperGov {None = -1, FornecimentoPagamentoPosterior = 1,
+                      RecebimentoPagamentoFornecimentoRealizado = 2,
+                      FornecimentoPagamentoRealizado = 3,
+                      RecebimentoPagamentoFornecimentoPosterior = 4};
+//tpCredPresIBSZFM - Classificação para subapuração do IBS na ZFM (NT 2025.002)
+enum class TpCredPresIBSZFM {None = -1, SemCreditoPresumido = 0, BensConsumoFinal = 1,
+                             BensCapital = 2, BensIntermediarios = 3, BensInformatica = 4};
+//indBemMovelUsado - Indicador de fornecimento de bem móvel usado (NT 2025.002)
+enum class IndBemMovelUsado {None = -1, BemMovelUsado = 1};
+//indDoacao - Indicador de doação (NT 2025.002)
+enum class IndDoacao {None = -1, Doacao = 1};
+//tpALCZFMCBS - Tipo de aplicação da alíquota zero da CBS em ALC/ZFM (NT 2025.002)
+enum class TpALCZFMCBS {None = -1, SemProcessoSuframa = 1, ComProcessoSuframa = 2};
 //indFinal - Indica operação com Consumidor final
 enum class IndFinal {None = -1, Normal = 0, ConsumidorFinal = 1};
 //indPres - Indicador de presença do comprador no estabelecimento comercial no momento da operação
@@ -258,6 +284,22 @@ public:
     static TpEmis strToTpEmis(const QString &value);
     static QString finNFeToStr(const FinNFe &value);
     static FinNFe strToFinNFe(const QString &value);
+    static QString tpNFDebitoToStr(const TpNFDebito &value);
+    static TpNFDebito strToTpNFDebito(const QString &value);
+    static QString tpNFCreditoToStr(const TpNFCredito &value);
+    static TpNFCredito strToTpNFCredito(const QString &value);
+    static QString tpEnteGovToStr(const TpEnteGov &value);
+    static TpEnteGov strToTpEnteGov(const QString &value);
+    static QString tpOperGovToStr(const TpOperGov &value);
+    static TpOperGov strToTpOperGov(const QString &value);
+    static QString tpCredPresIBSZFMToStr(const TpCredPresIBSZFM &value);
+    static TpCredPresIBSZFM strToTpCredPresIBSZFM(const QString &value);
+    static QString indBemMovelUsadoToStr(const IndBemMovelUsado &value);
+    static IndBemMovelUsado strToIndBemMovelUsado(const QString &value);
+    static QString indDoacaoToStr(const IndDoacao &value);
+    static IndDoacao strToIndDoacao(const QString &value);
+    static QString tpALCZFMCBSToStr(const TpALCZFMCBS &value);
+    static TpALCZFMCBS strToTpALCZFMCBS(const QString &value);
     static QString indFinalToStr(const IndFinal &value);
     static IndFinal strToIndFinal(const QString &value);
     static QString indPresToStr(const IndPres &value);

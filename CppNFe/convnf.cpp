@@ -222,12 +222,152 @@ QString ConvNF::finNFeToStr(const FinNFe &value)
 
 FinNFe ConvNF::strToFinNFe(const QString &value)
 {
-    QList<QString> _r = {"-1","1","2","3","4"};
+    QList<QString> _r = {"-1","1","2","3","4","5","6"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return FinNFe::None;
     else
         return static_cast<FinNFe>(_r[_i].toInt());
+}
+
+QString ConvNF::tpNFDebitoToStr(const TpNFDebito &value)
+{
+    if (value == TpNFDebito::None)
+        return QString();
+    else
+        return QString("%1").arg(static_cast<int>(value), 2, 10, QChar('0'));
+}
+
+TpNFDebito ConvNF::strToTpNFDebito(const QString &value)
+{
+    QList<QString> _r = {"01","02","03","04","05","06","07","08"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpNFDebito::None;
+    else
+        return static_cast<TpNFDebito>(_r[_i].toInt());
+}
+
+QString ConvNF::tpNFCreditoToStr(const TpNFCredito &value)
+{
+    if (value == TpNFCredito::None)
+        return QString();
+    else
+        return QString("%1").arg(static_cast<int>(value), 2, 10, QChar('0'));
+}
+
+TpNFCredito ConvNF::strToTpNFCredito(const QString &value)
+{
+    QList<QString> _r = {"01","02","03","04","05","06"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpNFCredito::None;
+    else
+        return static_cast<TpNFCredito>(_r[_i].toInt());
+}
+
+QString ConvNF::tpEnteGovToStr(const TpEnteGov &value)
+{
+    if (value == TpEnteGov::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpEnteGov ConvNF::strToTpEnteGov(const QString &value)
+{
+    QList<QString> _r = {"1","2","3","4","5","6"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpEnteGov::None;
+    else
+        return static_cast<TpEnteGov>(_r[_i].toInt());
+}
+
+QString ConvNF::tpOperGovToStr(const TpOperGov &value)
+{
+    if (value == TpOperGov::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpOperGov ConvNF::strToTpOperGov(const QString &value)
+{
+    QList<QString> _r = {"1","2","3","4"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpOperGov::None;
+    else
+        return static_cast<TpOperGov>(_r[_i].toInt());
+}
+
+QString ConvNF::tpCredPresIBSZFMToStr(const TpCredPresIBSZFM &value)
+{
+    if (value == TpCredPresIBSZFM::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpCredPresIBSZFM ConvNF::strToTpCredPresIBSZFM(const QString &value)
+{
+    QList<QString> _r = {"0","1","2","3","4"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpCredPresIBSZFM::None;
+    else
+        return static_cast<TpCredPresIBSZFM>(_r[_i].toInt());
+}
+
+QString ConvNF::indBemMovelUsadoToStr(const IndBemMovelUsado &value)
+{
+    if (value == IndBemMovelUsado::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+IndBemMovelUsado ConvNF::strToIndBemMovelUsado(const QString &value)
+{
+    if (value == QStringLiteral("1"))
+        return IndBemMovelUsado::BemMovelUsado;
+    else
+        return IndBemMovelUsado::None;
+}
+
+QString ConvNF::indDoacaoToStr(const IndDoacao &value)
+{
+    if (value == IndDoacao::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+IndDoacao ConvNF::strToIndDoacao(const QString &value)
+{
+    if (value == QStringLiteral("1"))
+        return IndDoacao::Doacao;
+    else
+        return IndDoacao::None;
+}
+
+QString ConvNF::tpALCZFMCBSToStr(const TpALCZFMCBS &value)
+{
+    if (value == TpALCZFMCBS::None)
+        return QString();
+    else
+        return QString::number(static_cast<int>(value));
+}
+
+TpALCZFMCBS ConvNF::strToTpALCZFMCBS(const QString &value)
+{
+    QList<QString> _r = {"1","2"};
+    int _i = _r.indexOf(value);
+    if (_i == -1 || value.isEmpty())
+        return TpALCZFMCBS::None;
+    else
+        return static_cast<TpALCZFMCBS>(_r[_i].toInt());
 }
 
 QString ConvNF::indFinalToStr(const IndFinal &value)

@@ -40,6 +40,7 @@ void Emit::clear()
     this->m_IM.clear();
     this->m_CNAE.clear();
     this->m_CRT = Crt::None;
+    this->m_ISUFEmit.clear();
 
     this->enderEmit->clear();
 }
@@ -132,4 +133,14 @@ Crt Emit::get_CRT() const
 void Emit::set_CRT(const Crt &CRT)
 {
     this->m_CRT = CRT;
+}
+
+QString Emit::get_ISUFEmit() const
+{
+    return this->m_ISUFEmit;
+}
+
+void Emit::set_ISUFEmit(const QString &ISUFEmit)
+{
+    this->m_ISUFEmit = ISUFEmit;
 }

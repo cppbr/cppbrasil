@@ -32,6 +32,8 @@ limitations under the License.
 #include <CppNFe/cofins.h>
 #include <CppNFe/cofinsst.h>
 #include <CppNFe/issqn.h>
+#include <CppNFe/is.h>
+#include <CppNFe/ibscbs.h>
 
 class CPPNFE_EXPORT Imposto
 {
@@ -51,6 +53,8 @@ public:
     std::unique_ptr<Cofins> COFINS;
     std::unique_ptr<CofinsST> COFINSST;
     std::unique_ptr<IssQN> ISSQN;
+    std::unique_ptr<Is> IS; //UB01
+    std::unique_ptr<IbsCbs> IBSCBS; //UB12
 private:
     double m_vTotTrib;
 };

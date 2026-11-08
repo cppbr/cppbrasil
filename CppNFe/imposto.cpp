@@ -22,7 +22,7 @@ limitations under the License.
 
 Imposto::Imposto(): ICMS(new Icms), ICMSUFDest(new IcmsUFDest), IPI(new Ipi),
     II(new Ii), PIS(new Pis), PISST(new PisST), COFINS(new Cofins), COFINSST(new CofinsST),
-    ISSQN(new IssQN), m_vTotTrib(0.0)
+    ISSQN(new IssQN), IS(new Is), IBSCBS(new IbsCbs), m_vTotTrib(0.0)
 {
 }
 
@@ -43,6 +43,8 @@ void Imposto::clear()
     this->COFINS->clear();
     this->COFINSST->clear();
     this->ISSQN->clear();
+    this->IS->clear();
+    this->IBSCBS->clear();
 }
 
 double Imposto::get_vTotTrib() const

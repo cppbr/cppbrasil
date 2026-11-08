@@ -30,6 +30,8 @@ add_library(CppNFe SHARED
     comb.cpp
     compra.h
     compra.cpp
+    compragov.h
+    compragov.cpp
     confignfe.h
     confignfe.cpp
     conssitnfe.h
@@ -46,6 +48,8 @@ add_library(CppNFe SHARED
     detexport.cpp
     detpag.h
     detpag.cpp
+    dfereferenciado.h
+    dfereferenciado.cpp
     di.h
     di.cpp
     dup.h
@@ -76,6 +80,12 @@ add_library(CppNFe SHARED
     fordia.cpp
     gcred.h
     gcred.cpp
+    ibscbs.h
+    ibscbs.cpp
+    ibscbsmono.h
+    ibscbsmono.cpp
+    ibscbstot.h
+    ibscbstot.cpp
     icms.h
     icms.cpp
     icmstot.h
@@ -104,6 +114,8 @@ add_library(CppNFe SHARED
     inutnfe.cpp
     ipi.h
     ipi.cpp
+    is.h
+    is.cpp
     issqn.h
     issqn.cpp
     issqntot.h
@@ -128,6 +140,8 @@ add_library(CppNFe SHARED
     obsitem.cpp
     origcomb.h
     origcomb.cpp
+    pagantecipado.h
+    pagantecipado.cpp
     pag.h
     pag.cpp
     pis.h
