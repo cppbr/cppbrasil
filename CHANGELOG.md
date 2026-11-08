@@ -428,6 +428,17 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### Compilação no Windows
+
+- O CMake da `CppBase` passa a localizar a libxml2, o OpenSSL e a zlib pelos
+  pacotes instalados (`find_package`), em vez de nomes fixos de bibliotecas.
+  Informe os diretórios em `CMAKE_PREFIX_PATH` e `OPENSSL_ROOT_DIR`. Sem
+  zlib instalada, é usada a zlib que acompanha o Qt, e a libIconv deixa de
+  ser obrigatória quando a libxml2 é compilada sem ela.
+- O README passa a descrever passo a passo a compilação no Linux e no
+  Windows (MSVC e MinGW), as opções do CMake e as DLLs necessárias para
+  executar a aplicação no Windows.
+
 #### Autorização com alerta — NT 2026.002 v1.11
 
 - O status `120` é tratado como autorização na emissão e na consulta de
@@ -580,6 +591,8 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   zlib 1.3 e libiconv. As versões novas serão distribuídas como pacotes compactados.
   Até lá, o instalador MSVC e os exemplos precisam de ajustes nas referências às dependências.
 - Exemplo legado QtCon-2022, sem manutenção.
+- Scripts interativos de compilação `MakeLinux.sh` e `MakeMSVC.bat`. Compile
+  diretamente com o CMake, como descrito no README.
 - Suporte ao Qt 5, cujo suporte oficial terminou em 2025. A biblioteca e os
   exemplos passam a exigir o Qt 6.5 ou superior.
 

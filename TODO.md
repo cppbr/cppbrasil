@@ -8,9 +8,20 @@
   totais W31–W60, com leitura, geração e recusa de grupos exclusivos.
   Validado localmente no Windows com NF-e modelo 55: ida e volta idêntica
   e XSD do pacote local com assinatura apenas estrutural.
-- [ ] Compilar a biblioteca completa e repetir a validação com libxml2 e
-  assinatura real (Linux e Windows/MSVC), incluindo NFC-e modelo 65 com
-  QR Code. O teste local substituiu o libxml2 e não assinou o XML.
+- [x] Compilar a biblioteca completa no Windows com llvm-mingw e libxml2 2.15.4
+  e validar o XML gerado pelo XSD por meio da própria biblioteca.
+- [x] Teste completo no Windows (MSVC e llvm-mingw) da NF-e 55 e da NFC-e 65
+  com IBS/CBS: alíquota cheia, redução, monofasia nas quatro combinações
+  AdRem/AdValorem, IS e totais; gerar, reler, validar pelo XSD, assinar com
+  certificado, validar e reler o assinado. NFC-e com QR Code v2 e v3.
+  Digest, assinatura RSA, XSD e hash do QR Code conferidos de forma
+  independente; XML idêntico nos dois kits.
+- [ ] Repetir o teste completo no Linux.
+- [x] Compilar a biblioteca completa no Windows com MSVC, libxml2 2.15.4 e
+  OpenSSL 3.5, com o mesmo resultado do llvm-mingw (ida e volta, grupos
+  exclusivos e XSD pela libxml2; XML gerado idêntico nos dois kits).
+- [ ] Definir um OpenSSL 3 para o kit llvm-mingw: o build usa hoje o
+  OpenSSL 1.1.1 (fora de suporte) do MinGW do Qt.
 - [ ] Homologar com a SEFAZ as regras do capítulo 7: CST/cClassTrib e
   indicadores `ind_g*`, totais W, finalidades 5 e 6 com `tpNFDebito`/
   `tpNFCredito`, `gCompraGov`, `cIndOp`, `vItem`/`DFeReferenciado` e o
