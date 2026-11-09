@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include "nota.h"
 #include <CppNFe/CppNFe>
-#include <DanfeQtRPT/CppDanfeQtRPT>
+#include <DanfeBrReport/CppDanfeBrReport>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

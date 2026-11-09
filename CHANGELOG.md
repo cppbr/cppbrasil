@@ -28,6 +28,44 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
   e na gravação. Recompile a biblioteca e as aplicações devido às
   alterações nas classes de evento.
 
+#### DANFE da NF-e com o BrReport — NT 2026.010 v1.00
+
+- Nova biblioteca `CppDanfeBrReport` (`<DanfeBrReport/CppDanfeBrReport>`),
+  que imprime o DANFE da NF-e modelo 55 com o BrReport, no leiaute retrato
+  de referência da NT 2026.010. Ela substitui a `CppDanfeQtRPT`.
+- O quadro do emitente traz o Código do Regime Tributário (`CRT`) e reserva
+  o campo do Tipo de Regime de Apuração do IBS e da CBS, que fica em branco
+  até a publicação da origem da informação.
+- O novo quadro "Total do IBS / CBS / IS" mostra os valores da CBS, do IBS
+  UF, do IBS Município e do Imposto Seletivo. A linha da monofasia do
+  IBS/CBS só aparece quando o grupo existe no XML.
+- Cada item mostra a classificação tributária (`cClassTrib`) junto do NCM
+  e as bases, alíquotas e valores de ICMS, IBS UF, IBS Município, CBS, IS e
+  IPI. Com redução de alíquota ou compra governamental (grupo `gRed`), a
+  alíquota impressa do IBS UF, do IBS Município e da CBS é a efetiva
+  (`pAliqEfet`). Tributo ausente no item fica em branco.
+- Quadros e campos facultativos seguem o item 4.4 da NT: o canhoto pode
+  ser suprimido com `exibirCanhoto(false)`; as linhas de FCP/DIFAL e de
+  ICMS monofásico, o cálculo do ISSQN, o transportador, os locais de
+  retirada e entrega, a fatura/duplicatas e o QR Code só são impressos
+  quando há dados no XML. Sem QR Code, o espaço fica para o fisco.
+- Contingência FS-IA e FS-DA com o segundo código de barras, protocolo do
+  EPEC, marca d'água de homologação ("SEM VALOR FISCAL") e de nota
+  cancelada, logotipo do emitente e numeração "FOLHA x/y".
+- Os itens continuam nas páginas seguintes com o cabeçalho da nota e o das
+  colunas; os dados adicionais ficam no rodapé da primeira página e o
+  quadro cresce para textos longos.
+- O código de barras da chave usa Code 128 com troca automática de
+  subconjunto, o que também atende chaves com CNPJ alfanumérico.
+- `print()` abre a visualização, `imprimir()` envia para a impressora e
+  `exportarPDF()` grava o PDF. O leiaute fica embutido na biblioteca; para
+  personalizá-lo, grave-o com `salvarModelo()`, edite o arquivo `.brt` no
+  `brdesigner` e informe-o em `caminhoArquivo()`.
+- A NFC-e (modelo 65) ainda não é atendida por este modelo: a impressão
+  retorna falso e `erro()` explica o motivo.
+- `CPPBRASIL_BUILD_DANFE` passa a compilar a `CppDanfe` e a
+  `CppDanfeBrReport`, que exige o BrReport instalado.
+
 #### Reforma Tributária: IBS, CBS e IS no XML da NF-e e NFC-e — NT 2025.002 v1.53
 
 - Informe em `Ide` a data de previsão de entrega (`dPrevEntrega`, somente
@@ -448,8 +486,19 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### DANFE
+
+- A `CppDanfe` deixa de depender do módulo `Svg` do Qt: o QR Code passa a
+  ser desenhado diretamente na imagem.
+- O destrutor de `CppDanfe` passa a ser virtual. Recompile as aplicações
+  que usam o DANFE.
+
 #### Compilação no Windows
 
+- Os cabeçalhos da `CppBase` que incluem o `windows.h` passam a definir
+  `NOMINMAX`. Antes, as macros `min` e `max` do Windows quebravam a
+  compilação com o MSVC de código que incluía cabeçalhos do Qt depois dos
+  da CppBrasil, como o DANFE.
 - O CMake da `CppBase` passa a localizar a libxml2, o OpenSSL e a zlib pelos
   pacotes instalados (`find_package`), em vez de nomes fixos de bibliotecas.
   Informe os diretórios em `CMAKE_PREFIX_PATH` e `OPENSSL_ROOT_DIR`. Sem
@@ -603,6 +652,14 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Removido
 
+- Biblioteca `CppDanfeQtRPT` (`DanfeQtRPT/`), o código-fonte do QtRPT que a
+  acompanhava e os modelos XML do DANFE em `examples/report`. Use a
+  `CppDanfeBrReport`: troque o include `<DanfeQtRPT/CppDanfeQtRPT>` por
+  `<DanfeBrReport/CppDanfeBrReport>` e a classe `CppDanfeQtRPT` por
+  `CppDanfeBrReport`. O `caminhoArquivo()` passa a receber um modelo `.brt`
+  opcional; sem ele, é usado o leiaute embutido. As opções do CMake
+  `QTRPT_INCLUDE_DIR` e `QTRPT_LIBRARY` e a macro `CPPDANFEQTRPT_EXPORT`
+  deixam de existir. O exemplo `WidgetsDANFE` passa a usar o BrReport.
 - Dependências pré-compiladas para Linux, Windows e Android. Elas devem ser instaladas
   à parte. O código-fonte do QtRPT passa a acompanhar o módulo `DanfeQtRPT`.
 - Projetos qmake (`.pro`). O CMake é o único sistema de build.

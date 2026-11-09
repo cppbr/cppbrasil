@@ -169,13 +169,25 @@ void CppDanfe::genQrCode()
 {
     QString _http = this->m_cppnfe->notafiscal->NFe->value(this->m_recNo)->infNFeSupl->get_qrCode();
     QrCode _qr = QrCode::encodeText(_http.toLocal8Bit(), QrCode::Ecc::HIGH);
-    QString _svg = toSvgString(_qr, 2);
-    QSvgRenderer _renderer(_svg.toUtf8());
+    //desenha os módulos direto na imagem, com margem de 2 módulos, sem depender do Qt SVG.
+    const int _border = 2;
+    const int _total = _qr.getSize() + _border * 2;
     //tamanho do QrCode
-    m_imQrCode = QImage(100, 100, QImage::Format_ARGB32);
-    m_imQrCode.fill(0xaaA08080);  // partly transparent red-ish background
+    const int _tamanho = 100;
+    m_imQrCode = QImage(_tamanho, _tamanho, QImage::Format_ARGB32);
+    m_imQrCode.fill(Qt::white);
     QPainter _painter(&m_imQrCode);
-    _renderer.render(&_painter);
+    _painter.scale(double(_tamanho) / _total, double(_tamanho) / _total);
+    _painter.setPen(Qt::NoPen);
+    _painter.setBrush(Qt::black);
+    for (int _y = 0; _y < _qr.getSize(); _y++)
+    {
+        for (int _x = 0; _x < _qr.getSize(); _x++)
+        {
+            if (_qr.getModule(_x, _y))
+                _painter.drawRect(QRectF(_x + _border, _y + _border, 1, 1));
+        }
+    }
 }
 
 void CppDanfe::getParam()
@@ -262,33 +274,4 @@ QString CppDanfe::formatChave(const QString &chave)
                + chave.mid(32, 4) + QStringLiteral(" ") + chave.mid(36, 4) + QStringLiteral(" ")
                + chave.mid(40, 4);
     return _v;
-}
-
-QString CppDanfe::toSvgString(const QrCode &qr, int border)
-{
-    if (border < 0)
-        throw std::domain_error("Border must be non-negative");
-    if (border > INT_MAX / 2 || border * 2 > INT_MAX - qr.getSize())
-        throw std::overflow_error("Border too large");
-
-    std::ostringstream sb;
-    sb << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    sb << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-    sb << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 ";
-    sb << (qr.getSize() + border * 2) << " " << (qr.getSize() + border * 2) << "\" stroke=\"none\">\n";
-    sb << "\t<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n";
-    sb << "\t<path d=\"";
-    for (int y = 0; y < qr.getSize(); y++) {
-        for (int x = 0; x < qr.getSize(); x++) {
-            if (qr.getModule(x, y)) {
-                if (x != 0 || y != 0)
-                    sb << " ";
-                sb << "M" << (x + border) << "," << (y + border) << "h1v1h-1z";
-            }
-        }
-    }
-    sb << "\" fill=\"#000000\"/>\n";
-    sb << "</svg>\n";
-    return QString::fromStdString(sb.str());
-
 }

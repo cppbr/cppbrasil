@@ -24,7 +24,6 @@ limitations under the License.
 #include <QObject>
 #include <QPixmap>
 #include <QPainter>
-#include <QSvgRenderer>
 #include <CppBase/cppbrasil_global.h>
 #include <CppBase/cpputility.h>
 #include <CppDanfe/cppbarcode.h>
@@ -41,7 +40,7 @@ class CPPDANFE_EXPORT CppDanfe
 {
 public:
     CppDanfe(const CppNFe *cppnfe, const int &recNo = 0);
-    ~CppDanfe();
+    virtual ~CppDanfe();
 
     virtual void caminhoArquivo(const QString &arquivo);
     virtual void caminhoLogo(const QString &logo);
@@ -73,7 +72,6 @@ private:
     void genQrCode();
     void getParam();
     QString formatChave(const QString &chave); //9999 9999 9999 9999 9999 9999 9999 9999 9999
-    QString toSvgString(const QrCode &qr, int border);
 
 };
 

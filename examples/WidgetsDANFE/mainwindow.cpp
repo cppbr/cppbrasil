@@ -81,28 +81,18 @@ void MainWindow::on_btDanfe_clicked()
 
 void MainWindow::imprimirDANFE(const CppNFe *cppnfe)
 {
-    CppDanfeQtRPT danfe(cppnfe, 0);
+    //o DANFE com o BrReport atende a NF-e (modelo 55).
+    CppDanfeBrReport danfe(cppnfe, 0);
     //danfe.caminhoLogo("C:/cppbrasil/suaLogo.jpg");
     if (cppnfe->notafiscal->retorno->protNFe->count() > 0)
     {
         if ((cppnfe->notafiscal->retorno->protNFe->value(0)->get_cStat() == 100) ||
             (cppnfe->notafiscal->retorno->protNFe->value(0)->get_cStat() == 150))
-        {
-            if (cppnfe->notafiscal->NFe->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-                danfe.caminhoArquivo(QDir::currentPath() +  "/../report/DANFE-NFe.xml");
-            else
-                danfe.caminhoArquivo(QDir::currentPath() +  "/../report/DANFE-NFCe.xml");
-
             danfe.print();
-        }
     } else
-    {
-        if (cppnfe->notafiscal->NFe->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-            danfe.caminhoArquivo(QDir::currentPath() +  "/../report/DANFE-NFe.xml");
-        else
-            danfe.caminhoArquivo(QDir::currentPath() +  "/../report/DANFE-NFCe.xml");
-
         danfe.print();
-    }
+
+    if (!danfe.erro().isEmpty())
+        ui->textSaida->insertPlainText(danfe.erro());
 }
 

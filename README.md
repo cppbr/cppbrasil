@@ -13,7 +13,7 @@ eletrônicos brasileiros.
 | `CppBase` | `CppBase/` | Base comum: XML (libxml2), criptografia e certificado (OpenSSL), HTTP e utilitários. Obrigatória. |
 | `CppNFe` | `CppNFe/` | Geração, leitura, assinatura, validação e transmissão de NF-e (modelo 55) e NFC-e (modelo 65). |
 | `CppDanfe` | `CppDanfe/` | Dados e regras do DANFE. Opcional. |
-| `CppDanfeQtRPT` | `DanfeQtRPT/` | Impressão do DANFE com o [QtRPT](https://sourceforge.net/projects/qtrpt/). Opcional. |
+| `CppDanfeBrReport` | `DanfeBrReport/` | Impressão do DANFE da NF-e com o [BrReport](https://github.com/cppbr/BrReport), no leiaute da NT 2026.010. Opcional. |
 
 Veja o [CHANGELOG](CHANGELOG.md) para as mudanças de cada versão, inclusive as que quebram compatibilidade.
 
@@ -29,11 +29,11 @@ Ambientes testados: Linux, Windows e Android.
 | OpenSSL | 1.1.1 ou superior | Recomendado 3.x; a série 1.1.1 está fora de suporte. |
 | libxml2 | 2.12 ou superior | Recomendado 2.13 ou superior (veja [libxml2](#libxml2-versão-e-recompilação)). |
 | zlib | qualquer | No Windows, sem zlib instalada, é usada a que acompanha o Qt. |
-| QtRPT | | Apenas para o DANFE; exige também os módulos `Gui`, `Svg`, `Widgets`, `Xml`, `Charts`, `Qml`, `Sql` e `PrintSupport` do Qt. |
+| BrReport | 0.2 ou superior | Apenas para o DANFE; exige também os módulos `Gui`, `Widgets` e `PrintSupport` do Qt. |
 | libiconv | | Apenas se a libxml2 tiver sido compilada com ela. |
 
-As dependências não acompanham o projeto: instale-as antes de compilar. O código-fonte do QtRPT está em
-`DanfeQtRPT/QtRptProject-Source` (projeto qmake, compile-o com o mesmo kit do Qt usado na CppBrasil).
+As dependências não acompanham o projeto: instale-as antes de compilar. O BrReport é compilado e instalado com o
+CMake, pelas instruções do próprio projeto, com o mesmo kit do Qt usado na CppBrasil.
 
 > **Use o mesmo compilador em tudo.** Qt, OpenSSL, libxml2, CppBrasil e a sua aplicação devem ser compilados com o
 > mesmo compilador e a mesma versão do runtime. Misturar MSVC com MinGW, ou versões diferentes do GCC do MinGW, corrompe
@@ -45,9 +45,8 @@ A compilação é feita pelo `CMakeLists.txt` da raiz do projeto, sempre em uma 
 
 | Opção do CMake | Padrão | Função |
 |---|---|---|
-| `CPPBRASIL_BUILD_DANFE` | `ON` | Compila `CppDanfe` e `CppDanfeQtRPT`. Use `OFF` para compilar sem o DANFE e sem o QtRPT. |
-| `QTRPT_INCLUDE_DIR` / `QTRPT_LIBRARY` | busca automática | Pasta do `qtrpt.h` e arquivo da biblioteca do QtRPT, quando fora dos caminhos padrão. |
-| `CMAKE_PREFIX_PATH` | | Kit do Qt e, no Windows, a pasta de instalação da libxml2 (separados por `;`). |
+| `CPPBRASIL_BUILD_DANFE` | `ON` | Compila a `CppDanfe` e a `CppDanfeBrReport`, que exige o BrReport. Use `OFF` para compilar sem o DANFE. |
+| `CMAKE_PREFIX_PATH` | | Kit do Qt e, no Windows, as pastas de instalação da libxml2 e do BrReport (separados por `;`). |
 | `OPENSSL_ROOT_DIR` | | Pasta de instalação do OpenSSL, quando fora dos caminhos padrão. |
 | `CMAKE_INSTALL_PREFIX` | `/usr` no Linux | Destino do `cmake --install`. |
 
@@ -91,10 +90,10 @@ Com o Qt do instalador oficial, informe o kit:
 cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.12.0/gcc_64 -DCPPBRASIL_BUILD_DANFE=OFF
 ```
 
-Com o DANFE, depois de compilar o QtRPT:
+Com o DANFE, depois de instalar o BrReport (informe a pasta de instalação se ela não for padrão do sistema):
 
 ```bash
-cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DQTRPT_INCLUDE_DIR=/caminho/QtRPT -DQTRPT_LIBRARY=/caminho/libQtRPT.so
+cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/caminho/BrReport
 ```
 
 ### 3. Instalar
@@ -162,13 +161,17 @@ cmake -S . -B build\msvc -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH
 cmake --build build\msvc
 ```
 
+Para compilar o DANFE, instale o BrReport compilado com o mesmo kit, retire `-DCPPBRASIL_BUILD_DANFE=OFF` e
+acrescente a pasta de instalação dele ao `CMAKE_PREFIX_PATH`, por exemplo `"C:/Qt/6.12.0/msvc2022_64;C:/deps/libxml2-msvc;C:/deps/BrReport"`.
+
 Para instalar, configure também `-DCMAKE_INSTALL_PREFIX=C:\deps\cppbrasil` e rode `cmake --install build\msvc`.
 
 ### 5. Executar
 
 A aplicação precisa encontrar, no `PATH` ou na própria pasta do executável, as DLLs da CppBrasil (`CppBase.dll`,
 `CppNFe.dll`), do Qt (ou use o `windeployqt`), da libxml2 (`libxml2.dll`) e do OpenSSL (`libcrypto-3-x64.dll` e
-`libssl-3-x64.dll`).
+`libssl-3-x64.dll`). Com o DANFE no BrReport, também `CppDanfe.dll`, `CppDanfeBrReport.dll`, `brreportcore.dll` e
+`brreportwidgets.dll`.
 
 ### MinGW
 
@@ -181,10 +184,22 @@ A aplicação precisa encontrar, no `PATH` ou na própria pasta do executável, 
 
 ## Uso na aplicação
 
-Os includes seguem o nome do módulo (`<CppNFe/...>`, `<CppBase/...>`, `<CppDanfe/...>` e `<DanfeQtRPT/...>`), e a
-`CppBase` é obrigatória: ligue `-lCppNFe -lCppBase`. Para o DANFE, use
-`-lCppDanfeQtRPT -lCppDanfe -lCppNFe -lCppBase -lQtRPT`. Em um projeto CMake que inclui a CppBrasil com
-`add_subdirectory`, basta ligar ao alvo `CppNFe`.
+Os includes seguem o nome do módulo (`<CppNFe/...>`, `<CppBase/...>`, `<CppDanfe/...>` e `<DanfeBrReport/...>`), e
+a `CppBase` é obrigatória: ligue `-lCppNFe -lCppBase`. Para o DANFE, use
+`-lCppDanfeBrReport -lCppDanfe -lCppNFe -lCppBase` (os cabeçalhos do BrReport não são necessários na aplicação). Em
+um projeto CMake que inclui a CppBrasil com
+`add_subdirectory`, basta ligar ao alvo `CppNFe` ou `CppDanfeBrReport`.
+
+```cpp
+#include <DanfeBrReport/CppDanfeBrReport>
+
+CppDanfeBrReport danfe(cppnfe, 0);     // nota de índice 0 em cppnfe->notafiscal->NFe
+danfe.caminhoLogo("logo.png");         // opcional
+danfe.exportarPDF("danfe.pdf");        // ou print() para a visualização, imprimir() para a impressora
+```
+
+O leiaute fica embutido na biblioteca. Para personalizá-lo, grave-o com `salvarModelo("danfe.brt")`, altere o arquivo no
+`brdesigner` do BrReport e informe-o em `caminhoArquivo()`.
 
 Os XSDs da NF-e não acompanham a biblioteca: informe a pasta deles na configuração (`ConfigNFe::arquivos`) para que a
 assinatura e a validação funcionem.

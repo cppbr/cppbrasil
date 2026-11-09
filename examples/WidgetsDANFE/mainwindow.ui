@@ -34,7 +34,7 @@
       <item>
        <widget class="QPushButton" name="btDanfe">
         <property name="text">
-         <string>DANFE QtRPT</string>
+         <string>DANFE</string>
         </property>
        </widget>
       </item>

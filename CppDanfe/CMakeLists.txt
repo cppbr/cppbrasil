@@ -1,4 +1,4 @@
-find_package(Qt6 REQUIRED COMPONENTS Gui Svg Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Gui Widgets)
 
 set(cppdanfe_HEADERS
     code128.h
@@ -20,7 +20,6 @@ target_compile_definitions(CppDanfe PRIVATE CPPDANFE_LIBRARY)
 target_link_libraries(CppDanfe PUBLIC
     CppNFe
     Qt6::Gui
-    Qt6::Svg
     Qt6::Widgets
 )
 

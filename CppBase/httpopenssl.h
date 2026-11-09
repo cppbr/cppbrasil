@@ -34,6 +34,10 @@ limitations under the License.
 #ifndef WIN32_LEAN_AND_MEAN
  #define WIN32_LEAN_AND_MEAN
 #endif
+//sem as macros min/max do windows.h, que quebram std::min/std::max nos headers do Qt.
+#ifndef NOMINMAX
+ #define NOMINMAX
+#endif
 #include <iostream>
 #include <stdio.h>
 #include <winsock2.h>

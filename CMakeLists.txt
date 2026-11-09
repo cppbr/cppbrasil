@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CppBrasil LANGUAGES CXX)
 
-option(CPPBRASIL_BUILD_DANFE "Compila as bibliotecas CppDanfe e CppDanfeQtRPT" ON)
+option(CPPBRASIL_BUILD_DANFE "Compila a CppDanfe e a CppDanfeBrReport, impressão do DANFE com o BrReport" ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
@@ -32,5 +32,5 @@ add_subdirectory(CppNFe)
 
 if(CPPBRASIL_BUILD_DANFE)
     add_subdirectory(CppDanfe)
-    add_subdirectory(DanfeQtRPT)
+    add_subdirectory(DanfeBrReport)
 endif()
