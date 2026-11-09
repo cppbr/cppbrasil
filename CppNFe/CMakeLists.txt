@@ -68,6 +68,8 @@ add_library(CppNFe SHARED
     envevento.cpp
     tevento.h
     tevento.cpp
+    deteventortc.h
+    deteventortc.cpp
     eventonotafiscal.h
     eventonotafiscal.cpp
     exporta.h

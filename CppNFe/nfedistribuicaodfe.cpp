@@ -128,6 +128,34 @@ void lerInfEvento(QXmlStreamReader &xml, InfEvento &inf)
             inf.detEvento->set_xJust(det.value("xJust"));
             inf.detEvento->set_xCorrecao(det.value("xCorrecao"));
             inf.detEvento->set_xCondUso(det.value("xCondUso"));
+            const auto tipo = ConvNF::strToTpEvento(campos.value("tpEvento"));
+            if (ConvNF::orgaoEventoEntrega(tipo))
+            {
+                auto &entrega = *inf.detEvento;
+                entrega.set_cOrgaoAutor(det.value("cOrgaoAutor").toInt());
+                entrega.set_tpAutor(ConvNF::strToTpAutor(det.value("tpAutor")));
+                entrega.set_verAplic(det.value("verAplic"));
+                entrega.set_nProtEvento(det.value("nProtEvento"));
+                entrega.set_latGPS(det.value("latGPS"));
+                entrega.set_longGPS(det.value("longGPS"));
+                if (tipo == TpEvento::ComprovanteEntregaNFe)
+                {
+                    entrega.set_dhEntrega(data(det.value("dhEntrega")));
+                    entrega.set_nDoc(det.value("nDoc"));
+                    entrega.set_xNome(det.value("xNome"));
+                    entrega.set_hashComprovante(det.value("hashComprovante"));
+                    entrega.set_dhHashComprovante(data(det.value("dhHashComprovante")));
+                }
+                else if (tipo == TpEvento::InsucessoEntregaNFe)
+                {
+                    entrega.set_dhTentativaEntrega(data(det.value("dhTentativaEntrega")));
+                    entrega.set_nTentativa(det.value("nTentativa").toInt());
+                    entrega.set_tpMotivo(ConvNF::strToTpMotivo(det.value("tpMotivo")));
+                    entrega.set_xJustMotivo(det.value("xJustMotivo"));
+                    entrega.set_hashTentativaEntrega(det.value("hashTentativaEntrega"));
+                    entrega.set_dhHashTentativaEntrega(data(det.value("dhHashTentativaEntrega")));
+                }
+            }
         }
         else
             campos.insert(nome, xml.readElementText(QXmlStreamReader::SkipChildElements));

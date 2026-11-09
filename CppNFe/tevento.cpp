@@ -20,6 +20,105 @@ bool fiscoProrrogacao(TpEvento tipo)
            tipo == TpEvento::FiscoCancelPedidoProrrogacao1 || tipo == TpEvento::FiscoCancelPedidoProrrogacao2;
 }
 
+template<class Item>
+bool itensValidosRTC(const Container<Item> &itens)
+{
+    QSet<int> numeros;
+    for (const auto *item : itens)
+    {
+        const int numero = item->get_nItem();
+        if (numero < 1 || numero > 990 || numeros.contains(numero))
+            return false;
+        numeros.insert(numero);
+    }
+    return !numeros.isEmpty();
+}
+
+void escreverCreditoPresumido(QXmlStreamWriter &xml, const QString &tag, const CreditoPresumidoEvento *credito)
+{
+    if (!credito)
+        return;
+    xml.writeStartElement(tag);
+    xml.writeTextElement("pCredPres", CppUtility::doubleToStrDecimal(credito->get_pCredPres(), 4));
+    xml.writeTextElement("vCredPres", CppUtility::doubleToStrDecimal(credito->get_vCredPres(), 2));
+    xml.writeEndElement();
+}
+
+void escreverDetalheRTC(QXmlStreamWriter &xml, TpEvento tipo, const DetEvento &det)
+{
+    const auto &rtc = *det.rtc;
+    xml.writeTextElement("cOrgaoAutor", QString::number(det.get_cOrgaoAutor()));
+    if (tipo != TpEvento::CancelamentoEvento)
+        xml.writeTextElement("tpAutor", ConvNF::tpAutorToStr(det.get_tpAutor()));
+    xml.writeTextElement("verAplic", det.get_verAplic());
+
+    switch (tipo)
+    {
+    case TpEvento::CancelamentoEvento:
+        xml.writeTextElement("tpEventoAut", ConvNF::tpEventoToStr(rtc.get_tpEventoAut()));
+        xml.writeTextElement("nProtEvento", det.get_nProtEvento());
+        return;
+    case TpEvento::VinculacaoPagamento:
+        xml.writeTextElement("nProt", det.get_nProt());
+        xml.writeStartElement("gPgto");
+        xml.writeAttribute("idTransacao", rtc.gPgto->get_idTransacao());
+        xml.writeTextElement("tpMeioPgto", rtc.gPgto->get_tpMeioPgto());
+        xml.writeTextElement("CNPJReceb", rtc.gPgto->get_CNPJReceb());
+        xml.writeTextElement("CNPJBasePSP", rtc.gPgto->get_CNPJBasePSP());
+        xml.writeEndElement();
+        return;
+    case TpEvento::PagamentoIntegral:
+        xml.writeTextElement("indQuitacao", "1");
+        return;
+    case TpEvento::AtualizacaoPrevisaoEntrega:
+        xml.writeTextElement("dPrevEntrega", rtc.get_dPrevEntrega().toString(Qt::ISODate));
+        return;
+    case TpEvento::AceiteDebito:
+    case TpEvento::ManifestacaoTransferenciaIBS:
+    case TpEvento::ManifestacaoTransferenciaCBS:
+        xml.writeTextElement("indAceitacao", QString::number(rtc.get_indAceitacao()));
+        return;
+    case TpEvento::ApropriacaoCreditoPresumido:
+        for (const auto *item : *rtc.gCredPresOper)
+        {
+            xml.writeStartElement("gCredPresOper");
+            xml.writeAttribute("nItem", QString::number(item->get_nItem()));
+            xml.writeTextElement("vBCCredPres", CppUtility::doubleToStrDecimal(item->get_vBCCredPres(), 2));
+            xml.writeTextElement("cCredPres", item->get_cCredPres());
+            escreverCreditoPresumido(xml, "gIBSCredPres", item->gIBSCredPres.get());
+            escreverCreditoPresumido(xml, "gCBSCredPres", item->gCBSCredPres.get());
+            xml.writeEndElement();
+        }
+        return;
+    default:
+        break;
+    }
+
+    const auto layout = ConvNF::layoutItensRTC(tipo);
+    const bool credito = tipo == TpEvento::CreditoAtividadeAdquirente;
+    for (const auto *item : *rtc.itens)
+    {
+        xml.writeStartElement(QLatin1String(layout.grupo));
+        xml.writeAttribute("nItem", QString::number(item->get_nItem()));
+        xml.writeTextElement(credito ? "vCredIBS" : "vIBS", CppUtility::doubleToStrDecimal(item->get_vIBS(), 2));
+        xml.writeTextElement(credito ? "vCredCBS" : "vCBS", CppUtility::doubleToStrDecimal(item->get_vCBS(), 2));
+        if (layout.quantidade)
+        {
+            const auto &estoque = *item->gControleEstoque;
+            xml.writeStartElement("gControleEstoque");
+            xml.writeTextElement(QLatin1String(layout.quantidade), CppUtility::doubleToStrDecimal(estoque.get_quantidade(), 4));
+            xml.writeTextElement(QLatin1String(layout.unidade), estoque.get_unidade());
+            if (tipo == TpEvento::PerecimentoFornecedor)
+            {
+                xml.writeTextElement("vIBS", CppUtility::doubleToStrDecimal(estoque.get_vIBSEstorno(), 2));
+                xml.writeTextElement("vCBS", CppUtility::doubleToStrDecimal(estoque.get_vCBSEstorno(), 2));
+            }
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+    }
+}
+
 // Destaca o detalhe com seu namespace, inclusive quando herdado do envelope.
 QByteArray extrairDetalheEvento(const QString &xml)
 {
@@ -245,7 +344,7 @@ void DestEPEC::set_IE(const QString &IE)
 
 DetEvento::DetEvento(): dest(new DestEPEC()), itemPedido(new Container<ItemPedProrrog>),
     autXML(new AutXMLAtor()), detPag(new Container<DetPag>),
-    respPedido(new RespPedido()), respCancPedido(new RespCancPedido()),
+    respPedido(new RespPedido()), respCancPedido(new RespCancPedido()), rtc(new DetEventoRTC()),
     m_cOrgaoAutor(0), m_tpAutor(TpAutor::None),
     m_tpNF(TpNF::None), m_vNF(0.0), m_vICMS(0.0), m_vST(0.0), m_tpAutorizacao(TpAutorizacao::None),
     m_nTentativa(0), m_tpMotivo(TpMotivo::None)
@@ -266,6 +365,7 @@ void DetEvento::clear()
     this->detPag->clear();
     this->respPedido->clear();
     this->respCancPedido->clear();
+    this->rtc->clear();
     this->m_idPedidoCancelado.clear();
     this->m_idPedido.clear();
     this->m_versao.clear();
@@ -853,7 +953,7 @@ void TEvento::assinarXML(const ConfigNFe *config)
     QByteArray _xmldoc, _schema, _nodedoc, _nodesign, _uri, _xml_assinado;
     XMLReturnType _returntype = XMLReturnType::XMLSign; //retornar xml assinado
 
-    _xmldoc.append(this->m_xml_original.toLocal8Bit());
+    _xmldoc.append(this->m_xml_original.toUtf8());
     _schema.append(config->arquivos->get_caminhoSchema().toLocal8Bit());
     _nodedoc.append("infEvento");
     _nodesign.append("SignedInfo");
@@ -862,7 +962,7 @@ void TEvento::assinarXML(const ConfigNFe *config)
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schema));
 
     const TpEvento tipo = infEvento->get_tpEvento();
-    if (!ConvNF::descricaoManifestacao(tipo).isEmpty() &&
+    if ((!ConvNF::descricaoManifestacao(tipo).isEmpty() || ConvNF::orgaoEventoEntrega(tipo)) &&
         !_libxml->parseXML(extrairDetalheEvento(m_xml_original),
                          ("e" + ConvNF::tpEventoToStr(tipo) + "_v1.00.xsd").toUtf8()))
     {
@@ -899,6 +999,12 @@ void TEvento::gerarXML()
     const QString descricaoManifestacao = ConvNF::descricaoManifestacao(tipo);
     const bool manifestacao = !descricaoManifestacao.isEmpty();
     if (manifestacao && !validarDadosManifestacao())
+        return;
+    const QString descricaoRTC = ConvNF::descricaoEventoRTC(tipo);
+    if (!descricaoRTC.isEmpty() && !validarDadosRTC())
+        return;
+    const int orgaoEntrega = ConvNF::orgaoEventoEntrega(tipo);
+    if (orgaoEntrega && !validarDadosEntrega())
         return;
     const bool epec = tipo == TpEvento::EPEC;
     const auto *det = infEvento->detEvento.get();
@@ -982,9 +1088,24 @@ void TEvento::gerarXML()
     _xmlw.writeStartElement("detEvento"); //abertura do grupo detEvento
     _xmlw.writeAttribute("versao", this->infEvento->get_verEvento());
 
-    _xmlw.writeTextElement("descEvento", manifestacao ? descricaoManifestacao :
-                         this->infEvento->detEvento->get_descEvento());
-    if (epec)
+    QString descricao = det->get_descEvento();
+    if (manifestacao)
+        descricao = descricaoManifestacao;
+    else if (!descricaoRTC.isEmpty())
+        descricao = descricaoRTC;
+    else if (orgaoEntrega)
+        descricao = ConvNF::descricaoEventoEntrega(tipo);
+    _xmlw.writeTextElement("descEvento", descricao);
+    if (!descricaoRTC.isEmpty())
+        escreverDetalheRTC(_xmlw, tipo, *det);
+    else if (orgaoEntrega)
+    {
+        _xmlw.writeTextElement("cOrgaoAutor", infEvento->get_chNFe().left(2));
+        if (orgaoEntrega == 91)
+            _xmlw.writeTextElement("tpAutor", "1");
+        _xmlw.writeTextElement("verAplic", det->get_verAplic());
+    }
+    else if (epec)
     {
         _xmlw.writeTextElement("cOrgaoAutor", infEvento->get_chNFe().left(2));
         _xmlw.writeTextElement("tpAutor", "1");
@@ -1075,8 +1196,7 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("xCondUso", this->infEvento->detEvento->get_xCondUso());
     }
     //Comprovante de Entrega
-    if (this->infEvento->get_tpEvento() == TpEvento::ComprovanteEntregaNFe ||
-        this->infEvento->get_tpEvento() == TpEvento::CancelComprovanteEntregaNFe)
+    if (tipo == TpEvento::ComprovanteEntregaNFe)
     {
         if (!this->infEvento->detEvento->get_dhEntrega().isNull())
             _xmlw.writeTextElement("dhEntrega", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhEntrega(), DtH::DateTimeUTC));
@@ -1092,9 +1212,6 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("hashComprovante", this->infEvento->detEvento->get_hashComprovante());
         if (!this->infEvento->detEvento->get_dhHashComprovante().isNull())
             _xmlw.writeTextElement("dhHashComprovante", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhHashComprovante(), DtH::DateTimeUTC));
-        if (!this->infEvento->detEvento->get_nProtEvento().isEmpty())
-            _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
-
     }
     //Insucesso na Entrega da NF-e
     if (this->infEvento->get_tpEvento() == TpEvento::InsucessoEntregaNFe)
@@ -1115,7 +1232,7 @@ void TEvento::gerarXML()
             _xmlw.writeTextElement("dhHashTentativaEntrega", CppUtil::dateTimeToStr(this->infEvento->detEvento->get_dhHashTentativaEntrega(), DtH::DateTimeUTC));
     }
     //Cancelamento Insucesso na Entrega da NF-e
-    if (this->infEvento->get_tpEvento() == TpEvento::CancelInsucessoEntregaNFe)
+    if (tipo == TpEvento::CancelInsucessoEntregaNFe || tipo == TpEvento::CancelComprovanteEntregaNFe)
     {
         _xmlw.writeTextElement("nProtEvento", this->infEvento->detEvento->get_nProtEvento());
     }
@@ -1159,6 +1276,93 @@ void TEvento::gerarXML()
 
     this->m_xml_original.clear();
     this->m_xml_original.append(_strXML);
+}
+
+bool TEvento::validarDadosEntrega()
+{
+    const auto &inf = *infEvento;
+    const auto &det = *inf.detEvento;
+    const auto tipo = inf.get_tpEvento();
+    const QString chave = inf.get_chNFe();
+    const bool chaveCPF = chave.mid(22, 3).toInt() > 909;
+    static const QRegularExpression formatoChave("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
+
+    if (!formatoChave.match(chave).hasMatch() || chave.mid(20, 2) != "55" ||
+        CppUtility::dvModulo11(chave.left(43)) != chave.back().digitValue())
+        m_error = "Informe uma chave válida de NF-e modelo 55 para o evento de entrega.";
+    else if (inf.get_nSeqEvento() < 1 || inf.get_nSeqEvento() > 99)
+        m_error = "Informe uma sequência de evento entre 1 e 99.";
+    else if (inf.get_CNPJ().isEmpty() == inf.get_CPF().isEmpty())
+        m_error = "Informe um único documento do emitente, CNPJ ou CPF.";
+    else if (chaveCPF ? (!CppUtility::cpfValido(inf.get_CPF()) ||
+                         inf.get_CPF().rightJustified(14, '0') != chave.mid(6, 14))
+                      : inf.get_CNPJ() != chave.mid(6, 14))
+        m_error = "O documento do autor do evento deve corresponder ao emitente da NF-e.";
+    else if (inf.get_cOrgao() != ConvNF::orgaoEventoEntrega(tipo))
+        m_error = "O órgão de recepção não corresponde ao tipo de evento de entrega.";
+    else if (!inf.get_dhEvento().isValid())
+        m_error = "Informe a data e hora do evento de entrega.";
+    else if (tipo == TpEvento::ComprovanteEntregaNFe &&
+             (!det.get_dhEntrega().isValid() || det.get_dhEntrega() > inf.get_dhEvento() ||
+              det.get_dhHashComprovante() > inf.get_dhEvento()))
+        m_error = "As datas da entrega e do hash devem ser anteriores ou iguais à data do evento.";
+    else if (tipo == TpEvento::InsucessoEntregaNFe &&
+             (!det.get_dhTentativaEntrega().isValid() || det.get_dhTentativaEntrega() > inf.get_dhEvento() ||
+              det.get_dhHashTentativaEntrega() > inf.get_dhEvento()))
+        m_error = "As datas da tentativa e do hash devem ser anteriores ou iguais à data do evento.";
+    return m_error.isEmpty();
+}
+
+bool TEvento::validarDadosRTC()
+{
+    const auto &inf = *infEvento;
+    const auto &det = *inf.detEvento;
+    const auto &rtc = *det.rtc;
+    const auto tipo = inf.get_tpEvento();
+    const QString chave = inf.get_chNFe();
+    const QString modelo = chave.mid(20, 2);
+    static const QRegularExpression formatoChave("^[0-9]{6}[0-9A-Z]{12}[0-9]{26}\\z");
+    if (!formatoChave.match(chave).hasMatch() ||
+        (modelo != "55" && !(modelo == "65" && ConvNF::usaAutorizadorDaNota(inf))))
+        m_error = "Chave de acesso ou modelo inválido para este evento.";
+    else if (CppUtility::dvModulo11(chave.left(43)) != chave.back().digitValue())
+        m_error = "Informe uma chave de acesso com dígito verificador válido.";
+    else if (inf.get_nSeqEvento() < 1 || inf.get_nSeqEvento() > 99)
+        m_error = "Informe uma sequência de evento entre 1 e 99.";
+    else if (inf.get_CNPJ().isEmpty() == inf.get_CPF().isEmpty())
+        m_error = "Informe um único documento do autor do evento, CNPJ ou CPF.";
+    else if (!inf.get_CPF().isEmpty() && !CppUtility::cpfValido(inf.get_CPF()))
+        m_error = "Informe um CPF válido para o autor do evento.";
+    else if (!inf.get_dhEvento().isValid() || det.get_verAplic().trimmed().isEmpty())
+        m_error = "Informe a data e hora do evento e a versão do aplicativo.";
+    else if (tipo == TpEvento::CancelamentoEvento &&
+             (rtc.get_tpEventoAut() == TpEvento::CancelamentoEvento || ConvNF::descricaoEventoRTC(rtc.get_tpEventoAut()).isEmpty()))
+        m_error = "Informe o tipo do evento do contribuinte a cancelar.";
+    else if (ConvNF::layoutItensRTC(tipo).grupo && !itensValidosRTC(*rtc.itens))
+        m_error = "Informe os itens do evento com números únicos de 1 a 990.";
+    else if (tipo == TpEvento::ApropriacaoCreditoPresumido && !itensValidosRTC(*rtc.gCredPresOper))
+        m_error = "Informe os itens de crédito presumido com números únicos de 1 a 990.";
+    return m_error.isEmpty();
+}
+
+bool TEvento::validarDetalheRTC(const ConfigNFe *config)
+{
+    m_error.clear();
+    const auto tipo = infEvento->get_tpEvento();
+    if (!config || ConvNF::descricaoEventoRTC(tipo).isEmpty())
+    {
+        m_error = "Informe a configuração de schemas e um evento da RTC.";
+        return false;
+    }
+    CppLibXml2 validador(config->certificado->get_cryptoLib(), config->arquivos->get_caminhoSchema().toUtf8());
+    const QString xml = m_xml_assinado.isEmpty() ? m_xml_original : m_xml_assinado;
+    const QByteArray detalhe = extrairDetalheEvento(xml);
+    if (!validador.parseXML(detalhe, ("e" + ConvNF::tpEventoToStr(tipo) + "_v1.00.xsd").toUtf8()))
+    {
+        m_error = validador.get_error();
+        return false;
+    }
+    return true;
 }
 
 bool TEvento::validarDadosManifestacao()

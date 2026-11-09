@@ -10,6 +10,7 @@
 #include <CppBase/cppbrasil_global.h>
 #include <CppBase/cpputility.h>
 #include <CppBase/container.h>
+#include <CppNFe/deteventortc.h>
 #include <CppNFe/convnf.h>
 #include <CppNFe/confignfe.h>
 #include <CppNFe/detpag.h>
@@ -207,6 +208,7 @@ public:
     std::unique_ptr<Container<DetPag>> detPag;
     std::unique_ptr<RespPedido> respPedido;
     std::unique_ptr<RespCancPedido> respCancPedido;
+    std::unique_ptr<DetEventoRTC> rtc;
 private:
     friend class TEvento;
     friend class WSConsultaProtocolo;
@@ -316,11 +318,14 @@ public:
     // Não consulta NFeDistribuicaoDFe nem verifica a assinatura digital do XML importado.
     bool lerXMLProrrogacao(const QString &xml, const ConfigNFe *config);
     bool validarProrrogacao(const ConfigNFe *config);
+    bool validarDetalheRTC(const ConfigNFe *config);
     QString get_error() const;
 
     std::unique_ptr<InfEvento> infEvento;
 
 private:
+    bool validarDadosEntrega();
+    bool validarDadosRTC();
     bool validarDadosManifestacao();
     bool validarDadosProrrogacao();
     QString m_versao;

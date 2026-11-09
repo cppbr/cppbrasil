@@ -68,7 +68,7 @@ bool EnvEvento::enviarEvento(const int &idLote)
             connect(_ws.get(), &WSEvento::errorOccurred, this, &EnvEvento::onError);
 
 
-            _ret = _ws->send(this->m_xml.toLocal8Bit(),
+            _ret = _ws->send(this->m_xml.toUtf8(),
                                   ConvNF::versaoLayout(WebServicesNF::NFeRecepcaoEvento),
                                   _servidor);
 
@@ -125,7 +125,7 @@ bool EnvEvento::assinarEvento(const QString &evento, const QString &uri, QString
     XMLReturnType _returntype = XMLReturnType::XMLSign; //retornar xml assinado
     bool _ret = true;
 
-    _xmldoc.append(evento.toLocal8Bit());
+    _xmldoc.append(evento.toUtf8());
     _schema.append(config->arquivos->get_caminhoSchema().toLocal8Bit());
     _nodedoc.append("infEvento");
     _nodesign.append("SignedInfo");
@@ -156,7 +156,10 @@ bool EnvEvento::gerarXML(const int &idLote)
     this->m_error.clear();
     this->m_xml.clear();
     bool prorrogacao = false;
+    bool rtc = false;
     int epec = 0;
+    int entregas = 0;
+    int orgaoEntrega = 0;
     for (const TEvento *item : *evento)
     {
         const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
@@ -174,6 +177,58 @@ bool EnvEvento::gerarXML(const int &idLote)
         prorrogacao = prorrogacao || (tipo >= 111500 && tipo <= 111503);
         if (item->infEvento->get_tpEvento() == TpEvento::EPEC)
             ++epec;
+        rtc = rtc || !ConvNF::descricaoEventoRTC(item->infEvento->get_tpEvento()).isEmpty();
+        const int orgao = ConvNF::orgaoEventoEntrega(item->infEvento->get_tpEvento());
+        if (orgao)
+        {
+            if (orgaoEntrega && orgaoEntrega != orgao)
+            {
+                m_error = "Comprovante e insucesso na entrega usam autorizadores distintos.";
+                return false;
+            }
+            orgaoEntrega = orgao;
+            ++entregas;
+        }
+    }
+    if (entregas)
+    {
+        if (entregas != evento->count() || entregas > 20 || idLote < 0 ||
+            config->get_ModeloDF() != ModeloDF::NFe || (!m_versao.isEmpty() && m_versao != "1.00"))
+        {
+            m_error = "Eventos de entrega exigem lote separado, modelo 55, versão 1.00, idLote não negativo e até 20 eventos.";
+            return false;
+        }
+        for (const TEvento *item : *evento)
+        {
+            const auto ambiente = item->infEvento->get_tpAmb();
+            if (ambiente != TpAmb::None && ambiente != config->webservices->get_tpAmb())
+            {
+                m_error = "O ambiente do evento de entrega deve ser igual ao ambiente configurado.";
+                return false;
+            }
+        }
+    }
+    if (rtc)
+    {
+        if (evento->count() != 1 || idLote < 0 || (!m_versao.isEmpty() && m_versao != "1.00"))
+        {
+            m_error = "Eventos da RTC exigem envio individual, versão 1.00 e idLote não negativo.";
+            return false;
+        }
+        const auto &inf = *evento->value(0)->infEvento;
+        const bool autorizadorDaNota = ConvNF::usaAutorizadorDaNota(inf);
+        const QString modelo = inf.get_chNFe().mid(20, 2);
+        const auto ambiente = config->webservices->get_tpAmb();
+        const int uf = ConvNF::ufToInt(config->webservices->get_uf());
+        if (modelo != ConvNF::modeloDFToStr(config->get_ModeloDF()) ||
+            (modelo != "55" && !(modelo == "65" && autorizadorDaNota)))
+            m_error = "A chave e o modelo configurado devem corresponder ao modelo aceito pelo evento.";
+        else if (inf.get_tpAmb() != TpAmb::None && inf.get_tpAmb() != ambiente)
+            m_error = "O ambiente do evento deve ser igual ao ambiente configurado.";
+        else if (autorizadorDaNota && inf.get_chNFe().left(2).toInt() != uf)
+            m_error = "Configure a UF da nota para a vinculação de pagamento ou seu cancelamento.";
+        if (!m_error.isEmpty())
+            return false;
     }
     if (epec > 0)
     {
@@ -277,6 +332,15 @@ void EnvEvento::updateEvento(int &index)
         if (inf->get_nSeqEvento() == 0)
             inf->set_nSeqEvento(1);
     }
+    const int orgaoEntrega = ConvNF::orgaoEventoEntrega(tipo);
+    if (orgaoEntrega)
+    {
+        auto &inf = *evento->value(index)->infEvento;
+        inf.set_cOrgao(orgaoEntrega);
+        inf.set_verEvento("1.00");
+        inf.detEvento->set_cOrgaoAutor(inf.get_chNFe().left(2).toInt());
+        inf.detEvento->set_descEvento(ConvNF::descricaoEventoEntrega(tipo));
+    }
     if (!ConvNF::descricaoManifestacao(tipo).isEmpty())
     {
         auto *inf = evento->value(index)->infEvento.get();
@@ -322,6 +386,22 @@ void EnvEvento::updateEvento(int &index)
                 ? 92 : ConvNF::ufToInt(config->webservices->get_uf()));
         }
     }
+    if (!ConvNF::descricaoEventoRTC(tipo).isEmpty())
+    {
+        auto &inf = *evento->value(index)->infEvento;
+        auto &det = *inf.detEvento;
+        const int uf = ConvNF::ufToInt(config->webservices->get_uf());
+        if (inf.get_cOrgao() == 0)
+        {
+            // No cancelamento, a NT informa a UF no envelope, inclusive no envio à SVRS.
+            const bool usarUF = ConvNF::usaAutorizadorDaNota(inf) || tipo == TpEvento::CancelamentoEvento;
+            inf.set_cOrgao(usarUF ? uf : 92);
+        }
+        if (det.get_cOrgaoAutor() == 0)
+            det.set_cOrgaoAutor(uf);
+        inf.set_verEvento("1.00");
+        det.set_descEvento(ConvNF::descricaoEventoRTC(tipo));
+    }
     //versão
     evento->value(index)->set_versao(this->m_versao);
     //nSeqEvento deve ser tratado pelo software do usuário e não pela lib, portanto,
@@ -356,6 +436,18 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
     if (!evento->isEmpty())
     {
         const TpEvento primeiro = evento->value(0)->infEvento->get_tpEvento();
+        const auto &inf = *evento->value(0)->infEvento;
+        if (!ConvNF::descricaoEventoRTC(primeiro).isEmpty())
+        {
+            if (!ConvNF::usaAutorizadorDaNota(inf))
+                servidor = "SVRS";
+            return true;
+        }
+        if (const int orgao = ConvNF::orgaoEventoEntrega(primeiro))
+        {
+            servidor = orgao == 91 ? "AN" : "SVRS";
+            return true;
+        }
         if (primeiro == TpEvento::EPEC)
         {
             servidor = "AN";
@@ -428,29 +520,6 @@ bool EnvEvento::get_servidorEvento(QString &servidor)
             return true;
         }
     }
-    //Insucesso na Entrega da NF-e (NT 2023.005) é autorizado somente pela SVRS, independente
-    //da UF do emitente. Por isso, não pode ser enviado no mesmo lote com outros tipos de evento.
-    int _qtdInsucesso = 0;
-    for (int i = 0; i < evento->count(); ++i)
-    {
-        TpEvento _tpEvento = evento->value(i)->infEvento->get_tpEvento();
-        if (_tpEvento == TpEvento::InsucessoEntregaNFe ||
-            _tpEvento == TpEvento::CancelInsucessoEntregaNFe)
-            ++_qtdInsucesso;
-    }
-
-    servidor.clear();
-    if (_qtdInsucesso == 0)
-        return true;
-
-    if (_qtdInsucesso != evento->count())
-    {
-        this->m_error = "Eventos de Insucesso na Entrega da NF-e devem ser enviados em lote "
-                        "separado, pois são autorizados somente pela SVRS.";
-        return false;
-    }
-
-    servidor = "SVRS";
     return true;
 }
 
@@ -472,7 +541,7 @@ bool EnvEvento::validarEvento()
     std::unique_ptr<CppXML> _libxml(new CppLibXml2(config->certificado->get_cryptoLib(), _schemaPath));
 
     this->m_error.clear(); //limpando erro
-    if (!_libxml->parseXML(this->m_xml.toLocal8Bit(), _schemaName))
+    if (!_libxml->parseXML(this->m_xml.toUtf8(), _schemaName))
     {
        this->m_error = _libxml->get_error();
         _ret = false;
@@ -482,7 +551,8 @@ bool EnvEvento::validarEvento()
         for (TEvento *item : *evento)
         {
             const int tipo = static_cast<int>(item->infEvento->get_tpEvento());
-            if (tipo >= 111500 && tipo <= 111503 && !item->validarProrrogacao(config))
+            if ((!ConvNF::descricaoEventoRTC(item->infEvento->get_tpEvento()).isEmpty() && !item->validarDetalheRTC(config)) ||
+                (tipo >= 111500 && tipo <= 111503 && !item->validarProrrogacao(config)))
             {
                 m_error = item->get_error();
                 return false;
@@ -494,13 +564,61 @@ bool EnvEvento::validarEvento()
 
 void EnvEvento::tratarRetorno()
 {
+    const bool loteEntrega = !evento->isEmpty() && ConvNF::orgaoEventoEntrega(evento->value(0)->infEvento->get_tpEvento());
+    if (loteEntrega)
+    {
+        if (retorno->get_cStat() != 128)
+            return;
+        if (retorno->retEvento->count() != evento->count())
+        {
+            m_error = "A quantidade de retornos do lote de entrega diverge da quantidade enviada.";
+            return;
+        }
+        QSet<QString> enviados;
+        for (const auto *item : *evento)
+            enviados.insert(item->infEvento->get_Id());
+        for (const auto *item : *retorno->retEvento)
+        {
+            const auto &inf = *item->infEvento;
+            if (inf.get_cStat() != 135 && inf.get_cStat() != 136)
+                continue;
+            const QString id = "ID" + ConvNF::tpEventoToStr(inf.get_tpEvento()) + inf.get_chNFe() +
+                               QString::number(inf.get_nSeqEvento()).rightJustified(2, '0');
+            if (!enviados.remove(id) || inf.get_tpAmb() != config->webservices->get_tpAmb() ||
+                inf.get_nProt().isEmpty())
+            {
+                m_error = "A confirmação de entrega está duplicada ou diverge do evento enviado, ambiente ou protocolo.";
+                return;
+            }
+        }
+    }
     if (!evento->isEmpty())
     {
-        const int tipo = static_cast<int>(evento->value(0)->infEvento->get_tpEvento());
+        const auto *inf = evento->value(0)->infEvento.get();
+        const int tipo = static_cast<int>(inf->get_tpEvento());
         if (tipo >= 111500 && tipo <= 111503)
         {
             tratarRetornoProrrogacao();
             return;
+        }
+        if (!ConvNF::descricaoEventoRTC(inf->get_tpEvento()).isEmpty())
+        {
+            if (retorno->get_cStat() != 128)
+                return;
+            if (retorno->retEvento->count() != 1)
+            {
+                m_error = "O lote processado da RTC deve retornar exatamente um evento.";
+                return;
+            }
+            const auto &ret = *retorno->retEvento->value(0)->infEvento;
+            if (ret.get_cStat() != 135 && ret.get_cStat() != 136)
+                return;
+            if (ret.get_tpEvento() != inf->get_tpEvento() || ret.get_chNFe() != inf->get_chNFe() ||
+                ret.get_nSeqEvento() != inf->get_nSeqEvento())
+            {
+                m_error = "O retorno da RTC não corresponde ao evento enviado.";
+                return;
+            }
         }
     }
     //atualiza e salva o xml do evento
@@ -526,10 +644,18 @@ void EnvEvento::tratarRetorno()
                 {
                     const TpEvento tipo = evento->value(j)->infEvento->get_tpEvento();
                     const bool manifestacao = !ConvNF::descricaoManifestacao(tipo).isEmpty();
-                    if (manifestacao && (_cStat == 135 || _cStat == 136))
+                    const bool rtc = !ConvNF::descricaoEventoRTC(tipo).isEmpty();
+                    const bool entrega = ConvNF::orgaoEventoEntrega(tipo) != 0;
+                    if ((manifestacao || rtc || entrega) && (_cStat == 135 || _cStat == 136))
                     {
                         auto *ret = retorno->retEvento->value(i);
                         const auto *enviado = evento->value(j);
+                        if (rtc && (ret->infEvento->get_tpAmb() != enviado->infEvento->get_tpAmb() ||
+                                    ret->infEvento->get_nProt().isEmpty()))
+                        {
+                            m_error = "Retorno de evento com ambiente divergente ou sem protocolo.";
+                            return;
+                        }
                         const QString processado =
                             "<procEventoNFe xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"1.00\">" +
                             CppUtility::extractStr(enviado->get_XMLAssinado(), "<evento", "/evento>") +
@@ -548,12 +674,12 @@ void EnvEvento::tratarRetorno()
                         _procEventoNFe.append("</procEventoNFe>");
 
                         _xmlOriginal.append("<a>");
-                        _xmlOriginal.append(CppUtility::extractStr(this->evento->value(j)->get_XMLAssinado().toLocal8Bit(), "<evento", "/evento>"));
+                        _xmlOriginal.append(CppUtility::extractStr(this->evento->value(j)->get_XMLAssinado(), "<evento", "/evento>").toUtf8());
                         _xmlOriginal.append("</a>");
 
                         //xml do evento é inserido ao retornar do webservices.
                         _retEvento.append("<a>");
-                        _retEvento.append(CppUtility::extractStr(this->retorno->retEvento->value(i)->get_XML().toLocal8Bit(), "<retEvento", "/retEvento>"));
+                        _retEvento.append(CppUtility::extractStr(this->retorno->retEvento->value(i)->get_XML(), "<retEvento", "/retEvento>").toUtf8());
                         _retEvento.append("</a>");
 
                         //primeiro o xml original dentro de procEventoNFe

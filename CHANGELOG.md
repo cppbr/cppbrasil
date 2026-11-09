@@ -8,6 +8,26 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Eventos da Reforma Tributária — NT 2025.002 v1.53 e NT 2026.006 v1.01
+
+- Envie pela classe `EnvEvento` os eventos da RTC `112110`, `112120`, `112130`,
+  `112140`, `112150`, `211110`, `211124`, `211128`, `211130`, `211140`,
+  `211150`, `212110`, `212120` e o cancelamento genérico `110001`. Envie
+  cada evento individualmente. Os eventos da NT 2025.002 seguem para a SVRS.
+- Use `TpEvento::VinculacaoPagamento` (`110300`) para vincular uma transação
+  a uma NF-e ou NFC-e autorizada. Informe `DetEvento::set_nProt()` e preencha
+  `detEvento->rtc->gPgto`. A vinculação e seu cancelamento seguem para o
+  autorizador da nota.
+- Informe os dados específicos em `detEvento->rtc`. Confirme os registros
+  dos grupos repetidos com `itens->add()` ou `gCredPresOper->add()`. No
+  `110001`, informe `tpEventoAut`, `nProtEvento` e a sequência do evento
+  original.
+- A biblioteca valida o envelope e o detalhe pelo XSD antes do envio.
+  Os retornos 135 e 136 geram o XML processado, preservando a assinatura
+  opcional do retorno. O XML de eventos usa UTF-8 na assinatura, no envio
+  e na gravação. Recompile a biblioteca e as aplicações devido às
+  alterações nas classes de evento.
+
 #### Reforma Tributária: IBS, CBS e IS no XML da NF-e e NFC-e — NT 2025.002 v1.53
 
 - Informe em `Ide` a data de previsão de entrega (`dPrevEntrega`, somente
@@ -597,6 +617,17 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
+
+#### Eventos de entrega da NF-e — NT 2021.001 e NT 2023.005
+
+- `EnvEvento` encaminha comprovantes de entrega (`110130` e `110131`)
+  ao Ambiente Nacional e insucessos (`110192` e `110193`) à SVRS.
+  Use lotes separados para cada serviço.
+- Cada tipo gera e valida seu próprio detalhe por XSD. No cancelamento,
+  informe `nProtEvento` e a sequência do evento original.
+- Os retornos 135 e 136 geram o XML processado com a assinatura opcional
+  do retorno preservada. A distribuição de DF-e lê os detalhes dos quatro
+  códigos.
 
 #### Ordem do ISSQN no XML da NF-e
 

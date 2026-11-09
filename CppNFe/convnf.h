@@ -23,6 +23,8 @@ limitations under the License.
 #include <CppBase/cppbrasil_global.h>
 #include <CppBase/convdf.h>
 
+class InfEvento;
+
 //TIPOS NFe e NFCe
 
 //Tipo de serviço utilizados pela projeto NFe/NFCe
@@ -242,12 +244,27 @@ enum class TpEvento {None = -1, CartaCorrecao = 110110, Cancelamento = 110111,
                      FiscoCancelPedidoProrrogacao1 = 411502, FiscoCancelPedidoProrrogacao2 = 411503,
                      AtorInteressadoNFeTransp = 110150,
                      ConfirmacaoOperacaoDest = 210200, CienciaOperacaoDest = 210210,
-                     DesconhecimentoOperacaoDest = 210220, OperacaoNaoRealizadaDest = 210240};
+                     DesconhecimentoOperacaoDest = 210220, OperacaoNaoRealizadaDest = 210240,
+                     CancelamentoEvento = 110001,
+                     VinculacaoPagamento = 110300,
+                     PagamentoIntegral = 112110,
+                     ImportacaoSemIsencao = 112120,
+                     PerecimentoFornecedor = 112130,
+                     FornecimentoNaoRealizado = 112140,
+                     AtualizacaoPrevisaoEntrega = 112150,
+                     ApropriacaoCreditoPresumido = 211110,
+                     PerecimentoAdquirente = 211124,
+                     AceiteDebito = 211128,
+                     ImobilizacaoItem = 211130,
+                     CreditoCombustivel = 211140,
+                     CreditoAtividadeAdquirente = 211150,
+                     ManifestacaoTransferenciaIBS = 212110,
+                     ManifestacaoTransferenciaCBS = 212120};
 
 //tpAutor - Tipo de autor do evento
 //obs: 3-EmpresaTerceiros, serve para terceiros como no caso de evento Ator Interessado. 3=Empresa Transportadora.
 enum class TpAutor {None = -1, EmpresaEmitente = 1, EmpresaDestinataria = 2, EmpresaTerceiros = 3,
-                    Fisco = 5, RFB = 6, OutrosOrgaos = 9};
+                    Fisco = 5, RFB = 6, EmpresaSucessora = 8, OutrosOrgaos = 9};
 
 //tpAutorizacao - tipo de autorização para o transportador
 enum class TpAutorizacao {None = -1, NaoPermite = 0, PermiteTranspAutTransp = 1};
@@ -370,6 +387,18 @@ public:
     static TpAto strToTpAto(const QString &value);
     static QString tpEventoToStr(const TpEvento &value);
     static QString descricaoManifestacao(TpEvento tipo);
+    static QString descricaoEventoRTC(TpEvento tipo);
+    static bool usaAutorizadorDaNota(const InfEvento &inf);
+    static int orgaoEventoEntrega(TpEvento tipo);
+    static QString descricaoEventoEntrega(TpEvento tipo);
+
+    struct LayoutItensRTC
+    {
+        const char *grupo;
+        const char *quantidade;
+        const char *unidade;
+    };
+    static LayoutItensRTC layoutItensRTC(TpEvento tipo);
     static TpEvento strToTpEvento(const QString &value);
     static QString tpAutorToStr(const TpAutor &value);
     static TpAutor strToTpAutor(const QString &value);

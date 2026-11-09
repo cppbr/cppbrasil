@@ -102,7 +102,7 @@ bool WSNFeBase::validarXML(const QString &schemaName, const QString &nomeGrupo, 
         //junto e dará erro na validação
         QByteArray _xml;
         _xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        _xml.append(CppUtility::extractStr(xml, "<" + nomeGrupo, nomeGrupo + ">").toLocal8Bit());
+        _xml.append(CppUtility::extractStr(QString::fromUtf8(xml), "<" + nomeGrupo, nomeGrupo + ">").toUtf8());
         _ret = _libxml->parseXML(_xml, schemaName.toLocal8Bit());
     }
 
@@ -755,7 +755,9 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
 
     if (_ret == StatusRetorno::Processado)
     {
-        const bool manifestacao = !ConvNF::descricaoManifestacao(m_tpEvento).isEmpty();
+        const bool preservarRetorno = !ConvNF::descricaoManifestacao(m_tpEvento).isEmpty() ||
+                                      !ConvNF::descricaoEventoRTC(m_tpEvento).isEmpty() ||
+                                      ConvNF::orgaoEventoEntrega(m_tpEvento);
         const QString xmlRetorno = QString::fromUtf8(m_msgRetorno);
         QXmlStreamReader _xml(xmlRetorno);
         QXmlStreamNamespaceDeclarations namespacesLote;
@@ -766,7 +768,7 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
         QXmlStreamAttributes attributes;
         while(!(_xml.tokenType() == QXmlStreamReader::EndElement && _xml.name() == QStringLiteral("retEnvEvento")))
         {
-            if (manifestacao && _xml.isStartElement() && _xml.name() == QStringLiteral("retEnvEvento"))
+            if (preservarRetorno && _xml.isStartElement() && _xml.name() == QStringLiteral("retEnvEvento"))
                 namespacesLote = _xml.namespaceDeclarations();
             attributes = _xml.attributes();
             if(attributes.hasAttribute("versao"))
@@ -813,10 +815,10 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
             }
             if(_xml.isStartElement() && _xml.name() == QStringLiteral("retEvento"))
             {
-                const qsizetype inicio = manifestacao
+                const qsizetype inicio = preservarRetorno
                     ? xmlRetorno.lastIndexOf(QLatin1Char('<'), _xml.characterOffset() - 1) : 0;
                 QString namespacesHerdados;
-                if (manifestacao)
+                if (preservarRetorno)
                 {
                     const auto namespacesEvento = _xml.namespaceDeclarations();
                     for (const auto &ns : namespacesLote)
@@ -1002,7 +1004,7 @@ WSNFeBase::StatusRetorno WSEvento::tratarRetorno()
                 }
                 _xmlRetEvento.writeEndElement(); //fechamento retEvento
                 // Preserva a assinatura opcional do Fisco e o conteúdo assinado.
-                if (manifestacao)
+                if (preservarRetorno)
                 {
                     QString xmlEvento = xmlRetorno.mid(inicio, _xml.characterOffset() - inicio);
                     xmlEvento.insert(_xml.qualifiedName().size() + 1, namespacesHerdados);

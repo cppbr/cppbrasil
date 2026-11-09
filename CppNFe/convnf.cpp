@@ -19,6 +19,7 @@ limitations under the License.
 
 
 #include "convnf.h"
+#include "tevento.h"
 
 ConvNF::ConvNF()
 {
@@ -1023,7 +1024,9 @@ TpEvento ConvNF::strToTpEvento(const QString &value)
 {
     QList<QString> _r = {"-1", "110110", "110111", "110112", "110130", "110131", "110140", "110192",
                          "110193", "110750", "110751", "111500", "111501", "111502", "111503",
-                         "411500", "411501", "411502", "411503", "110150", "210200", "210210", "210220", "210240"};
+                         "411500", "411501", "411502", "411503", "110150", "210200", "210210", "210220", "210240",
+                         "110001", "110300", "112110", "112120", "112130", "112140", "112150",
+                         "211110", "211124", "211128", "211130", "211140", "211150", "212110", "212120"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpEvento::None;
@@ -1044,6 +1047,75 @@ QString ConvNF::descricaoManifestacao(TpEvento tipo)
     }
 }
 
+QString ConvNF::descricaoEventoRTC(TpEvento tipo)
+{
+    switch (tipo)
+    {
+    case TpEvento::CancelamentoEvento: return QStringLiteral("Cancelamento de Evento");
+    case TpEvento::VinculacaoPagamento: return QStringLiteral("Vinculação Pagamento");
+    case TpEvento::PagamentoIntegral: return QStringLiteral("Informação de efetivo pagamento integral para liberar crédito presumido do adquirente");
+    case TpEvento::ImportacaoSemIsencao: return QStringLiteral("Importação em ALC/ZFM não convertida em isenção");
+    case TpEvento::PerecimentoFornecedor: return QStringLiteral("Perecimento, perda, roubo ou furto durante o transporte contratado pelo fornecedor");
+    case TpEvento::FornecimentoNaoRealizado: return QStringLiteral("Fornecimento não realizado com pagamento antecipado");
+    case TpEvento::AtualizacaoPrevisaoEntrega: return QStringLiteral("Atualização da Data de Previsão de Entrega");
+    case TpEvento::ApropriacaoCreditoPresumido: return QStringLiteral("Solicitação de Apropriação de crédito presumido");
+    case TpEvento::PerecimentoAdquirente: return QStringLiteral("Perecimento, perda, roubo ou furto durante o transporte contratado pelo adquirente");
+    case TpEvento::AceiteDebito: return QStringLiteral("Aceite de débito na apuração por emissão de nota de crédito");
+    case TpEvento::ImobilizacaoItem: return QStringLiteral("Imobilização de Item");
+    case TpEvento::CreditoCombustivel: return QStringLiteral("Solicitação de Apropriação de Crédito de Combustível");
+    case TpEvento::CreditoAtividadeAdquirente: return QStringLiteral("Solicitação de Apropriação de Crédito para bens e serviços que dependem de atividade do adquirente");
+    case TpEvento::ManifestacaoTransferenciaIBS: return QStringLiteral("Manifestação sobre Pedido de Transferência de Crédito de IBS em Operação de Sucessão");
+    case TpEvento::ManifestacaoTransferenciaCBS: return QStringLiteral("Manifestação sobre Pedido de Transferência de Crédito de CBS em Operação de Sucessão");
+    default: return {};
+    }
+}
+
+bool ConvNF::usaAutorizadorDaNota(const InfEvento &inf)
+{
+    return inf.get_tpEvento() == TpEvento::VinculacaoPagamento ||
+           (inf.get_tpEvento() == TpEvento::CancelamentoEvento &&
+            inf.detEvento->rtc->get_tpEventoAut() == TpEvento::VinculacaoPagamento);
+}
+
+int ConvNF::orgaoEventoEntrega(TpEvento tipo)
+{
+    switch (tipo)
+    {
+    case TpEvento::ComprovanteEntregaNFe:
+    case TpEvento::CancelComprovanteEntregaNFe: return 91;
+    case TpEvento::InsucessoEntregaNFe:
+    case TpEvento::CancelInsucessoEntregaNFe: return 92;
+    default: return 0;
+    }
+}
+
+QString ConvNF::descricaoEventoEntrega(TpEvento tipo)
+{
+    switch (tipo)
+    {
+    case TpEvento::ComprovanteEntregaNFe: return QStringLiteral("Comprovante de Entrega da NF-e");
+    case TpEvento::CancelComprovanteEntregaNFe: return QStringLiteral("Cancelamento Comprovante de Entrega da NF-e");
+    case TpEvento::InsucessoEntregaNFe: return QStringLiteral("Insucesso na Entrega da NF-e");
+    case TpEvento::CancelInsucessoEntregaNFe: return QStringLiteral("Cancelamento Insucesso na Entrega da NF-e");
+    default: return {};
+    }
+}
+
+ConvNF::LayoutItensRTC ConvNF::layoutItensRTC(TpEvento tipo)
+{
+    switch (tipo)
+    {
+    case TpEvento::ImportacaoSemIsencao: return {"gConsumo", "qtde", "unidade"};
+    case TpEvento::PerecimentoFornecedor:
+    case TpEvento::PerecimentoAdquirente: return {"gPerecimento", "qPerecimento", "uPerecimento"};
+    case TpEvento::FornecimentoNaoRealizado: return {"gItemNaoFornecido", "qNaoFornecida", "uNaoFornecida"};
+    case TpEvento::ImobilizacaoItem: return {"gImobilizacao", "qImobilizado", "uImobilizado"};
+    case TpEvento::CreditoCombustivel: return {"gConsumoComb", "qComb", "uComb"};
+    case TpEvento::CreditoAtividadeAdquirente: return {"gCredito", nullptr, nullptr};
+    default: return {};
+    }
+}
+
 QString ConvNF::tpAutorToStr(const TpAutor &value)
 {
     if(value == TpAutor::None)
@@ -1055,7 +1127,7 @@ QString ConvNF::tpAutorToStr(const TpAutor &value)
 
 TpAutor ConvNF::strToTpAutor(const QString &value)
 {
-    QList<QString> _r = {"-1", "1", "2", "3", "5", "6", "9"};
+    QList<QString> _r = {"-1", "1", "2", "3", "5", "6", "8", "9"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpAutor::None;

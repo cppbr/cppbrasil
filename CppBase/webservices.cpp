@@ -77,7 +77,7 @@ bool WebServices::get_soapEnvelop(const QByteArray &dados, const QByteArray &Nam
         _env += QStringLiteral("</soap12:Body>");
         _env += QStringLiteral("</soap12:Envelope>");
 
-        output.append(_env.toLocal8Bit());
+        output.append(_env.toUtf8());
         return true;
 
     } catch (std::exception const& e) {

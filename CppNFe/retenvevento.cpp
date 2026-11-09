@@ -274,7 +274,7 @@ void RetEvento::salvarXML(const QString &caminho, const QString &nomeArquivo)
         nome = this->infEvento->get_Id() + "-procEventoNFe"; //se não informar o nome, será salvo com o Id retornado
     else
         nome = nomeArquivo;
-    CppUtility::saveFile(caminho, nome, TipoArquivo::XML, this->m_xml.toLocal8Bit());
+    CppUtility::saveFile(caminho, nome, TipoArquivo::XML, this->m_xml.toUtf8());
 }
 
 //------------------------------------------------------------------------
