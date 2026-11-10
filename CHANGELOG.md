@@ -8,6 +8,14 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Exemplo consoleNFe
+
+- Use o exemplo `consoleNFe`, em `examples/`, para gerar, assinar, validar e
+  transmitir uma NF-e, consultar o status do serviço e a situação da nota,
+  cancelar e inutilizar, por linha de comando ou menu. A configuração vem
+  de um arquivo INI. O exemplo acessa os objetos por referências e
+  ponteiros locais, sem repetir o caminho inteiro a cada chamada.
+
 #### Eventos da Reforma Tributária — NT 2025.002 v1.53 e NT 2026.006 v1.01
 
 - Envie pela classe `EnvEvento` os eventos da RTC `112110`, `112120`, `112130`,
@@ -490,6 +498,12 @@ dependem do preenchimento de `CNPJPag` e `UFPag`.
 
 ### Modificado
 
+#### Fontes em `src/`
+
+- Os fontes da biblioteca passam para a pasta `src/`. Configure o CMake com
+  `-S src` e, em projetos que incluem a CppBrasil com `add_subdirectory`,
+  aponte para a pasta `src`.
+
 #### DANFE
 
 - A `CppDanfe` deixa de depender do módulo `Svg` do Qt: o QR Code passa a
@@ -656,6 +670,8 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
 
 ### Removido
 
+- Exemplos antigos `consoleNFe`, `WidgetsNFe` e `WidgetsDANFE`, substituídos
+  pelo novo `consoleNFe`, em `examples/`.
 - Biblioteca `CppDanfeQtRPT` (`DanfeQtRPT/`), o código-fonte do QtRPT que a
   acompanhava e os modelos XML do DANFE em `examples/report`. Use a
   `CppDanfeBrReport`: troque o include `<DanfeQtRPT/CppDanfeQtRPT>` por

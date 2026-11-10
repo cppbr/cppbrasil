@@ -1,0 +1,44 @@
+; Configuração do exemplo consoleNFe.
+; Copie para consoleNFe.ini, na pasta do executável, ou informe o arquivo com --config.
+; A senha do certificado pode ficar fora deste arquivo, na variável de ambiente CPPBR_CERT_SENHA.
+
+[geral]
+; 55 = NF-e, 65 = NFC-e
+modelo=55
+; homologacao ou producao
+ambiente=homologacao
+uf=RO
+; pasta com os XSDs da NF-e (nfe_v4.00.xsd e dependências)
+schemas=C:/schemas/NFe
+; pasta onde os XMLs são salvos; vazio = pasta do executável
+salvar=
+; HttpQt ou HttpOpenSSL
+http=HttpQt
+timeout=8000
+; Somente NFC-e
+idCSC=
+CSC=
+
+[certificado]
+arquivo=C:/certificado.pfx
+senha=
+; certificados da cadeia ICP-Brasil, separados por vírgula (opcional)
+cadeia=
+
+[emitente]
+CNPJ=12345678000195
+xNome=EMPRESA DE TESTE LTDA
+xFant=EMPRESA TESTE
+IE=00000000062308
+xLgr=RUA A
+nro=100
+xBairro=CENTRO
+cMun=1100205
+xMun=PORTO VELHO
+UF=RO
+CEP=76800000
+fone=6932221111
+
+[nota]
+serie=1
+numero=1

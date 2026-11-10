@@ -41,7 +41,8 @@ CMake, pelas instruções do próprio projeto, com o mesmo kit do Qt usado na Cp
 
 # Compilação
 
-A compilação é feita pelo `CMakeLists.txt` da raiz do projeto, sempre em uma pasta separada do código-fonte.
+A compilação é feita pelo `CMakeLists.txt` da pasta `src/`, onde ficam os fontes da biblioteca, sempre em uma pasta
+de build separada do código-fonte.
 
 | Opção do CMake | Padrão | Função |
 |---|---|---|
@@ -77,7 +78,7 @@ que seja 6.5 ou superior, ou do instalador oficial do Qt. No Fedora/RHEL, libere
 Sem o DANFE:
 
 ```bash
-cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPPBRASIL_BUILD_DANFE=OFF
+cmake -S src -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCPPBRASIL_BUILD_DANFE=OFF
 ```
 
 ```bash
@@ -87,13 +88,13 @@ cmake --build build/release
 Com o Qt do instalador oficial, informe o kit:
 
 ```bash
-cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.12.0/gcc_64 -DCPPBRASIL_BUILD_DANFE=OFF
+cmake -S src -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.12.0/gcc_64 -DCPPBRASIL_BUILD_DANFE=OFF
 ```
 
 Com o DANFE, depois de instalar o BrReport (informe a pasta de instalação se ela não for padrão do sistema):
 
 ```bash
-cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/caminho/BrReport
+cmake -S src -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/caminho/BrReport
 ```
 
 ### 3. Instalar
@@ -154,7 +155,7 @@ padrão.
 ### 4. Configurar e compilar a CppBrasil
 
 ```bat
-cmake -S . -B build\msvc -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.12.0/msvc2022_64;C:/deps/libxml2-msvc" -DOPENSSL_ROOT_DIR="C:/Program Files/OpenSSL-Win64" -DCPPBRASIL_BUILD_DANFE=OFF
+cmake -S src -B build\msvc -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.12.0/msvc2022_64;C:/deps/libxml2-msvc" -DOPENSSL_ROOT_DIR="C:/Program Files/OpenSSL-Win64" -DCPPBRASIL_BUILD_DANFE=OFF
 ```
 
 ```bat
@@ -204,6 +205,24 @@ paisagem, é a do modelo informado.
 
 Os XSDs da NF-e não acompanham a biblioteca: informe a pasta deles na configuração (`ConfigNFe::arquivos`) para que a
 assinatura e a validação funcionem.
+
+## Exemplo
+
+`examples/` traz um exemplo em modo console que gera, assina, valida e transmite uma NF-e, consulta o status do
+serviço e a situação da nota, cancela e inutiliza. Ele compila a biblioteca junto, a partir de `src/`:
+
+```bash
+cmake -S examples -B build/consoleNFe -G Ninja -DCMAKE_BUILD_TYPE=Release
+```
+
+```bash
+cmake --build build/consoleNFe
+```
+
+No Windows, acrescente o `CMAKE_PREFIX_PATH` e o `OPENSSL_ROOT_DIR` do passo 4. O executável fica em
+`build/consoleNFe/bin`; copie para essa pasta o `consoleNFe.ini.exemplo` como `consoleNFe.ini` e ajuste os dados do
+emitente, do certificado e a pasta dos XSDs. Rode `consoleNFe --help` para ver os comandos; sem comando, o exemplo abre
+um menu.
 
 # Avisos importantes
 
