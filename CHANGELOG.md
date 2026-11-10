@@ -15,6 +15,8 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
   cancelar e inutilizar, por linha de comando ou menu. A configuração vem
   de um arquivo INI. O exemplo acessa os objetos por referências e
   ponteiros locais, sem repetir o caminho inteiro a cada chamada.
+  A nota de exemplo traz o IBS e a CBS por item (`IBSCBS`, CST 000) e
+  os totais do grupo `IBSCBSTot`.
 
 #### Eventos da Reforma Tributária — NT 2025.002 v1.53 e NT 2026.006 v1.01
 

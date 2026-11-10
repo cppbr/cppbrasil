@@ -217,17 +217,45 @@ void adicionarItem(Container<Det> &itens, const Item &item)
     imposto.PIS->set_CST(CstPIS::PIS49);
     imposto.COFINS->set_CST(CstCOFINS::COFINS49);
 
+    // IBS e CBS (Reforma Tributária, NT 2025.002): tributação integral, CST 000.
+    // Alíquotas de teste de 2026: IBS UF 0,1%, IBS municipal 0% e CBS 0,9%.
+    // A base exclui o ICMS (e o PIS/COFINS, aqui zerados).
+    auto &ibscbs = *imposto.IBSCBS;
+    ibscbs.set_CST("000");
+    ibscbs.set_cClassTrib("000001");
+
+    auto *g = ibscbs.gIBSCBS.get();
+    const double vBCIBSCBS = valor - icms->get_vICMS();
+    const double vIBSUF = qRound(vBCIBSCBS * 0.1) / 100.0;
+    const double vCBS = qRound(vBCIBSCBS * 0.9) / 100.0;
+    g->set_vBC(vBCIBSCBS);
+    g->gIBSUF->set_pIBSUF(0.1);
+    g->gIBSUF->set_vIBSUF(vIBSUF);
+    g->gIBSMun->set_pIBSMun(0);
+    g->gIBSMun->set_vIBSMun(0);
+    g->set_vIBS(vIBSUF);
+    g->gCBS->set_pCBS(0.9);
+    g->gCBS->set_vCBS(vCBS);
+
     itens.add();
 }
 
 void preencherTotais(InfNFe &inf)
 {
     double vProd = 0, vBC = 0, vICMS = 0;
+    double vBCIBSCBS = 0, vIBSUF = 0, vIBSMun = 0, vCBS = 0;
     for (const Det *det : *inf.det)
     {
+        const auto &imposto = *det->imposto;
         vProd += det->prod->get_vProd();
-        vBC += det->imposto->ICMS->get_vBC();
-        vICMS += det->imposto->ICMS->get_vICMS();
+        vBC += imposto.ICMS->get_vBC();
+        vICMS += imposto.ICMS->get_vICMS();
+
+        const auto *g = imposto.IBSCBS->gIBSCBS.get();
+        vBCIBSCBS += g->get_vBC();
+        vIBSUF += g->gIBSUF->get_vIBSUF();
+        vIBSMun += g->gIBSMun->get_vIBSMun();
+        vCBS += g->gCBS->get_vCBS();
     }
 
     auto *tot = inf.total->ICMSTot.get();
@@ -235,6 +263,14 @@ void preencherTotais(InfNFe &inf)
     tot->set_vICMS(vICMS);
     tot->set_vProd(vProd);
     tot->set_vNF(vProd);
+
+    // Totais do IBS e da CBS (grupo W03). Em 2026 eles não compõem o vNF.
+    auto &rtc = *inf.total->IBSCBSTot;
+    rtc.set_vBCIBSCBS(vBCIBSCBS);
+    rtc.gIBS->gIBSUF->set_vIBSUF(vIBSUF);
+    rtc.gIBS->gIBSMun->set_vIBSMun(vIBSMun);
+    rtc.gIBS->set_vIBS(vIBSUF + vIBSMun);
+    rtc.gCBS->set_vCBS(vCBS);
 
     inf.transp->set_modFrete(ModFrete::SemFrete);
 
