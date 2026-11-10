@@ -31,8 +31,14 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 #### DANFE da NF-e com o BrReport — NT 2026.010 v1.00
 
 - Nova biblioteca `CppDanfeBrReport` (`<DanfeBrReport/CppDanfeBrReport>`),
-  que imprime o DANFE da NF-e modelo 55 com o BrReport, no leiaute retrato
-  de referência da NT 2026.010. Ela substitui a `CppDanfeQtRPT`.
+  que imprime o DANFE da NF-e modelo 55 com o BrReport, no leiaute da
+  NT 2026.010. Ela substitui a `CppDanfeQtRPT` e recebe o `CppNFe` por
+  ponteiro ou por referência.
+- O leiaute vem de um modelo `.brt` do BrReport, editável no `brdesigner`,
+  informado pela aplicação em `caminhoArquivo()`, como na `CppDanfeQtRPT`.
+  A orientação, retrato ou paisagem, é a do modelo: a aplicação escolhe o
+  arquivo, por exemplo pelo `tpImp` da nota. Sem modelo, a impressão
+  retorna falso e `erro()` explica o motivo.
 - O quadro do emitente traz o Código do Regime Tributário (`CRT`) e reserva
   o campo do Tipo de Regime de Apuração do IBS e da CBS, que fica em branco
   até a publicação da origem da informação.
@@ -58,9 +64,7 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 - O código de barras da chave usa Code 128 com troca automática de
   subconjunto, o que também atende chaves com CNPJ alfanumérico.
 - `print()` abre a visualização, `imprimir()` envia para a impressora e
-  `exportarPDF()` grava o PDF. O leiaute fica embutido na biblioteca; para
-  personalizá-lo, grave-o com `salvarModelo()`, edite o arquivo `.brt` no
-  `brdesigner` e informe-o em `caminhoArquivo()`.
+  `exportarPDF()` grava o PDF.
 - A NFC-e (modelo 65) ainda não é atendida por este modelo: a impressão
   retorna falso e `erro()` explica o motivo.
 - `CPPBRASIL_BUILD_DANFE` passa a compilar a `CppDanfe` e a
@@ -656,8 +660,8 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   acompanhava e os modelos XML do DANFE em `examples/report`. Use a
   `CppDanfeBrReport`: troque o include `<DanfeQtRPT/CppDanfeQtRPT>` por
   `<DanfeBrReport/CppDanfeBrReport>` e a classe `CppDanfeQtRPT` por
-  `CppDanfeBrReport`. O `caminhoArquivo()` passa a receber um modelo `.brt`
-  opcional; sem ele, é usado o leiaute embutido. As opções do CMake
+  `CppDanfeBrReport`. O `caminhoArquivo()` passa a receber o modelo `.brt`
+  do BrReport no lugar do modelo XML do QtRPT. As opções do CMake
   `QTRPT_INCLUDE_DIR` e `QTRPT_LIBRARY` e a macro `CPPDANFEQTRPT_EXPORT`
   deixam de existir. O exemplo `WidgetsDANFE` passa a usar o BrReport.
 - Dependências pré-compiladas para Linux, Windows e Android. Elas devem ser instaladas

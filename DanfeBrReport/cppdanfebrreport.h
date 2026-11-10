@@ -31,23 +31,26 @@ class BrReport;
 class BrListDataSource;
 
 /*
-DANFE da NF-e (modelo 55) impresso com o BrReport, no leiaute retrato da
-NT 2026.010 (IBS, CBS e IS).
+DANFE da NF-e (modelo 55) impresso com o BrReport a partir de um modelo .brt,
+no leiaute da NT 2026.010 (IBS, CBS e IS).
 
-O leiaute fica embutido na biblioteca. Para personalizar, grave-o com
-salvarModelo(), altere o arquivo .brt no brdesigner e informe-o em
-caminhoArquivo(). Os dados chegam ao modelo por variáveis do relatório
-e pelas fontes de dados "itens", "duplicatas", "volumes" e "locais".
-Mantenha os nomes dos objetos "barcodeChave", "barcodeContingencia",
-"qrCode", "logo", "infCpl" e "dadosAdicionais", preenchidos pelo código.
+O modelo não acompanha a biblioteca: informe o arquivo .brt em
+caminhoArquivo() antes de imprimir. A orientação (retrato ou paisagem)
+é a do modelo; a aplicação escolhe o arquivo, por exemplo pelo tpImp da nota.
+
+Os dados chegam ao modelo por variáveis do relatório e pelas fontes de
+dados "itens", "duplicatas", "volumes" e "locais". Mantenha os nomes dos
+objetos "barcodeChave", "barcodeContingencia", "qrCode", "logo", "infCpl"
+e "dadosAdicionais", preenchidos pelo código.
 */
 class CPPDANFEBRREPORT_EXPORT CppDanfeBrReport: public CppDanfe
 {
 public:
     CppDanfeBrReport(const CppNFe *cppnfe, const int &recNo = 0);
+    CppDanfeBrReport(const CppNFe &cppnfe, const int &recNo = 0);
     virtual ~CppDanfeBrReport();
 
-    //modelo .brt opcional. Vazio (padrão) usa o leiaute embutido.
+    //modelo .brt do DANFE (obrigatório).
     virtual void caminhoArquivo(const QString &arquivo);
     virtual void caminhoLogo(const QString &logo);
     //abre a janela de visualização.
@@ -55,12 +58,11 @@ public:
 
     //o canhoto é facultativo (NT 2026.010, item 4.4). Padrão: exibir.
     void exibirCanhoto(const bool &exibir);
+
     //envia para a impressora, com ou sem o diálogo de impressão do sistema.
     bool imprimir(const bool &exibirDialogo = true);
     bool exportarPDF(const QString &arquivo);
-    //grava o leiaute embutido em um arquivo .brt.
-    bool salvarModelo(const QString &arquivo);
-    //descrição da falha quando print(), imprimir(), exportarPDF() ou salvarModelo() não concluem.
+    //descrição da falha quando print(), imprimir() ou exportarPDF() não concluem.
     QString erro() const;
 
 private:
@@ -76,7 +78,7 @@ private:
     QString m_erro;
 
     bool preparar();
-    void montarLeiaute(BrReport &report) const;
+    bool carregarLeiaute(BrReport &report);
     void carregarDados();
     QVariantMap variaveis() const;
     void vincular(BrReport &report);

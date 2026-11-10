@@ -193,13 +193,14 @@ um projeto CMake que inclui a CppBrasil com
 ```cpp
 #include <DanfeBrReport/CppDanfeBrReport>
 
-CppDanfeBrReport danfe(cppnfe, 0);     // nota de índice 0 em cppnfe->notafiscal->NFe
+CppDanfeBrReport danfe(cppnfe, 0);     // ponteiro ou referência; nota de índice 0 em cppnfe->notafiscal->NFe
+danfe.caminhoArquivo("danfe.brt");    // modelo do BrReport (obrigatório)
 danfe.caminhoLogo("logo.png");         // opcional
 danfe.exportarPDF("danfe.pdf");        // ou print() para a visualização, imprimir() para a impressora
 ```
 
-O leiaute fica embutido na biblioteca. Para personalizá-lo, grave-o com `salvarModelo("danfe.brt")`, altere o arquivo no
-`brdesigner` do BrReport e informe-o em `caminhoArquivo()`.
+O modelo `.brt` não acompanha a biblioteca: ele é criado e editado no `brdesigner` do BrReport. A orientação, retrato ou
+paisagem, é a do modelo informado.
 
 Os XSDs da NF-e não acompanham a biblioteca: informe a pasta deles na configuração (`ConfigNFe::arquivos`) para que a
 assinatura e a validação funcionem.

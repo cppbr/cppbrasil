@@ -20,27 +20,12 @@ limitations under the License.
 
 #include "cppdanfebrreport.h"
 
-#include <initializer_list>
 #include <QDebug>
+#include <QFile>
 #include <brreportcore.h>
 #include <brprinting.h>
 
 namespace {
-
-//medidas em milímetros: A4 retrato.
-const double kMargem = 7.0;
-const double kLargura = 210.0 - 2 * kMargem;
-const double kLinha = 6.6;   //altura de uma linha de campos
-const double kTitulo = 3.6;  //altura do título de um quadro
-const double kEspaco = 1.0;  //espaço acima de cada quadro
-const double kTraco = 0.2;
-const double kItem = 9.4;    //altura mínima da linha de um item
-//tamanhos de fonte em pontos.
-const double kPtRotulo = 5.0;
-const double kPtValor = 7.5;
-const double kPtTitulo = 6.5;
-const double kPtItem = 5.5;
-const double kPtTributo = 5.0;
 
 QFont fonte(const double &pt, const bool &negrito = false)
 {
@@ -48,528 +33,6 @@ QFont fonte(const double &pt, const bool &negrito = false)
     _f.setPointSizeF(pt);
     _f.setBold(negrito);
     return _f;
-}
-
-BrLabel *rotulo(BrContainer *pai, const double &x, const double &y, const double &w, const double &h,
-                const QString &texto, const double &pt, const bool &negrito = false,
-                const Br::TextAlign &alinhamento = Br::TextAlign::Left)
-{
-    BrLabel *_l = new BrLabel(texto, pai);
-    _l->setGeometry(x, y, w, h);
-    _l->setFont(fonte(pt, negrito));
-    _l->setAlignment(alinhamento);
-    return _l;
-}
-
-//texto vindo de uma variável do relatório ou de um campo da fonte de dados.
-BrDBText *valor(BrContainer *pai, const double &x, const double &y, const double &w, const double &h,
-                const QString &variavel, const double &pt, const bool &negrito = false,
-                const Br::TextAlign &alinhamento = Br::TextAlign::Left)
-{
-    BrDBText *_t = new BrDBText(pai);
-    _t->setDataFormula(variavel);
-    _t->setGeometry(x, y, w, h);
-    _t->setFont(fonte(pt, negrito));
-    _t->setAlignment(alinhamento);
-    _t->setShrinkToFit(true);
-    return _t;
-}
-
-BrLabel *quadro(BrContainer *pai, const double &x, const double &y, const double &w, const double &h)
-{
-    BrLabel *_q = rotulo(pai, x, y, w, h, QString(), kPtRotulo);
-    _q->setBorders(BrBorders::all(kTraco));
-    return _q;
-}
-
-//campo com o rótulo no alto e o valor abaixo. Rótulo iniciado por '=' é uma fórmula.
-void celula(BrContainer *pai, const double &x, const double &y, const double &w, const QString &titulo,
-            const QString &variavel, const Br::TextAlign &alinhamento = Br::TextAlign::Left,
-            const double &h = kLinha)
-{
-    BrCustomText *_r;
-    if (titulo.startsWith(QLatin1Char('=')))
-    {
-        BrDBText *_d = new BrDBText(pai);
-        _d->setDataFormula(titulo.mid(1));
-        _r = _d;
-    }
-    else
-        _r = new BrLabel(titulo, pai);
-
-    _r->setGeometry(x, y, w, h);
-    _r->setFont(fonte(kPtRotulo));
-    _r->setLayout(Br::TextLayout::Top);
-    _r->setPadding(0.5);
-    _r->setBorders(BrBorders::all(kTraco));
-
-    if (!variavel.isEmpty())
-        valor(pai, x + 0.8, y + 2.3, w - 1.6, h - 2.5, variavel, kPtValor, false, alinhamento);
-}
-
-struct Coluna
-{
-    QString titulo;
-    QString variavel;
-    double largura;
-    Br::TextAlign alinhamento = Br::TextAlign::Left;
-};
-
-//linha de campos lado a lado. Retorna o y da linha seguinte.
-double linha(BrContainer *pai, const double &y, std::initializer_list<Coluna> colunas)
-{
-    double _x = 0.0;
-    for (const Coluna &_c : colunas)
-    {
-        celula(pai, _x, y, _c.largura, _c.titulo, _c.variavel, _c.alinhamento);
-        _x += _c.largura;
-    }
-    return y + kLinha;
-}
-
-//título de um quadro. Retorna o y da primeira linha de campos.
-double tituloQuadro(BrContainer *pai, const double &y, const QString &texto, const double &w = kLargura)
-{
-    rotulo(pai, 0, y, w, kTitulo, texto, kPtTitulo, true);
-    return y + kTitulo;
-}
-
-//----------leiaute
-
-void montarCanhoto(BrReport &report)
-{
-    const double _wNumero = 36.0;
-    const double _wTexto = kLargura - _wNumero;
-    const double _h = 15.0;
-
-    BrBand *_b = report.addBand(Br::BandType::Header, _h + 3.0);
-    _b->setObjectName(QStringLiteral("canhoto"));
-    _b->setPrintIf(QStringLiteral("tem_canhoto and page() = 1"));
-    _b->setAutoExpand(false);
-
-    BrDBText *_texto = valor(_b, 0, 0, _wTexto, _h / 2, QStringLiteral("canhoto_texto"), 5.5, true);
-    _texto->setBorders(BrBorders::all(kTraco));
-    _texto->setPadding(0.8);
-    _texto->setWordWrap(true);
-    celula(_b, 0, _h / 2, 40, "DATA DE RECEBIMENTO", QString(), Br::TextAlign::Left, _h / 2);
-    celula(_b, 40, _h / 2, _wTexto - 40, "IDENTIFICAÇÃO E ASSINATURA DO RECEBEDOR", QString(),
-           Br::TextAlign::Left, _h / 2);
-
-    quadro(_b, _wTexto, 0, _wNumero, _h);
-    rotulo(_b, _wTexto, 1.0, _wNumero, 5.0, "NF-e", 10, true, Br::TextAlign::Center);
-    valor(_b, _wTexto, 6.2, _wNumero, 4.0, QStringLiteral("ide_numero"), 7.5, false, Br::TextAlign::Center);
-    valor(_b, _wTexto, 10.2, _wNumero, 4.0, QStringLiteral("ide_serie"), 7.5, false, Br::TextAlign::Center);
-
-    //linha de corte
-    BrDraw *_corte = new BrDraw(Br::DrawKind::HorizontalLine, _b);
-    _corte->setGeometry(0, _h + 0.5, kLargura, 2.0);
-    _corte->setPenStyle(Qt::DashLine);
-    _corte->setPenWidth(kTraco);
-}
-
-//nome e endereço do emitente, com e sem espaço para o logotipo.
-void montarIdentificacaoEmitente(BrBand *banda, const double &x, const double &w, const QString &condicao)
-{
-    BrDBText *_nome = valor(banda, x, 2.0, w, 9.0, QStringLiteral("emit_xNome"), 10, true,
-                            Br::TextAlign::Center);
-    _nome->setWordWrap(true);
-    _nome->setPrintIf(condicao);
-
-    BrDBText *_endereco = valor(banda, x, 11.5, w, 15.0, QStringLiteral("emit_endereco"), 7, false,
-                                Br::TextAlign::Center);
-    _endereco->setWordWrap(true);
-    _endereco->setLayout(Br::TextLayout::Top);
-    _endereco->setPrintIf(condicao);
-}
-
-void montarCabecalho(BrReport &report)
-{
-    const double _hId = 28.0;
-    const double _wEmit = 78.0;
-    const double _wDanfe = 34.0;
-    const double _xDanfe = _wEmit;
-    const double _xChave = _wEmit + _wDanfe;
-    const double _wChave = kLargura - _xChave;
-
-    BrBand *_b = report.addBand(Br::BandType::Header, _hId + 3 * kLinha);
-    _b->setObjectName(QStringLiteral("cabecalho"));
-    _b->setAutoExpand(false);
-
-    //----------emitente
-    quadro(_b, 0, 0, _wEmit, _hId);
-    BrImage *_logo = new BrImage(_b);
-    _logo->setObjectName(QStringLiteral("logo"));
-    _logo->setGeometry(1.5, 2.0, 22.0, _hId - 4.0);
-    _logo->setPrintIf(QStringLiteral("tem_logo"));
-    montarIdentificacaoEmitente(_b, 1.0, _wEmit - 2.0, QStringLiteral("not tem_logo"));
-    montarIdentificacaoEmitente(_b, 25.0, _wEmit - 26.0, QStringLiteral("tem_logo"));
-
-    //----------DANFE
-    quadro(_b, _xDanfe, 0, _wDanfe, _hId);
-    rotulo(_b, _xDanfe, 0.8, _wDanfe, 5.0, "DANFE", 12, true, Br::TextAlign::Center);
-    BrLabel *_doc = rotulo(_b, _xDanfe + 1.0, 5.6, _wDanfe - 2.0, 4.6,
-                           "DOCUMENTO AUXILIAR DA NOTA FISCAL ELETRÔNICA", 4.5, false, Br::TextAlign::Center);
-    _doc->setWordWrap(true);
-    rotulo(_b, _xDanfe + 4.0, 10.6, 16.0, 6.0, "0 - ENTRADA\n1 - SAÍDA", 5.5);
-    BrDBText *_tpNF = valor(_b, _xDanfe + 22.0, 10.9, 6.0, 5.4, QStringLiteral("ide_tpNF"), 9, true,
-                            Br::TextAlign::Center);
-    _tpNF->setBorders(BrBorders::all(kTraco));
-    valor(_b, _xDanfe, 17.0, _wDanfe, 4.0, QStringLiteral("ide_numero"), 8, true, Br::TextAlign::Center);
-    valor(_b, _xDanfe, 20.7, _wDanfe, 3.4, QStringLiteral("ide_serie"), 7, true, Br::TextAlign::Center);
-    BrSystemInfo *_folha = new BrSystemInfo(Br::InfoType::PagePreview, _b);
-    _folha->setFormat(QStringLiteral("FOLHA %1/%2"));
-    _folha->setGeometry(_xDanfe, 23.9, _wDanfe, 3.4);
-    _folha->setFont(fonte(7, true));
-    _folha->setAlignment(Br::TextAlign::Center);
-
-    //----------chave de acesso
-    quadro(_b, _xChave, 0, _wChave, 12.5);
-    BrBarcode *_barras = new BrBarcode(Br::BarcodeType::Code128, QString(), _b);
-    _barras->setObjectName(QStringLiteral("barcodeChave"));
-    _barras->setGeometry(_xChave + 4.0, 1.2, _wChave - 8.0, 10.0);
-    _barras->setShowText(false);
-
-    celula(_b, _xChave, 12.5, _wChave, "CHAVE DE ACESSO", QString(), Br::TextAlign::Left, 7.5);
-    valor(_b, _xChave + 1.0, 15.2, _wChave - 2.0, 4.4, QStringLiteral("chave"), 8, true,
-          Br::TextAlign::Center);
-
-    quadro(_b, _xChave, 20.0, _wChave, _hId - 20.0);
-    BrDBText *_consulta = valor(_b, _xChave + 1.0, 20.3, _wChave - 2.0, _hId - 20.6,
-                                QStringLiteral("consulta"), 6, false, Br::TextAlign::Center);
-    _consulta->setWordWrap(true);
-    _consulta->setPrintIf(QStringLiteral("not tem_contingencia_fs"));
-    //segundo código de barras: dados da NF-e em contingência FS-IA e FS-DA.
-    BrBarcode *_barrasCont = new BrBarcode(Br::BarcodeType::Code128, QString(), _b);
-    _barrasCont->setObjectName(QStringLiteral("barcodeContingencia"));
-    _barrasCont->setGeometry(_xChave + 8.0, 20.8, _wChave - 16.0, _hId - 21.6);
-    _barrasCont->setShowText(false);
-    _barrasCont->setPrintIf(QStringLiteral("tem_contingencia_fs"));
-
-    double _y = _hId;
-    _y = linha(_b, _y, {{"NATUREZA DA OPERAÇÃO", "ide_natOp", _xChave},
-                        {"=protocolo_titulo", "protocolo", _wChave, Br::TextAlign::Center}});
-    _y = linha(_b, _y, {{"INSCRIÇÃO ESTADUAL", "emit_IE", 66},
-                        {"INSCRIÇÃO ESTADUAL DO SUBSTITUTO TRIBUTÁRIO", "emit_IEST", 66},
-                        {"CNPJ / CPF", "emit_doc", kLargura - 132}});
-    //o tipo de regime de apuração é um campo reservado: a origem da informação ainda não foi publicada.
-    linha(_b, _y, {{"CÓDIGO DO REGIME TRIBUTÁRIO", "emit_CRT", kLargura / 2},
-                   {"TIPO DE REGIME DE APURAÇÃO DO IBS E DA CBS", "emit_regimeIBSCBS", kLargura / 2}});
-}
-
-void montarDestinatario(BrReport &report)
-{
-    BrBand *_b = report.addBand(Br::BandType::Title, kEspaco + kTitulo + 3 * kLinha);
-    _b->setObjectName(QStringLiteral("destinatario"));
-
-    double _y = tituloQuadro(_b, kEspaco, "DESTINATÁRIO / REMETENTE");
-    _y = linha(_b, _y, {{"NOME / RAZÃO SOCIAL", "dest_xNome", 118},
-                        {"CNPJ / CPF", "dest_doc", 46},
-                        {"DATA DE EMISSÃO", "ide_dEmi", kLargura - 164}});
-    _y = linha(_b, _y, {{"ENDEREÇO", "dest_endereco", 92},
-                        {"BAIRRO / DISTRITO", "dest_bairro", 46},
-                        {"CEP", "dest_CEP", 26},
-                        {"DATA DE ENTRADA / SAÍDA", "ide_dSaiEnt", kLargura - 164}});
-    linha(_b, _y, {{"MUNICÍPIO", "dest_municipio", 70},
-                   {"FONE / FAX", "dest_fone", 32},
-                   {"UF", "dest_UF", 12},
-                   {"INSCRIÇÃO ESTADUAL", "dest_IE", 50},
-                   {"HORA DE SAÍDA", "ide_hSaiEnt", kLargura - 164}});
-}
-
-//os quadros seguintes ficam na primeira página, antes dos itens, na ordem de criação.
-BrSubDetail *novoQuadroInicial(BrReport &report, const QString &nome, const QString &fonteDados = QString())
-{
-    BrSubDetail *_s = new BrSubDetail(&report);
-    _s->setObjectName(nome);
-    _s->setPositioning(Br::BandType::Title);
-    _s->setDataSourceName(fonteDados);
-    return _s;
-}
-
-//local de retirada e local de entrega: um registro para cada um informado.
-void montarLocais(BrReport &report)
-{
-    BrSubDetail *_s = novoQuadroInicial(report, QStringLiteral("quadroLocais"), QStringLiteral("locais"));
-    BrBand *_b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + 2 * kLinha);
-
-    valor(_b, 0, kEspaco, kLargura, kTitulo, QStringLiteral("local_titulo"), kPtTitulo, true);
-    double _y = kEspaco + kTitulo;
-    _y = linha(_b, _y, {{"NOME / RAZÃO SOCIAL", "local_xNome", 118},
-                        {"CNPJ / CPF", "local_doc", 46},
-                        {"INSCRIÇÃO ESTADUAL", "local_IE", kLargura - 164}});
-    linha(_b, _y, {{"ENDEREÇO", "local_endereco", 74},
-                   {"BAIRRO / DISTRITO", "local_bairro", 34},
-                   {"CEP", "local_CEP", 18},
-                   {"MUNICÍPIO", "local_municipio", 36},
-                   {"UF", "local_UF", 8},
-                   {"FONE / FAX", "local_fone", kLargura - 170}});
-}
-
-//três duplicatas por linha. Sem registros, o quadro não é impresso.
-void montarDuplicatas(BrReport &report)
-{
-    BrSubDetail *_s = novoQuadroInicial(report, QStringLiteral("quadroDuplicatas"),
-                                        QStringLiteral("duplicatas"));
-    BrBand *_t = _s->addBand(Br::BandType::Title, kEspaco + kTitulo);
-    tituloQuadro(_t, kEspaco, "FATURA / DUPLICATAS");
-
-    BrBand *_b = _s->addBand(Br::BandType::Detail, kLinha);
-    _b->setColumns(3);
-    const double _w = kLargura / 3;
-    const double _wData = 19.0;
-    const double _wValor = 21.0;
-    celula(_b, 0, 0, _w - _wData - _wValor, "FATURA/DUPLICATA", "dup_numero");
-    celula(_b, _w - _wData - _wValor, 0, _wData, "VENCIMENTO", "dup_vencimento");
-    celula(_b, _w - _wValor, 0, _wValor, "VALOR", "dup_valor");
-}
-
-void montarTotais(BrReport &report)
-{
-    BrSubDetail *_s = novoQuadroInicial(report, QStringLiteral("quadroTotais"));
-    const double _w5 = kLargura / 5;
-    const double _w4 = kLargura / 4;
-
-    //----------total dos produtos e total da nota
-    BrBand *_b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + 2 * kLinha);
-    _b->setObjectName(QStringLiteral("totalNota"));
-    double _y = tituloQuadro(_b, kEspaco, "TOTAL DOS PRODUTOS E TOTAL DA NOTA");
-    _y = linha(_b, _y, {{"VALOR TOTAL DOS PRODUTOS", "tot_vProd", _w5},
-                        {"VALOR DO FRETE", "tot_vFrete", _w5},
-                        {"VALOR DO SEGURO", "tot_vSeg", _w5},
-                        {"DESCONTO", "tot_vDesc", _w5},
-                        {"OUTRAS DESPESAS ACESSÓRIAS", "tot_vOutro", _w5}});
-    linha(_b, _y, {{"VALOR TOTAL DA NOTA", "tot_vNF", kLargura}});
-
-    //----------total do ICMS / IPI
-    _b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + kLinha);
-    _b->setObjectName(QStringLiteral("totalICMS"));
-    _y = tituloQuadro(_b, kEspaco, "TOTAL DO ICMS / IPI");
-    linha(_b, _y, {{"BASE DE CÁLCULO DO ICMS", "tot_vBC", _w5},
-                   {"VALOR DO ICMS", "tot_vICMS", _w5},
-                   {"BASE DE CÁLCULO DO ICMS ST", "tot_vBCST", _w5},
-                   {"VALOR DO ICMS ST", "tot_vST", _w5},
-                   {"VALOR DO IPI", "tot_vIPI", _w5}});
-
-    //linhas facultativas: impressas quando algum de seus valores existe no XML.
-    _b = _s->addBand(Br::BandType::Detail, kLinha);
-    _b->setObjectName(QStringLiteral("totalFCP"));
-    _b->setPrintIf(QStringLiteral("tem_fcp_difal"));
-    linha(_b, 0, {{"VALOR DO FCP", "tot_vFCP", _w4},
-                  {"VALOR DO FCP RETIDO POR ST", "tot_vFCPST", _w4},
-                  {"VALOR DO DIFAL NA UF DE DESTINO", "tot_vICMSUFDest", _w4},
-                  {"VALOR DO FCP NA UF DE DESTINO", "tot_vFCPUFDest", _w4}});
-
-    _b = _s->addBand(Br::BandType::Detail, kLinha);
-    _b->setObjectName(QStringLiteral("totalICMSMono"));
-    _b->setPrintIf(QStringLiteral("tem_icms_mono"));
-    linha(_b, 0, {{"BC DO ICMS MONOFÁSICO", "tot_qBCMono", _w4},
-                  {"VALOR DO ICMS MONOFÁSICO", "tot_vICMSMono", _w4},
-                  {"BC DO ICMS MONOFÁSICO POR RETENÇÃO", "tot_qBCMonoReten", _w4},
-                  {"VALOR DO ICMS MONOFÁSICO POR RETENÇÃO", "tot_vICMSMonoReten", _w4}});
-
-    //----------total do IBS / CBS / IS
-    _b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + kLinha);
-    _b->setObjectName(QStringLiteral("totalIBSCBS"));
-    _y = tituloQuadro(_b, kEspaco, "TOTAL DO IBS / CBS / IS");
-    linha(_b, _y, {{"VALOR DA CBS", "tot_vCBS", _w4},
-                   {"VALOR DO IBS UF", "tot_vIBSUF", _w4},
-                   {"VALOR DO IBS MUNICÍPIO", "tot_vIBSMun", _w4},
-                   {"VALOR DO IMPOSTO SELETIVO", "tot_vIS", _w4}});
-
-    _b = _s->addBand(Br::BandType::Detail, kLinha);
-    _b->setObjectName(QStringLiteral("totalIBSCBSMono"));
-    _b->setPrintIf(QStringLiteral("tem_ibscbs_mono"));
-    linha(_b, 0, {{"VALOR DO IBS MONOFÁSICO", "tot_vIBSMono", _w4},
-                  {"VALOR DA CBS MONOFÁSICA", "tot_vCBSMono", _w4},
-                  {"VALOR DO IBS MONOFÁSICO POR RETENÇÃO", "tot_vIBSMonoReten", _w4},
-                  {"VALOR DA CBS MONOFÁSICA POR RETENÇÃO", "tot_vCBSMonoReten", _w4}});
-
-    //----------cálculo do ISSQN
-    _b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + kLinha);
-    _b->setObjectName(QStringLiteral("totalISSQN"));
-    _b->setPrintIf(QStringLiteral("tem_issqn"));
-    _y = tituloQuadro(_b, kEspaco, "CÁLCULO DO ISSQN");
-    linha(_b, _y, {{"INSCRIÇÃO MUNICIPAL", "emit_IM", _w4},
-                   {"VALOR TOTAL DOS SERVIÇOS", "tot_vServ", _w4},
-                   {"BASE DE CÁLCULO DO ISSQN", "tot_vBCISS", _w4},
-                   {"VALOR DO ISSQN", "tot_vISS", _w4}});
-
-    //----------transportador
-    _b = _s->addBand(Br::BandType::Detail, kEspaco + kTitulo + 2 * kLinha);
-    _b->setObjectName(QStringLiteral("transportador"));
-    _b->setPrintIf(QStringLiteral("tem_transp"));
-    _y = tituloQuadro(_b, kEspaco, "TRANSPORTADOR / VOLUMES TRANSPORTADOS");
-    _y = linha(_b, _y, {{"RAZÃO SOCIAL", "transp_xNome", 62},
-                        {"FRETE POR CONTA", "transp_modFrete", 36},
-                        {"CÓDIGO ANTT", "transp_RNTC", 26},
-                        {"PLACA DO VEÍCULO", "transp_placa", 24},
-                        {"UF", "transp_veicUF", 10},
-                        {"CNPJ / CPF", "transp_doc", kLargura - 158}});
-    linha(_b, _y, {{"ENDEREÇO", "transp_endereco", 84},
-                   {"MUNICÍPIO", "transp_municipio", 54},
-                   {"UF", "transp_UF", 10},
-                   {"INSCRIÇÃO ESTADUAL", "transp_IE", kLargura - 148}});
-}
-
-//volumes transportados: continuação do quadro do transportador.
-void montarVolumes(BrReport &report)
-{
-    BrSubDetail *_s = novoQuadroInicial(report, QStringLiteral("quadroVolumes"), QStringLiteral("volumes"));
-    BrBand *_b = _s->addBand(Br::BandType::Detail, kLinha);
-    linha(_b, 0, {{"QUANTIDADE", "vol_qVol", 24},
-                  {"ESPÉCIE", "vol_esp", 40},
-                  {"MARCA", "vol_marca", 40},
-                  {"NUMERAÇÃO", "vol_nVol", 36},
-                  {"PESO BRUTO", "vol_pesoB", 28},
-                  {"PESO LÍQUIDO", "vol_pesoL", kLargura - 168}});
-}
-
-//colunas do quadro de itens. A soma das larguras é a largura útil da página.
-struct ColunaItem
-{
-    const char *titulo;
-    double largura;
-};
-const ColunaItem kColunasItem[] = {
-    {"DESCRIÇÃO DO PRODUTO / SERVIÇO", 38.0},
-    {"CST /\nCFOP", 12.0},
-    {"QTD / UN", 16.0},
-    {"VLR UNIT", 17.0},
-    {"VLR TOTAL", 17.0},
-    {"BASES DE CÁLCULO", 28.0},
-    {"ALÍQUOTAS", 31.0},
-    {"VALOR DOS TRIBUTOS", 37.0},
-};
-
-//texto de várias linhas em uma coluna do item.
-BrDBText *textoItem(BrBand *banda, const double &x, const double &w, const QString &campo, const double &pt,
-                    const Br::TextAlign &alinhamento)
-{
-    BrDBText *_t = new BrDBText(banda);
-    _t->setDataFormula(campo);
-    _t->setGeometry(x, 0, w, kItem);
-    _t->setFont(fonte(pt));
-    _t->setAlignment(alinhamento);
-    _t->setLayout(Br::TextLayout::Top);
-    _t->setPadding(0.6);
-    return _t;
-}
-
-//nomes dos tributos à esquerda e valores à direita, linha a linha.
-void tributosItem(BrBand *banda, const double &x, const double &w, const QString &nomes, const QString &campo)
-{
-    BrLabel *_n = rotulo(banda, x, 0, w, kItem, nomes, kPtTributo);
-    _n->setLayout(Br::TextLayout::Top);
-    _n->setPadding(0.6);
-    textoItem(banda, x, w, campo, kPtTributo, Br::TextAlign::Right);
-}
-
-void montarItens(BrReport &report)
-{
-    //sub-relatório: o cabeçalho das colunas se repete em cada página e nunca fica sozinho
-    //no pé da página, sem ao menos um item abaixo dele.
-    BrSubDetail *_s = new BrSubDetail(&report);
-    _s->setObjectName(QStringLiteral("quadroItens"));
-    _s->setDataSourceName(QStringLiteral("itens"));
-    _s->setKeepHeaderWithDetail(true);
-
-    //----------cabeçalho das colunas
-    const double _hColunas = 5.0;
-    BrBand *_c = _s->addBand(Br::BandType::ColumnHeader, kEspaco + kTitulo + _hColunas);
-    _c->setObjectName(QStringLiteral("itensCabecalho"));
-    _c->setAutoExpand(false);
-    tituloQuadro(_c, kEspaco, "DADOS DOS PRODUTOS / SERVIÇOS");
-
-    BrBand *_b = _s->addBand(Br::BandType::Detail, kItem);
-    _b->setObjectName(QStringLiteral("itens"));
-
-    double _x[8];
-    double _pos = 0.0;
-    for (int _i = 0; _i < 8; ++_i)
-    {
-        const ColunaItem &_col = kColunasItem[_i];
-        _x[_i] = _pos;
-        BrLabel *_t = rotulo(_c, _pos, kEspaco + kTitulo, _col.largura, _hColunas,
-                             QString::fromUtf8(_col.titulo), kPtRotulo, true, Br::TextAlign::Center);
-        _t->setBorders(BrBorders::all(kTraco));
-
-        //moldura da coluna: acompanha a altura da linha do item.
-        BrLabel *_moldura = quadro(_b, _pos, 0, _col.largura, kItem);
-        _moldura->setStretchToBand(true);
-        _pos += _col.largura;
-    }
-
-    BrDBMemo *_descricao = new BrDBMemo(_b);
-    _descricao->setDataFormula(QStringLiteral("prod_descricao"));
-    _descricao->setGeometry(_x[0], 0, kColunasItem[0].largura, kItem);
-    _descricao->setFont(fonte(kPtItem));
-    _descricao->setPadding(0.6);
-
-    tributosItem(_b, _x[1], kColunasItem[1].largura, "CST\nCFOP", QStringLiteral("prod_cst_cfop"));
-    textoItem(_b, _x[2], kColunasItem[2].largura, QStringLiteral("prod_qtd"), kPtItem, Br::TextAlign::Center);
-    textoItem(_b, _x[3], kColunasItem[3].largura, QStringLiteral("prod_vUnCom"), kPtItem,
-              Br::TextAlign::Right)->setShrinkToFit(true);
-    textoItem(_b, _x[4], kColunasItem[4].largura, QStringLiteral("prod_vProd"), kPtItem,
-              Br::TextAlign::Right)->setShrinkToFit(true);
-    tributosItem(_b, _x[5], kColunasItem[5].largura, "ICMS\nIBS / CBS\nIS\nIPI", QStringLiteral("prod_bases"));
-
-    const double _wAliq = kColunasItem[6].largura / 2;
-    tributosItem(_b, _x[6], _wAliq, "ICMS\nIBS UF\nIBS MUN", QStringLiteral("prod_aliq_esq"));
-    tributosItem(_b, _x[6] + _wAliq, _wAliq, "CBS\nIPI\nIS", QStringLiteral("prod_aliq_dir"));
-
-    const double _wVal = kColunasItem[7].largura / 2;
-    tributosItem(_b, _x[7], _wVal, "ICMS\nIBS UF\nIBS MUN", QStringLiteral("prod_valor_esq"));
-    tributosItem(_b, _x[7] + _wVal, _wVal, "CBS\nIPI\nIS", QStringLiteral("prod_valor_dir"));
-}
-
-//rodapé da primeira página: informações complementares, reservado ao fisco e QR Code.
-void montarDadosAdicionais(BrReport &report)
-{
-    const double _hQuadro = 27.0;
-    const double _wInfo = 116.0;
-    const double _wQr = 36.0;
-    const double _y = kEspaco + kTitulo;
-
-    BrBand *_b = report.addBand(Br::BandType::Footer, _y + _hQuadro);
-    _b->setObjectName(QStringLiteral("dadosAdicionais"));
-    _b->setPrintIf(QStringLiteral("page() = 1"));
-    _b->setAutoExpand(false);
-
-    tituloQuadro(_b, kEspaco, "DADOS ADICIONAIS", kLargura - _wQr);
-    BrLabel *_tituloQr = rotulo(_b, kLargura - _wQr, kEspaco, _wQr, kTitulo, "QR CODE", kPtTitulo, true,
-                                Br::TextAlign::Center);
-    _tituloQr->setPrintIf(QStringLiteral("tem_qrcode"));
-
-    celula(_b, 0, _y, _wInfo, "INFORMAÇÕES COMPLEMENTARES", QString(), Br::TextAlign::Left, _hQuadro);
-    BrDBMemo *_info = new BrDBMemo(_b);
-    _info->setObjectName(QStringLiteral("infCpl"));
-    _info->setDataFormula(QStringLiteral("infCpl"));
-    _info->setGeometry(0.8, _y + 2.6, _wInfo - 1.6, _hQuadro - 3.0);
-    _info->setFont(fonte(6));
-    _info->setAutoStretch(false);
-    _info->setShrinkToFit(true);
-
-    //o quadro do fisco ocupa a área do QR Code quando a nota não tem um.
-    BrLabel *_fisco = new BrLabel("RESERVADO AO FISCO", _b);
-    _fisco->setGeometry(_wInfo, _y, kLargura - _wInfo - _wQr, _hQuadro);
-    _fisco->setPrintIf(QStringLiteral("tem_qrcode"));
-    BrLabel *_fiscoLargo = new BrLabel("RESERVADO AO FISCO", _b);
-    _fiscoLargo->setGeometry(_wInfo, _y, kLargura - _wInfo, _hQuadro);
-    _fiscoLargo->setPrintIf(QStringLiteral("not tem_qrcode"));
-    for (BrLabel *_l : {_fisco, _fiscoLargo})
-    {
-        _l->setFont(fonte(kPtRotulo));
-        _l->setLayout(Br::TextLayout::Top);
-        _l->setPadding(0.5);
-        _l->setBorders(BrBorders::all(kTraco));
-    }
-
-    BrLabel *_quadroQr = quadro(_b, kLargura - _wQr, _y, _wQr, _hQuadro);
-    _quadroQr->setPrintIf(QStringLiteral("tem_qrcode"));
-    BrBarcode *_qr = new BrBarcode(Br::BarcodeType::QrCode, QString(), _b);
-    _qr->setObjectName(QStringLiteral("qrCode"));
-    _qr->setGeometry(kLargura - _wQr + 0.5, _y + 0.5, _wQr - 1.0, _hQuadro - 1.0);
-    _qr->setPrintIf(QStringLiteral("tem_qrcode"));
 }
 
 //----------formatação
@@ -699,8 +162,34 @@ CppDanfeBrReport::CppDanfeBrReport(const CppNFe *cppnfe, const int &recNo): CppD
 {
 }
 
+CppDanfeBrReport::CppDanfeBrReport(const CppNFe &cppnfe, const int &recNo): CppDanfeBrReport(&cppnfe, recNo)
+{
+}
+
 CppDanfeBrReport::~CppDanfeBrReport()
 {
+}
+
+bool CppDanfeBrReport::carregarLeiaute(BrReport &report)
+{
+    const QString &_arquivo = this->m_pathArquivo;
+    if (_arquivo.isEmpty())
+    {
+        this->m_erro = QStringLiteral("Informe o modelo .brt do DANFE em caminhoArquivo().");
+        return false;
+    }
+    if (!QFile::exists(_arquivo))
+    {
+        this->m_erro = QStringLiteral("Modelo do DANFE não encontrado: %1").arg(_arquivo);
+        return false;
+    }
+    if (!report.load(_arquivo))
+    {
+        this->m_erro = QStringLiteral("Não foi possível carregar o modelo %1: %2")
+                           .arg(_arquivo, report.errorString());
+        return false;
+    }
+    return true;
 }
 
 void CppDanfeBrReport::caminhoArquivo(const QString &arquivo)
@@ -750,19 +239,6 @@ bool CppDanfeBrReport::exportarPDF(const QString &arquivo)
     return true;
 }
 
-bool CppDanfeBrReport::salvarModelo(const QString &arquivo)
-{
-    this->m_erro.clear();
-    BrReport _report;
-    montarLeiaute(_report);
-    if (!_report.save(arquivo))
-    {
-        this->m_erro = QStringLiteral("Não foi possível gravar o arquivo %1").arg(arquivo);
-        return false;
-    }
-    return true;
-}
-
 bool CppDanfeBrReport::preparar()
 {
     this->m_erro.clear();
@@ -775,13 +251,8 @@ bool CppDanfeBrReport::preparar()
     carregarDados();
 
     m_report.reset(new BrReport);
-    if (this->m_pathArquivo.isEmpty())
-        montarLeiaute(*m_report);
-    else if (!m_report->load(this->m_pathArquivo))
-    {
-        this->m_erro = QStringLiteral("Não foi possível carregar o modelo %1").arg(this->m_pathArquivo);
+    if (!carregarLeiaute(*m_report))
         return false;
-    }
 
     vincular(*m_report);
 
@@ -791,29 +262,6 @@ bool CppDanfeBrReport::preparar()
         return false;
     }
     return true;
-}
-
-void CppDanfeBrReport::montarLeiaute(BrReport &report) const
-{
-    report.setTitle(QStringLiteral("DANFE"));
-    report.setPageSize(QPageSize::A4);
-    report.setOrientation(QPageLayout::Portrait);
-    report.setMargins(kMargem, kMargem, kMargem, kMargem);
-    report.setFont(fonte(kPtValor));
-    report.setLocaleName(QStringLiteral("pt_BR"));
-
-    //páginas: canhoto (só na primeira) e cabeçalho; quadros da primeira página;
-    //itens; dados adicionais no rodapé da primeira página. O relatório não tem
-    //fonte de dados principal: os itens vêm do sub-relatório "quadroItens".
-    montarCanhoto(report);
-    montarCabecalho(report);
-    montarDestinatario(report);
-    montarLocais(report);
-    montarDuplicatas(report);
-    montarTotais(report);
-    montarVolumes(report);
-    montarItens(report);
-    montarDadosAdicionais(report);
 }
 
 void CppDanfeBrReport::carregarDados()

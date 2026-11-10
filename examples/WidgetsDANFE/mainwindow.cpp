@@ -83,6 +83,8 @@ void MainWindow::imprimirDANFE(const CppNFe *cppnfe)
 {
     //o DANFE com o BrReport atende a NF-e (modelo 55).
     CppDanfeBrReport danfe(cppnfe, 0);
+    //modelo .brt do DANFE: retrato ou paisagem, conforme o tpImp da nota.
+    danfe.caminhoArquivo("C:/cppbrasil/DanfeBrReport-Retrato.brt");
     //danfe.caminhoLogo("C:/cppbrasil/suaLogo.jpg");
     if (cppnfe->notafiscal->retorno->protNFe->count() > 0)
     {
