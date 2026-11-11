@@ -27,8 +27,27 @@ include(GNUInstallDirs)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Network)
 
-add_subdirectory(CppBase)
+#Dependências dos arquivos comuns (CppBase), compilados dentro da CppNFe. Ficam aqui porque
+#os alvos importados do find_package só são visíveis na pasta em que foram localizados.
+find_package(LibXml2 REQUIRED)
+if (CMAKE_SYSTEM MATCHES "Windows")
+    #informe os diretórios em CMAKE_PREFIX_PATH (libxml2) e OPENSSL_ROOT_DIR (OpenSSL).
+    #O libiconv só é necessário se a libxml2 tiver sido compilada com ele; o alvo
+    #LibXml2::LibXml2 já traz as dependências da própria libxml2.
+    find_package(OpenSSL 1.1.1 REQUIRED)
+    find_package(ZLIB QUIET)
+    if (ZLIB_FOUND)
+        set(CPPBASE_ZLIB ZLIB::ZLIB)
+    else()
+        #sem zlib instalada, usa a zlib que acompanha o Qt
+        find_package(Qt6 REQUIRED COMPONENTS ZlibPrivate)
+        set(CPPBASE_ZLIB Qt6::ZlibPrivate)
+    endif()
+endif()
+
+#A CppNFe é criada primeiro; a CppBase acrescenta a ela os fontes comuns (biblioteca única)
 add_subdirectory(CppNFe)
+add_subdirectory(CppBase)
 
 if(CPPBRASIL_BUILD_DANFE)
     add_subdirectory(CppDanfe)

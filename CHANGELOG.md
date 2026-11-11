@@ -8,6 +8,11 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Alterado
 
+- **Quebra de compatibilidade:** a `CppBase` deixa de ser uma biblioteca
+  separada. Os arquivos comuns de `CppBase/` passam a ser compilados dentro
+  da `CppNFe`, que gera uma única biblioteca (`CppNFe.dll` no Windows,
+  `libCppNFe.so` no Linux). Ligue apenas `-lCppNFe` e remova `-lCppBase`; os
+  includes `<CppBase/...>` continuam iguais.
 - A distribuição Windows x64 da CrossNFe e dos exemplos em C# e Java
   passa a usar binários MSVC com OpenSSL 3.5.9.
 

@@ -23,7 +23,8 @@ limitations under the License.
 
 #include <QtCore/qglobal.h>
 
-#if defined(CPPBASE_LIBRARY)
+//Os arquivos comuns (CppBase) são compilados dentro da CppNFe
+#if defined(CPPBASE_LIBRARY) || defined(CPPNFE_LIBRARY)
 #  define CPPBASE_EXPORT Q_DECL_EXPORT
 #else
 #  define CPPBASE_EXPORT Q_DECL_IMPORT

@@ -10,8 +10,7 @@ eletrônicos brasileiros.
 
 | Biblioteca | Pasta | Função |
 |---|---|---|
-| `CppBase` | `CppBase/` | Base comum: XML (libxml2), criptografia e certificado (OpenSSL), HTTP e utilitários. Obrigatória. |
-| `CppNFe` | `CppNFe/` | Geração, leitura, assinatura, validação e transmissão de NF-e (modelo 55) e NFC-e (modelo 65). |
+| `CppNFe` | `CppNFe/` e `CppBase/` | Geração, leitura, assinatura, validação e transmissão de NF-e (modelo 55) e NFC-e (modelo 65). Inclui a base comum de `CppBase/`: XML (libxml2), criptografia e certificado (OpenSSL), HTTP e utilitários, compilada dentro da própria `CppNFe`. |
 | `CppDanfe` | `CppDanfe/` | Dados e regras do DANFE. Opcional. |
 | `CppDanfeBrReport` | `DanfeBrReport/` | Impressão do DANFE da NF-e com o [BrReport](https://github.com/cppbr/BrReport), no leiaute da NT 2026.010. Opcional. |
 
@@ -169,8 +168,8 @@ Para instalar, configure também `-DCMAKE_INSTALL_PREFIX=C:\deps\cppbrasil` e ro
 
 ### 5. Executar
 
-A aplicação precisa encontrar, no `PATH` ou na própria pasta do executável, as DLLs da CppBrasil (`CppBase.dll`,
-`CppNFe.dll`), do Qt (ou use o `windeployqt`), da libxml2 (`libxml2.dll`) e do OpenSSL (`libcrypto-3-x64.dll` e
+A aplicação precisa encontrar, no `PATH` ou na própria pasta do executável, a DLL da CppBrasil (`CppNFe.dll`;
+`libCppNFe.dll` no MinGW), do Qt (ou use o `windeployqt`), da libxml2 (`libxml2.dll`) e do OpenSSL (`libcrypto-3-x64.dll` e
 `libssl-3-x64.dll`). Com o DANFE no BrReport, também `CppDanfe.dll`, `CppDanfeBrReport.dll`, `brreportcore.dll` e
 `brreportwidgets.dll`.
 
@@ -186,8 +185,8 @@ A aplicação precisa encontrar, no `PATH` ou na própria pasta do executável, 
 ## Uso na aplicação
 
 Os includes seguem o nome do módulo (`<CppNFe/...>`, `<CppBase/...>`, `<CppDanfe/...>` e `<DanfeBrReport/...>`), e
-a `CppBase` é obrigatória: ligue `-lCppNFe -lCppBase`. Para o DANFE, use
-`-lCppDanfeBrReport -lCppDanfe -lCppNFe -lCppBase` (os cabeçalhos do BrReport não são necessários na aplicação). Em
+os arquivos de `CppBase/` fazem parte da `CppNFe`: ligue apenas `-lCppNFe`. Para o DANFE, use
+`-lCppDanfeBrReport -lCppDanfe -lCppNFe` (os cabeçalhos do BrReport não são necessários na aplicação). Em
 um projeto CMake que inclui a CppBrasil com
 `add_subdirectory`, basta ligar ao alvo `CppNFe` ou `CppDanfeBrReport`.
 

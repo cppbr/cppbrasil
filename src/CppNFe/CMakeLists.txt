@@ -205,7 +205,6 @@ add_library(CppNFe SHARED
 )
 
 target_compile_definitions(CppNFe PRIVATE CPPNFE_LIBRARY)
-target_link_libraries(CppNFe PUBLIC CppBase)
 
 get_target_property(cppnfe_SOURCES CppNFe SOURCES)
 list(FILTER cppnfe_SOURCES INCLUDE REGEX "\\.h$")
