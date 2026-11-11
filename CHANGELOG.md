@@ -6,6 +6,11 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ## [Não publicado]
 
+### Alterado
+
+- A distribuição Windows x64 da CrossNFe e dos exemplos em C# e Java
+  passa a usar binários MSVC com OpenSSL 3.5.9.
+
 ### Adicionado
 
 #### Exemplos de emissão com CrossNFe

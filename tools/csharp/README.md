@@ -14,11 +14,13 @@ Antes de executar, coloque as DLLs abaixo ao lado de `crossnfe.dll` ou em um dir
 
 | Componente | DLLs |
 | --- | --- |
-| CppBrasil | `libCppBase.dll`, `libCppNFe.dll` |
+| CppBrasil, build MSVC | `CppBase.dll`, `CppNFe.dll` |
 | Qt 6 | `Qt6Core.dll`, `Qt6Network.dll` |
 | libxml2 | `libxml2.dll` |
-| OpenSSL 1.1 | `libcrypto-1_1-x64.dll`, `libssl-1_1-x64.dll` |
-| Runtime LLVM-MinGW | `libc++.dll`, `libunwind.dll` |
+| OpenSSL 3 | `libcrypto-3-x64.dll`, `libssl-3-x64.dll` |
+| Microsoft Visual C++ Redistributable x64 | `MSVCP140.dll`, `MSVCP140_1.dll`, `VCRUNTIME140.dll`, `VCRUNTIME140_1.dll` |
+
+As DLLs do CppBrasil estão na pasta pai deste exemplo. A compilação usa OpenSSL 3.5.9, Qt do kit `msvc2022_64` e libxml2 para MSVC.
 
 O exemplo preenche uma NF-e modelo 55 com dados fictícios, dois produtos e total de R$ 125,00. Ele gera o XML e confere os dados por releitura. O fluxo local termina antes da transmissão à SEFAZ.
 
