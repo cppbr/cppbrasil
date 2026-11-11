@@ -8,6 +8,13 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Exemplos de emissão com CrossNFe
+
+- Exemplos em C# (.NET 10) e Java (JDK 22+) para gerar e reler o XML de
+  uma NF-e modelo 55, com opção de assinar e validar pelo XSD. Os exemplos
+  incluem a DLL nativa da CrossNFe, os bindings de cada linguagem e
+  instruções para configurar as dependências no Windows x64.
+
 #### Exemplo consoleNFe
 
 - Use o exemplo `consoleNFe`, em `examples/`, para gerar, assinar, validar e
