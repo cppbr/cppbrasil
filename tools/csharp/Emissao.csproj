@@ -4,6 +4,13 @@
     <Reference Include="CrossNFe.Managed">
       <HintPath>CrossNFe.Managed.dll</HintPath>
     </Reference>
-    <None Update="*.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <!-- Windows x64: crossnfe.dll fica nesta pasta. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <None Update="crossnfe.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <!-- Linux x64: as bibliotecas ficam na pasta pai e são copiadas para a saída. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <None Include="../libcrossnfe.so;../libCppNFe.so" Link="%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

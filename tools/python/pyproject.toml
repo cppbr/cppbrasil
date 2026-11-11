@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crossnfe"
+version = "0.1.0"
+description = "Acesso à CppNFe (NF-e) em Python pela biblioteca nativa da CrossNFe"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+license-files = ["licencas/*.txt"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+]
+
+[tool.setuptools]
+packages = ["crossnfe"]
+
+[tool.setuptools.package-data]
+crossnfe = ["py.typed"]

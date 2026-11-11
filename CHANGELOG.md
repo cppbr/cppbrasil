@@ -26,6 +26,14 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
   uma NF-e modelo 55, com opção de assinar e validar pelo XSD. Os exemplos
   incluem a DLL nativa da CrossNFe, os bindings de cada linguagem e
   instruções para configurar as dependências no Windows x64.
+- Distribuição Linux x64 da CrossNFe em `tools/`: `libcrossnfe.so` e
+  `libCppNFe.so` (RUNPATH `$ORIGIN`, Qt 6.12+). Os exemplos em C# e Java
+  passam a funcionar também no Linux, com scripts `executar.sh`; o projeto
+  C# copia as bibliotecas Linux para a saída da compilação.
+- Binding Python da CrossNFe em `tools/python` (pacote `crossnfe`, só
+  `ctypes`, Windows x64 e Linux x64), com modelos tipados gerados a partir
+  dos cabeçalhos, coleções iteráveis, exemplo de emissão equivalente aos de
+  C# e Java, testes e `pyproject.toml`. Os três exemplos geram o mesmo XML.
 
 #### Exemplo consoleNFe
 
