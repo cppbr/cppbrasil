@@ -20,7 +20,20 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
 
 ### Adicionado
 
+#### Exemplo Qt Widgets
+
+- Configure a biblioteca e o emitente em abas com persistência em INI.
+  Gere, assine, valide pelo XSD e envie a mesma nota em etapas. A aba
+  Eventos reúne status do serviço, consulta da nota, cancelamento e
+  inutilização. A lógica de emissão e de eventos é compartilhada com o
+  exemplo de console, e os dados fixos da nota podem ser editados em
+  um cabeçalho comum.
+
 #### Exemplos de emissão com CrossNFe
+
+- Exemplo em PHP CLI com FFI para gerar e reler a NF-e modelo 55 com a
+  mesma configuração e os mesmos itens do exemplo em C#. Inclui
+  assinatura opcional com certificado de teste e validação pelo XSD.
 
 - Exemplos em C# (.NET 10) e Java (JDK 22+) para gerar e reler o XML de
   uma NF-e modelo 55, com opção de assinar e validar pelo XSD. Os exemplos

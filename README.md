@@ -205,23 +205,32 @@ paisagem, é a do modelo informado.
 Os XSDs da NF-e não acompanham a biblioteca: informe a pasta deles na configuração (`ConfigNFe::arquivos`) para que a
 assinatura e a validação funcionem.
 
-## Exemplo
+## Exemplos
 
-`examples/` traz um exemplo em modo console que gera, assina, valida e transmite uma NF-e, consulta o status do
-serviço e a situação da nota, cancela e inutiliza. Ele compila a biblioteca junto, a partir de `src/`:
+Os alvos `consoleNFe` e `widgetsNFe` compilam a biblioteca junto, a partir de `src/`.
+O exemplo gráfico requer o módulo Qt Widgets. Use `-DCPPBRASIL_EXAMPLES_WIDGETS=OFF` para compilar só o console.
 
 ```bash
-cmake -S examples -B build/consoleNFe -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -S examples -B build/examples -G Ninja -DCMAKE_BUILD_TYPE=Release
 ```
 
 ```bash
-cmake --build build/consoleNFe
+cmake --build build/examples
 ```
 
-No Windows, acrescente o `CMAKE_PREFIX_PATH` e o `OPENSSL_ROOT_DIR` do passo 4. O executável fica em
-`build/consoleNFe/bin`; copie para essa pasta o `consoleNFe.ini.exemplo` como `consoleNFe.ini` e ajuste os dados do
-emitente, do certificado e a pasta dos XSDs. Rode `consoleNFe --help` para ver os comandos; sem comando, o exemplo abre
-um menu.
+No Windows, acrescente o `CMAKE_PREFIX_PATH` e o `OPENSSL_ROOT_DIR` do passo 4. Os executáveis ficam em
+`build/examples/bin`. Para o console, copie `consoleNFe.ini.exemplo` como `consoleNFe.ini`, ajuste o emitente,
+o certificado e a pasta dos XSDs e rode `consoleNFe --help`. Sem comando, o console abre um menu.
+Para distribuir o exemplo gráfico no Windows, execute `windeployqt build/examples/bin/widgetsNFe.exe` com o kit
+usado na compilação e siga o passo 5 para disponibilizar as demais DLLs.
+
+Para o exemplo gráfico, execute `widgetsNFe`. O caminho do INI aparece na barra de status e pode ser escolhido
+com `widgetsNFe --config arquivo.ini`. Para começar com os dados fictícios do console, copie o modelo
+`consoleNFe.ini.exemplo` para outro arquivo e passe essa cópia com `--config`. Os dados fixos da operação,
+como destinatário, produtos, alíquotas, série padrão e lote, são editados em `examples/nfe.h`. Recompile após editar.
+
+Os valores preenchidos nos campos de senha são gravados no INI. Nos dois exemplos, deixe a senha do certificado
+vazia para usar a variável de ambiente `CPPBR_CERT_SENHA`.
 
 # Avisos importantes
 

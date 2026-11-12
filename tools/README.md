@@ -1,8 +1,8 @@
 # CrossNFe
 
-A CrossNFe é a interface que permite usar a CppNFe em C#, Java, Python e outras linguagens capazes de chamar
+A CrossNFe é a interface que permite usar a CppNFe em C#, Java, Python, PHP e outras linguagens capazes de chamar
 uma biblioteca nativa. O núcleo fiscal continua na CppNFe. A aplicação navega pelos mesmos objetos e coleções
-do C++, com tipagem em cada linguagem.
+do C++.
 
 Versão 0.1.0, ABI 1. Binários para Windows x64 e Linux x64.
 
@@ -17,13 +17,15 @@ Versão 0.1.0, ABI 1. Binários para Windows x64 e Linux x64.
 | [`csharp/`](csharp/README.md) | Exemplo em C# (.NET 10) com o binding `CrossNFe.Managed.dll`. |
 | [`java/`](java/README.md) | Exemplo em Java (JDK 22+, API FFM) com o binding `crossnfe.jar`. |
 | [`python/`](python/README.md) | Binding Python (`crossnfe`, ctypes) com exemplo e testes. |
+| [`php/`](php/README.md) | Exemplo em PHP CLI com FFI e acesso à ABI nativa. |
 
 No Windows, os exemplos em C# e Java trazem a própria cópia da `crossnfe.dll`. No Linux, todos usam as
-bibliotecas desta pasta. Cada exemplo traz as licenças em `licencas/`.
+bibliotecas desta pasta. O exemplo PHP usa os binários desta pasta nas duas plataformas.
 
 ## Início rápido
 
-1. Instale o SDK .NET 10 x64 (C#), um JDK 22+ de 64 bits (Java) ou o Python 3.9+ de 64 bits (Python).
+1. Instale o SDK .NET 10 x64 (C#), um JDK 22+ (Java), o Python 3.9+ ou o PHP CLI 8.1+ com FFI.
+   Use um runtime de 64 bits.
 2. Deixe as dependências nativas da tabela abaixo acessíveis ao carregador do sistema.
 3. Dentro da pasta do exemplo, execute:
 
@@ -35,8 +37,8 @@ bibliotecas desta pasta. Cada exemplo traz as licenças em `licencas/`.
 
 ```bash
 # Linux
-./executar.sh                    # gera o XML e confere por releitura
-./executar.sh --assinar-validar  # também assina e valida pelo XSD
+bash executar.sh                    # gera o XML e confere por releitura
+bash executar.sh --assinar-validar  # também assina e valida pelo XSD
 ```
 
 Para assinar e validar, defina antes as variáveis de ambiente:
@@ -49,7 +51,7 @@ Para assinar e validar, defina antes as variáveis de ambiente:
 | `CROSSNFE_QT_LIB` | Somente Linux: pasta `lib` do Qt 6.12+, se o Qt do sistema for mais antigo. |
 
 Os exemplos usam dados fictícios em homologação e terminam antes da transmissão: nenhum documento é enviado à
-SEFAZ. Os XMLs ficam em `build/emissao`, dentro da pasta do exemplo. Os três exemplos geram o mesmo XML.
+SEFAZ. Os XMLs ficam em `build/emissao`, dentro da pasta do exemplo.
 
 ## Dependências nativas
 
@@ -165,6 +167,11 @@ with Session() as session:
 O pacote procura a biblioteca nativa em `CROSSNFE_LIBRARY`, na própria pasta e nas duas pastas acima dela. Veja
 [python/README.md](python/README.md).
 
+### PHP
+
+O exemplo PHP usa `child()` para navegar nos grupos e `get()` e `set()` para acessar os campos.
+Veja a configuração do FFI e o fluxo completo no [README do PHP](php/README.md).
+
 ## Convenções
 
 - Os nomes dos objetos e campos seguem a CppNFe, inclusive a capitalização (`infNFe`, `det`, `prod`, `cProd`).
@@ -182,11 +189,10 @@ O pacote procura a biblioteca nativa em `CROSSNFE_LIBRARY`, na própria pasta e 
 - Windows x64 (MSVC) e Linux x64.
 - Quatro propriedades ainda ficam fora da interface: `ConfWebServices.protocoloSSL`, `ConfWebServices.proxy`,
   `GCompraGov.refDFeAnt` e `GPagAntecipado.refNFe`.
-- Os exemplos cobrem geração, releitura, assinatura e validação. Transmissão, consulta, cancelamento e
-  inutilização usam a mesma API, mas não fazem parte dos exemplos. Veja o exemplo `consoleNFe` em C++, em
-  [`examples/`](../examples).
+- A ABI 1 cobre geração, releitura, assinatura e validação. Para transmissão, consulta, cancelamento e
+  inutilização, veja os exemplos nativos de C++ em [`examples/`](../examples).
 
 ## Licenças
 
 A CppBrasil e a CrossNFe são distribuídas sob a Apache License 2.0. O Qt segue a licença do próprio Qt. Os
-textos completos estão na pasta `licencas/` de cada exemplo.
+textos completos estão em [`csharp/licencas/`](csharp/licencas/).
