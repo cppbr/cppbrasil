@@ -207,6 +207,8 @@ assinatura e a validação funcionem.
 
 ## Exemplos
 
+Veja o [guia dos exemplos com capturas de tela](examples/README.md).
+
 Os alvos `consoleNFe` e `widgetsNFe` compilam a biblioteca junto, a partir de `src/`.
 O exemplo gráfico requer o módulo Qt Widgets. Use `-DCPPBRASIL_EXAMPLES_WIDGETS=OFF` para compilar só o console.
 
