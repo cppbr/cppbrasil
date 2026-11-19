@@ -17,8 +17,16 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
   a usar apenas a `CppNFe.dll` (compilação Release), sem a `CppBase.dll`.
 - A distribuição Windows x64 da CrossNFe e dos exemplos em C# e Java
   passa a usar binários MSVC com OpenSSL 3.5.9.
+- Os nomes `TPag::Crediario` (`05`) e `TPag::PixDinamico` (`17`) identificam
+  os meios de pagamento da tabela atual. `TPag::CreditoLoja` e `TPag::Pix`
+  continuam disponíveis com os valores anteriores.
 
 ### Adicionado
+
+- Leitura e gravação dos meios de pagamento `tPag` de `20` a `24`
+  (IT 2024.002 v1.11), com descrição no DANFE.
+- Conversão de `procEmi=4`, código de emissão por Provedor de Assinatura
+  e Autorização (PAA), conforme a NT 2026.001.
 
 #### Exemplo Qt Widgets
 
@@ -735,6 +743,9 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
+
+- O conversor de `tpEmis` recusa o código `8` da SVC-SP para NF-e e NFC-e.
+  O enumerador `Contingencia_SVCSP` foi descontinuado.
 
 - O indicador de pagamento `indPag` no XML usa `0` para pagamento à vista
   e `1` para pagamento a prazo. **Quebra de compatibilidade em C++:**

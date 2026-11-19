@@ -52,8 +52,9 @@ enum class TpImp {None = -1, SemGeracao = 0, Retrato = 1, Paisagem = 2,
 enum class TpEmis {None = -1, Normal = 1, Contingencia_FSIA = 2,
                    RegimeEspecialNFF_NaoUsarEste = 3, //Antes Contingência SCAN desativado na NT 2015/002. Agora Regime Especial NFF (NT 2021.002)
                    Contingencia_EPEC = 4, Contingencia_FSDA = 5, Contingencia_SVCAN = 6,
-                   Contingencia_SVCRS = 7, Contingencia_SVCSP = 8, Contingencia_Offline = 9,
-                   Contingencia_NFCe = Contingencia_Offline};
+                   Contingencia_SVCRS = 7, Contingencia_Offline = 9,
+                   Contingencia_NFCe = Contingencia_Offline,
+                   Contingencia_SVCSP [[deprecated("tpEmis=8 não é válido para NF-e/NFC-e")]] = 8};
 //finNFe - Finalidade de emissão da NF-e
 enum class FinNFe {None = -1, Normal = 1, Complementar = 2, Ajuste = 3, Devolucao = 4,
                    NotaCredito = 5, NotaDebito = 6};
@@ -93,7 +94,7 @@ enum class IndIntermed {None = -1, SemIntermediador = 0, SitePlataformaTerceiros
 
 //procEmi - Processo de emissão da NF-e
 enum class ProcEmi {None = -1, AplicativoContribuinte = 0, AvulsaFisco = 1,
-                   AvulsaContribuinte = 2, ContribuinteAplicativoFisco = 3};
+                   AvulsaContribuinte = 2, ContribuinteAplicativoFisco = 3, ProvedorAssinaturaAutorizacao = 4};
 
 //CRT - Código de Regime Tributário
 enum class Crt {None = -1, SimplesNacional = 1, SimplesExcesso = 2, RegimeNormal = 3, SimplesMEI = 4};
@@ -204,11 +205,14 @@ enum class IndPag {None = -1, PagamentoAVista = 0, PagamentoAPrazo = 1};
 
 //tPag - Meio de pagamento
 enum class TPag {None = -1, Dinheiro = 1, Cheque = 2, CartaoCredito = 3,
-                CartaoDebito = 4, CreditoLoja = 5, ValeAlimentacao = 10,
+                CartaoDebito = 4, Crediario = 5, ValeAlimentacao = 10,
                 ValeRefeicao = 11, ValePresente = 12, ValeCombustivel = 13,
                 DuplicataMercanti = 14, BoletoBancario = 15, DepositoBancario = 16,
-                Pix = 17, TranferenciaBancaria = 18, ProgramaFidelidade = 19,
-                SemPagamento = 90, PagamentoPosterior = 91, Outros = 99};
+                PixDinamico = 17, TranferenciaBancaria = 18, ProgramaFidelidade = 19,
+                PixEstatico = 20, CreditoEmLoja = 21, PagamentoEletronicoNaoInformado = 22,
+                PixAutomatico = 23, TefBookTransfer = 24,
+                SemPagamento = 90, PagamentoPosterior = 91, Outros = 99,
+                CreditoLoja = Crediario, Pix = PixDinamico};
 
 //tpIntegra - Tipo de Integração para pagamento
 enum class TpIntegra {None = -1, PagamentoIntegrado = 1, PagamentoNaoIntegrado = 2};

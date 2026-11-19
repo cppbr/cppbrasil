@@ -63,8 +63,8 @@ QString CppDanfe::tPagToNome(const TPag &tPag)
         case TPag::CartaoDebito:
             return "Cartao de Debito";
             break;
-        case TPag::CreditoLoja:
-            return "Credito da Loja";
+        case TPag::Crediario:
+            return "Crediario";
             break;
         case TPag::ValeAlimentacao:
             return "Vale Alimentacao";
@@ -84,8 +84,8 @@ QString CppDanfe::tPagToNome(const TPag &tPag)
         case TPag::DepositoBancario:
             return "Deposito Bancario";
             break;
-        case TPag::Pix:
-            return "Pix";
+        case TPag::PixDinamico:
+            return "Pix dinamico";
             break;
         case TPag::TranferenciaBancaria:
             return "Tranferencia Bancaria";
@@ -93,6 +93,16 @@ QString CppDanfe::tPagToNome(const TPag &tPag)
         case TPag::ProgramaFidelidade:
             return "Programa de Fidelidade";
             break;
+        case TPag::PixEstatico:
+            return "Pix estatico";
+        case TPag::CreditoEmLoja:
+            return "Credito em loja";
+        case TPag::PagamentoEletronicoNaoInformado:
+            return "Pagamento eletronico nao informado";
+        case TPag::PixAutomatico:
+            return "Pix automatico";
+        case TPag::TefBookTransfer:
+            return "TEF - Book Transfer";
         case TPag::SemPagamento:
             return "Sem Pagamento";
             break;

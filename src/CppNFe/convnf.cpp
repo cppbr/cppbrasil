@@ -197,15 +197,15 @@ TpImp ConvNF::strToTpImp(const QString &value)
 
 QString ConvNF::tpEmisToStr(const TpEmis &value)
 {
-    if (value == TpEmis::None)
+    const int codigo = static_cast<int>(value);
+    if (codigo < 1 || codigo == 8 || codigo > 9)
         return QString();
-    else
-        return QString::number(static_cast<int>(value));
+    return QString::number(codigo);
 }
 
 TpEmis ConvNF::strToTpEmis(const QString &value)
 {
-    QList<QString> _r = {"-1","1","2","3","4","5","6","7","8","9"};
+    QList<QString> _r = {"-1","1","2","3","4","5","6","7","9"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TpEmis::None;
@@ -436,7 +436,7 @@ QString ConvNF::procEmiToStr(const ProcEmi &value)
 
 ProcEmi ConvNF::strToProcEmi(const QString &value)
 {
-    QList<QString> _r = {"-1","0","1","2","3"};
+    QList<QString> _r = {"-1","0","1","2","3","4"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return ProcEmi::None;
@@ -915,7 +915,8 @@ QString ConvNF::tPagToStr(const TPag &value)
 TPag ConvNF::strToTPag(const QString &value)
 {
     QList<QString> _r = {"-1","01","02","03","04","05","10","11","12",
-                         "13","14","15","16","17","18","19","90","91","99"};
+                         "13","14","15","16","17","18","19","20","21","22",
+                         "23","24","90","91","99"};
     int _i = _r.indexOf(value);
     if (_i == -1 || value.isEmpty())
         return TPag::None;
