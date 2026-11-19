@@ -4,7 +4,7 @@ A CrossNFe é a interface que permite usar a CppNFe em C#, Java, Python, PHP e o
 uma biblioteca nativa. O núcleo fiscal continua na CppNFe. A aplicação navega pelos mesmos objetos e coleções
 do C++.
 
-Versão 0.1.0, ABI 1. Binários para Windows x64 e Linux x64.
+Versão 0.1.0, ABI 1. Binários incluídos para Windows x64.
 
 ## Conteúdo da pasta
 
@@ -12,15 +12,14 @@ Versão 0.1.0, ABI 1. Binários para Windows x64 e Linux x64.
 | --- | --- |
 | `crossnfe.dll` | Biblioteca nativa da CrossNFe para Windows x64 (MSVC, Release). |
 | `CppNFe.dll` | Biblioteca da CppBrasil usada pela `crossnfe.dll`. Já inclui a base comum (`CppBase`). |
-| `libcrossnfe.so` | Biblioteca nativa da CrossNFe para Linux x64 (GCC, Release). |
-| `libCppNFe.so` | Biblioteca da CppBrasil usada pela `libcrossnfe.so`. Já inclui a base comum (`CppBase`). |
 | [`csharp/`](csharp/README.md) | Exemplo em C# (.NET 10) com o binding `CrossNFe.Managed.dll`. |
 | [`java/`](java/README.md) | Exemplo em Java (JDK 22+, API FFM) com o binding `crossnfe.jar`. |
 | [`python/`](python/README.md) | Binding Python (`crossnfe`, ctypes) com exemplo e testes. |
 | [`php/`](php/README.md) | Exemplo em PHP CLI com FFI e acesso à ABI nativa. |
 
-No Windows, os exemplos em C# e Java trazem a própria cópia da `crossnfe.dll`. No Linux, todos usam as
-bibliotecas desta pasta. O exemplo PHP usa os binários desta pasta nas duas plataformas.
+No Windows, os exemplos em C# e Java trazem a própria cópia da `crossnfe.dll` e o exemplo PHP usa os
+binários desta pasta. Para executar os exemplos no Linux, compile `libcrossnfe.so` e `libCppNFe.so`
+no Linux e coloque as duas bibliotecas nesta pasta.
 
 ## Início rápido
 

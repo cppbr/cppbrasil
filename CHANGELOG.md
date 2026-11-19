@@ -39,10 +39,9 @@ As alterações ainda sem versão de lançamento estão agrupadas em **Não publ
   uma NF-e modelo 55, com opção de assinar e validar pelo XSD. Os exemplos
   incluem a DLL nativa da CrossNFe, os bindings de cada linguagem e
   instruções para configurar as dependências no Windows x64.
-- Distribuição Linux x64 da CrossNFe em `tools/`: `libcrossnfe.so` e
-  `libCppNFe.so` (RUNPATH `$ORIGIN`, Qt 6.12+). Os exemplos em C# e Java
-  passam a funcionar também no Linux, com scripts `executar.sh`; o projeto
-  C# copia as bibliotecas Linux para a saída da compilação.
+- Os exemplos em C# e Java incluem scripts `executar.sh` para Linux e usam
+  `libcrossnfe.so` e `libCppNFe.so` compiladas no Linux. O projeto C# copia as
+  bibliotecas para a saída da compilação.
 - Binding Python da CrossNFe em `tools/python` (pacote `crossnfe`, só
   `ctypes`, Windows x64 e Linux x64), com modelos tipados gerados a partir
   dos cabeçalhos, coleções iteráveis, exemplo de emissão equivalente aos de
@@ -736,6 +735,11 @@ A **inserção de dados não muda**: continue preenchendo `obj` e chamando `add(
   exemplos passam a exigir o Qt 6.5 ou superior.
 
 ### Corrigido
+
+- O indicador de pagamento `indPag` no XML usa `0` para pagamento à vista
+  e `1` para pagamento a prazo. **Quebra de compatibilidade em C++:**
+  substitua `IndPag::aVista` e `IndPag::aPrazo` por `IndPag::PagamentoAVista`
+  e `IndPag::PagamentoAPrazo`, respectivamente.
 
 #### Eventos de entrega da NF-e — NT 2021.001 e NT 2023.005
 

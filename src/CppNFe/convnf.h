@@ -200,7 +200,7 @@ enum class ModFrete {None = -1, PorContaRemetente = 0, PorContaDestinatario = 1,
                            ProprioContaDestinatario = 4, SemFrete = 9};
 
 //indPag - Indicador da Forma de Pagamento
-enum class IndPag {None = -1, aVista = 1, aPrazo = 2};
+enum class IndPag {None = -1, PagamentoAVista = 0, PagamentoAPrazo = 1};
 
 //tPag - Meio de pagamento
 enum class TPag {None = -1, Dinheiro = 1, Cheque = 2, CartaoCredito = 3,
